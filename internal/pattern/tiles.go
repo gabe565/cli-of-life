@@ -24,6 +24,7 @@ var (
 	ErrMissingTerminator = errors.New("missing terminator")
 	ErrOverflow          = errors.New("overflow")
 	ErrUnknownExtension  = errors.New("unknown pattern extension")
+	ErrUnsupportedRule   = errors.New("unsupported rule designation")
 )
 
 const (

@@ -7,6 +7,7 @@ import (
 	"io"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 func UnmarshalRLE(r io.Reader) ([][]int, error) {
@@ -20,10 +21,13 @@ scan:
 			continue
 		}
 		if bytes.HasPrefix(line, []byte("x = ")) {
-			rleHeaderRe := regexp.MustCompile(`^x *= *(\d+), *y *= *(\d+)`)
+			rleHeaderRe := regexp.MustCompile(`^x *= *(\d+), *y *= *(\d+)(?:, *rule *= *(.+))?`)
 			matches := rleHeaderRe.FindAllStringSubmatch(scanner.Text(), -1)
 			if len(matches) == 0 {
 				return nil, fmt.Errorf("rle: %w", ErrInvalidHeader)
+			}
+			if matches[0][3] != "" && strings.ToUpper(matches[0][3]) != "B3/S23" {
+				return nil, fmt.Errorf("rle: %w: %s", ErrUnsupportedRule, matches[0][3])
 			}
 			w, err := strconv.Atoi(matches[0][1])
 			if err != nil {
