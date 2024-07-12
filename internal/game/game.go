@@ -101,12 +101,14 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			if len(g.tiles) < g.h {
 				// Increase height
-				g.tiles = slices.Grow(g.tiles, g.h-len(g.tiles))
-				for range g.h - len(g.tiles) {
-					g.tiles = append(g.tiles, make([]int, g.w))
-				}
+				diff := g.h - len(g.tiles)
+				g.tiles = slices.Grow(g.tiles, diff)
+				g.tiles = slices.Insert(g.tiles, 0, make([][]int, diff/2)...)
+				g.tiles = append(g.tiles, make([][]int, (diff+1)/2)...)
 			} else {
 				// Decrease height
+				diff := len(g.tiles) - g.h
+				g.tiles = slices.Delete(g.tiles, 0, diff/2)
 				g.tiles = g.tiles[:g.h]
 			}
 
@@ -114,9 +116,13 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if len(g.tiles[i]) < g.w {
 					// Increase width
 					diff := g.w - len(g.tiles[i])
-					g.tiles[i] = append(g.tiles[i], make([]int, diff)...)
+					g.tiles[i] = slices.Grow(g.tiles[i], diff)
+					g.tiles[i] = slices.Insert(g.tiles[i], 0, make([]int, diff/2)...)
+					g.tiles[i] = append(g.tiles[i], make([]int, (diff+1)/2)...)
 				} else {
 					// Decrease width
+					diff := len(g.tiles[i]) - g.w
+					g.tiles[i] = slices.Delete(g.tiles[i], 0, diff/2)
 					g.tiles[i] = g.tiles[i][:g.w]
 				}
 			}
