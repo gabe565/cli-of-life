@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -19,12 +20,14 @@ func New() Game {
 type Game struct {
 	w, h   int
 	tiles  [][]int
+	ctx    context.Context
+	cancel context.CancelFunc
 	keymap keymap
 	help   help.Model
 }
 
 func (g Game) Init() tea.Cmd {
-	return Tick
+	return nil
 }
 
 func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -74,7 +77,7 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		}
-		return g, Tick
+		return g, Tick(g.ctx)
 	case tea.WindowSizeMsg:
 		if msg.Width != 0 && msg.Height != 0 {
 			g.w, g.h = msg.Width, msg.Height-1
@@ -92,6 +95,15 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case tea.KeyMsg:
 		switch {
+		case key.Matches(msg, g.keymap.playPause):
+			if g.ctx == nil {
+				g.ctx, g.cancel = context.WithCancel(context.Background())
+				return g, Tick(g.ctx)
+			} else {
+				g.cancel()
+				g.ctx = nil
+				g.cancel = nil
+			}
 		case key.Matches(msg, g.keymap.reset):
 			for _, row := range g.tiles {
 				for i := range row {
@@ -125,7 +137,13 @@ func (g Game) View() string {
 
 type tick struct{}
 
-func Tick() tea.Msg {
-	time.Sleep(time.Second / 30)
-	return tick{}
+func Tick(ctx context.Context) tea.Cmd {
+	return func() tea.Msg {
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-time.After(time.Second / 30):
+			return tick{}
+		}
+	}
 }
