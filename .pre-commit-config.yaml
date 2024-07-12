@@ -5,3 +5,11 @@ repos:
       - id: go-mod-tidy-repo
       - id: golangci-lint-mod
         args: [--fix]
+
+  - repo: local
+    hooks:
+      - id: usage-docs
+        name: usage-docs
+        entry: go run -tags rand_insecure_for_docs ./internal/generate/docs
+        language: system
+        pass_filenames: false

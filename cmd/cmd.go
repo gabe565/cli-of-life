@@ -13,11 +13,13 @@ import (
 
 func New() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "cli-of-life",
-		RunE: run,
-		Args: cobra.NoArgs,
+		Use:   "cli-of-life",
+		Short: "Play Conway's Game of Life in your terminal",
+		RunE:  run,
+		Args:  cobra.NoArgs,
 
 		ValidArgsFunction: cobra.NoFileCompletions,
+		DisableAutoGenTag: true,
 	}
 
 	cmd.Flags().StringP(config.FileFlag, "f", "", "Loads a pattern file on startup")
