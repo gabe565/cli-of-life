@@ -12,6 +12,18 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+//nolint:gochecknoglobals
+var speeds = []time.Duration{
+	time.Second,
+	time.Second / 2,
+	time.Second / 4,
+	time.Second / 10,
+	time.Second / 20,
+	time.Second / 30,
+	time.Second / 40,
+	time.Second / 60,
+}
+
 type Mode uint8
 
 const (
@@ -25,6 +37,7 @@ func New(tiles [][]int) Game {
 		keymap: newKeymap(),
 		help:   help.New(),
 		wrap:   true,
+		speed:  5,
 	}
 }
 
@@ -37,6 +50,7 @@ type Game struct {
 	help   help.Model
 	mode   Mode
 	wrap   bool
+	speed  int
 }
 
 func (g Game) Init() tea.Cmd {
@@ -94,7 +108,7 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 		if g.ctx != nil {
-			return g, Tick(g.ctx)
+			return g, Tick(g.ctx, speeds[g.speed])
 		}
 	case tea.WindowSizeMsg:
 		if msg.Width != 0 && msg.Height != 0 {
@@ -147,7 +161,7 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if g.ctx == nil {
 				g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "pause")
 				g.ctx, g.cancel = context.WithCancel(context.Background())
-				return g, Tick(g.ctx)
+				return g, Tick(g.ctx, speeds[g.speed])
 			} else {
 				g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "play")
 				g.cancel()
@@ -170,6 +184,24 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case key.Matches(msg, g.keymap.wrap):
 			g.wrap = !g.wrap
+		case key.Matches(msg, g.keymap.speedUp):
+			if g.speed < len(speeds)-1 {
+				g.speed++
+				if g.ctx != nil {
+					g.cancel()
+					g.ctx, g.cancel = context.WithCancel(context.Background())
+					return g, Tick(g.ctx, speeds[g.speed])
+				}
+			}
+		case key.Matches(msg, g.keymap.speedDown):
+			if g.speed > 0 {
+				g.speed--
+				if g.ctx != nil {
+					g.cancel()
+					g.ctx, g.cancel = context.WithCancel(context.Background())
+					return g, Tick(g.ctx, speeds[g.speed])
+				}
+			}
 		case key.Matches(msg, g.keymap.reset):
 			for _, row := range g.tiles {
 				for i := range row {
@@ -205,7 +237,7 @@ func (g Game) View() string {
 
 type tick struct{}
 
-func Tick(ctx context.Context) tea.Cmd {
+func Tick(ctx context.Context, wait time.Duration) tea.Cmd {
 	return func() tea.Msg {
 		if ctx == nil {
 			return nil
@@ -213,7 +245,7 @@ func Tick(ctx context.Context) tea.Cmd {
 		select {
 		case <-ctx.Done():
 			return nil
-		case <-time.After(time.Second / 30):
+		case <-time.After(wait):
 			return tick{}
 		}
 	}
