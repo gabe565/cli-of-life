@@ -4,21 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"io"
-	"os"
 	"slices"
 )
-
-func UnmarshalPlaintextFile(path string) ([][]int, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		_ = f.Close()
-	}()
-
-	return UnmarshalPlaintext(f)
-}
 
 func UnmarshalPlaintext(r io.Reader) ([][]int, error) {
 	var tiles [][]int

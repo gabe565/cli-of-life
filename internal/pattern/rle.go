@@ -5,22 +5,9 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"os"
 	"regexp"
 	"strconv"
 )
-
-func UnmarshalRLEFile(path string) ([][]int, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		_ = f.Close()
-	}()
-
-	return UnmarshalRLE(f)
-}
 
 func UnmarshalRLE(r io.Reader) ([][]int, error) {
 	var tiles [][]int
