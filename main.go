@@ -9,7 +9,7 @@ import (
 
 func main() {
 	program := tea.NewProgram(
-		Game{},
+		New(),
 		tea.WithAltScreen(),
 		tea.WithMouseCellMotion(),
 	)

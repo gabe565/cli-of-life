@@ -4,12 +4,23 @@ import (
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+func New() Game {
+	return Game{
+		keymap: newKeymap(),
+		help:   help.New(),
+	}
+}
+
 type Game struct {
-	w, h  int
-	tiles [][]int
+	w, h   int
+	tiles  [][]int
+	keymap keymap
+	help   help.Model
 }
 
 func (g Game) Init() tea.Cmd {
@@ -65,10 +76,12 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return g, Tick
 	case tea.WindowSizeMsg:
-		g.w, g.h = msg.Width, msg.Height-1
-		g.tiles = make([][]int, g.h)
-		for i := range g.h {
-			g.tiles[i] = make([]int, g.w)
+		if msg.Width != 0 && msg.Height != 0 {
+			g.w, g.h = msg.Width, msg.Height-1
+			g.tiles = make([][]int, g.h)
+			for i := range g.h {
+				g.tiles[i] = make([]int, g.w)
+			}
 		}
 	case tea.MouseMsg:
 		switch msg.Action {
@@ -78,14 +91,14 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "r":
+		switch {
+		case key.Matches(msg, g.keymap.reset):
 			for _, row := range g.tiles {
 				for i := range row {
 					row[i] = 0
 				}
 			}
-		case "ctrl+c", "q", "esc":
+		case key.Matches(msg, g.keymap.quit):
 			return g, tea.Quit
 		}
 	}
@@ -107,7 +120,7 @@ func (g Game) View() string {
 			view.WriteByte('\n')
 		}
 	}
-	return view.String()
+	return view.String() + g.help.ShortHelpView(g.keymap.ShortHelp())
 }
 
 type tick struct{}
