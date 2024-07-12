@@ -19,8 +19,9 @@ const (
 	ModeErase
 )
 
-func New() Game {
+func New(tiles [][]int) Game {
 	return Game{
+		tiles:  tiles,
 		keymap: newKeymap(),
 		help:   help.New(),
 		wrap:   true,

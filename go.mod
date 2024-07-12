@@ -5,6 +5,7 @@ go 1.22.5
 require (
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.6
+	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
 )
 
