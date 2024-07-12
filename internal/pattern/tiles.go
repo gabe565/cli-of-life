@@ -26,6 +26,11 @@ var (
 	ErrUnknownExtension  = errors.New("unknown pattern extension")
 )
 
+const (
+	ExtRLE       = ".rle"
+	ExtPlaintext = ".cells"
+)
+
 func UnmarshalFile(path string, format Format) ([][]int, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -37,9 +42,9 @@ func UnmarshalFile(path string, format Format) ([][]int, error) {
 
 	ext := filepath.Ext(path)
 	switch {
-	case format == FormatRLE, ext == ".rle":
+	case format == FormatRLE, ext == ExtRLE:
 		return UnmarshalRLE(f)
-	case format == FormatPlaintext, ext == ".cells":
+	case format == FormatPlaintext, ext == ExtPlaintext:
 		return UnmarshalPlaintext(f)
 	default:
 		return nil, fmt.Errorf("%w: %s", ErrUnknownExtension, filepath.Ext(path))

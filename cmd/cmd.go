@@ -25,7 +25,7 @@ func New() *cobra.Command {
 	if err := errors.Join(
 		cmd.RegisterFlagCompletionFunc(config.FileFlag,
 			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-				return []string{".rle", ".cells"}, cobra.ShellCompDirectiveFilterFileExt
+				return []string{pattern.ExtRLE, pattern.ExtPlaintext}, cobra.ShellCompDirectiveFilterFileExt
 			},
 		),
 		cmd.RegisterFlagCompletionFunc(config.FileFormatFlag,
