@@ -22,6 +22,7 @@ func New() Game {
 	return Game{
 		keymap: newKeymap(),
 		help:   help.New(),
+		wrap:   true,
 	}
 }
 
@@ -33,6 +34,7 @@ type Game struct {
 	keymap keymap
 	help   help.Model
 	mode   Mode
+	wrap   bool
 }
 
 func (g Game) Init() tea.Cmd {
@@ -54,19 +56,25 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				var neighbors int
 				for _, d := range directions {
 					nx, ny := x+d.X, y+d.Y
-					switch {
-					case nx < 0:
-						nx = len(row) - 1
-					case nx > len(row)-1:
-						nx = 0
+					if g.wrap {
+						switch {
+						case nx < 0:
+							nx = len(row) - 1
+						case nx > len(row)-1:
+							nx = 0
+						}
+						switch {
+						case ny < 0:
+							ny = len(g.tiles) - 1
+						case ny > len(g.tiles)-1:
+							ny = 0
+						}
+						neighbors += g.tiles[ny][nx]
+					} else {
+						if ny >= 0 && ny < len(g.tiles) && nx >= 0 && nx < len(g.tiles[ny]) {
+							neighbors += g.tiles[ny][nx]
+						}
 					}
-					switch {
-					case ny < 0:
-						ny = len(g.tiles) - 1
-					case ny > len(g.tiles)-1:
-						ny = 0
-					}
-					neighbors += g.tiles[ny][nx]
 				}
 
 				switch {
@@ -127,6 +135,8 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				g.mode = ModePlace
 				g.keymap.placeErase.SetHelp(g.keymap.placeErase.Help().Key, "erase")
 			}
+		case key.Matches(msg, g.keymap.wrap):
+			g.wrap = !g.wrap
 		case key.Matches(msg, g.keymap.reset):
 			for _, row := range g.tiles {
 				for i := range row {
