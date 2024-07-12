@@ -97,9 +97,11 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, g.keymap.playPause):
 			if g.ctx == nil {
+				g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "pause")
 				g.ctx, g.cancel = context.WithCancel(context.Background())
 				return g, Tick(g.ctx)
 			} else {
+				g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "play")
 				g.cancel()
 				g.ctx, g.cancel = nil, nil
 			}

@@ -8,7 +8,7 @@ func newKeymap() keymap {
 	return keymap{
 		playPause: key.NewBinding(
 			key.WithKeys(" ", "enter"),
-			key.WithHelp("space", "play/pause"),
+			key.WithHelp("space", "play"),
 		),
 		reset: key.NewBinding(
 			key.WithKeys("r"),
