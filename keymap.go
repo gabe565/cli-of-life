@@ -10,6 +10,10 @@ func newKeymap() keymap {
 			key.WithKeys(" ", "enter"),
 			key.WithHelp("space", "play"),
 		),
+		placeErase: key.NewBinding(
+			key.WithKeys("m"),
+			key.WithHelp("m", "erase"),
+		),
 		reset: key.NewBinding(
 			key.WithKeys("r"),
 			key.WithHelp("r", "reset"),
@@ -22,14 +26,16 @@ func newKeymap() keymap {
 }
 
 type keymap struct {
-	playPause key.Binding
-	reset     key.Binding
-	quit      key.Binding
+	playPause  key.Binding
+	placeErase key.Binding
+	reset      key.Binding
+	quit       key.Binding
 }
 
 func (k keymap) ShortHelp() []key.Binding {
 	return []key.Binding{
 		k.playPause,
+		k.placeErase,
 		k.reset,
 		k.quit,
 	}

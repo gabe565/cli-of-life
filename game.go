@@ -11,6 +11,13 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type Mode uint8
+
+const (
+	ModePlace Mode = iota
+	ModeErase
+)
+
 func New() Game {
 	return Game{
 		keymap: newKeymap(),
@@ -25,6 +32,7 @@ type Game struct {
 	cancel context.CancelFunc
 	keymap keymap
 	help   help.Model
+	mode   Mode
 }
 
 func (g Game) Init() tea.Cmd {
@@ -90,7 +98,12 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Action {
 		case tea.MouseActionPress, tea.MouseActionMotion:
 			if len(g.tiles) > msg.Y && len(g.tiles[msg.Y]) > msg.X {
-				g.tiles[msg.Y][msg.X] = 1
+				switch g.mode {
+				case ModePlace:
+					g.tiles[msg.Y][msg.X] = 1
+				case ModeErase:
+					g.tiles[msg.Y][msg.X] = 0
+				}
 			}
 		}
 	case tea.KeyMsg:
@@ -104,6 +117,15 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "play")
 				g.cancel()
 				g.ctx, g.cancel = nil, nil
+			}
+		case key.Matches(msg, g.keymap.placeErase):
+			switch g.mode {
+			case ModePlace:
+				g.mode = ModeErase
+				g.keymap.placeErase.SetHelp(g.keymap.placeErase.Help().Key, "place")
+			case ModeErase:
+				g.mode = ModePlace
+				g.keymap.placeErase.SetHelp(g.keymap.placeErase.Help().Key, "erase")
 			}
 		case key.Matches(msg, g.keymap.reset):
 			for _, row := range g.tiles {
