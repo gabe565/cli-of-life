@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"image"
 	"strings"
 	"time"
 
@@ -30,34 +31,23 @@ func (g Game) Init() tea.Cmd {
 	return nil
 }
 
+//nolint:gochecknoglobals
+var directions = []image.Point{
+	image.Pt(-1, -1), image.Pt(-1, 0), image.Pt(-1, 1),
+	image.Pt(0, -1), image.Pt(0, 1),
+	image.Pt(1, -1), image.Pt(1, 0), image.Pt(1, 1),
+}
+
 func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tick:
 		for y, row := range g.tiles {
 			for x, cell := range row {
 				var neighbors int
-				if y > 0 {
-					if x > 0 {
-						neighbors += g.tiles[y-1][x-1]
-					}
-					neighbors += g.tiles[y-1][x]
-					if x < len(row)-1 {
-						neighbors += g.tiles[y-1][x+1]
-					}
-				}
-				if x > 0 {
-					neighbors += row[x-1]
-				}
-				if x < len(row)-1 {
-					neighbors += row[x+1]
-				}
-				if y < len(g.tiles)-1 {
-					if x > 0 {
-						neighbors += g.tiles[y+1][x-1]
-					}
-					neighbors += g.tiles[y+1][x]
-					if x < len(row)-1 {
-						neighbors += g.tiles[y+1][x+1]
+				for _, d := range directions {
+					nx, ny := x+d.X, y+d.Y
+					if ny >= 0 && ny < len(g.tiles) && nx >= 0 && nx < len(g.tiles[ny]) {
+						neighbors += g.tiles[ny][nx]
 					}
 				}
 
