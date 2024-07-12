@@ -22,6 +22,8 @@ func New() *cobra.Command {
 
 	cmd.Flags().StringP(config.FileFlag, "f", "", "Loads a pattern file on startup")
 	cmd.Flags().String(config.FileFormatFlag, "auto", "File format (one of: "+strings.Join(pattern.FormatStrings(), ", ")+")")
+	cmd.Flags().String(config.CompletionFlag, "", "Output command-line completion code for the specified shell. Can be 'bash', 'zsh', 'fish', or 'powershell'.")
+
 	if err := errors.Join(
 		cmd.RegisterFlagCompletionFunc(config.FileFlag,
 			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
@@ -36,8 +38,6 @@ func New() *cobra.Command {
 	); err != nil {
 		panic(err)
 	}
-
-	cmd.Flags().String(config.CompletionFlag, "", "Output command-line completion code for the specified shell. Can be 'bash', 'zsh', 'fish', or 'powershell'.")
 
 	return cmd
 }
