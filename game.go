@@ -101,8 +101,7 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return g, Tick(g.ctx)
 			} else {
 				g.cancel()
-				g.ctx = nil
-				g.cancel = nil
+				g.ctx, g.cancel = nil, nil
 			}
 		case key.Matches(msg, g.keymap.reset):
 			for _, row := range g.tiles {
@@ -139,6 +138,9 @@ type tick struct{}
 
 func Tick(ctx context.Context) tea.Cmd {
 	return func() tea.Msg {
+		if ctx == nil {
+			return nil
+		}
 		select {
 		case <-ctx.Done():
 			return nil
