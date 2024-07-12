@@ -5,11 +5,12 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/gabe565/cli-of-life/internal/game"
 )
 
 func main() {
 	program := tea.NewProgram(
-		New(),
+		game.New(),
 		tea.WithAltScreen(),
 		tea.WithMouseCellMotion(),
 	)
