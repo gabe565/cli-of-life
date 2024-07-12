@@ -3,6 +3,7 @@ package game
 import (
 	"context"
 	"image"
+	"slices"
 	"strings"
 	"time"
 
@@ -97,9 +98,27 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		if msg.Width != 0 && msg.Height != 0 {
 			g.w, g.h = msg.Width, msg.Height-1
-			g.tiles = make([][]int, g.h)
+
+			if len(g.tiles) < g.h {
+				// Increase height
+				g.tiles = slices.Grow(g.tiles, g.h-len(g.tiles))
+				for range g.h - len(g.tiles) {
+					g.tiles = append(g.tiles, make([]int, g.w))
+				}
+			} else {
+				// Decrease height
+				g.tiles = g.tiles[:g.h]
+			}
+
 			for i := range g.h {
-				g.tiles[i] = make([]int, g.w)
+				if len(g.tiles[i]) < g.w {
+					// Increase width
+					diff := g.w - len(g.tiles[i])
+					g.tiles[i] = append(g.tiles[i], make([]int, diff)...)
+				} else {
+					// Decrease width
+					g.tiles[i] = g.tiles[i][:g.w]
+				}
 			}
 		}
 	case tea.MouseMsg:
