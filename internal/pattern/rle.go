@@ -3,7 +3,7 @@ package pattern
 import (
 	"bufio"
 	"bytes"
-	"errors"
+	"fmt"
 	"io"
 	"os"
 	"regexp"
@@ -22,12 +22,6 @@ func UnmarshalRLEFile(path string) ([][]int, error) {
 	return UnmarshalRLE(f)
 }
 
-var (
-	ErrInvalidHeader     = errors.New("rle: invalid header")
-	ErrMissingTerminator = errors.New("rle: missing terminator")
-	ErrOverflow          = errors.New("rle: overflow")
-)
-
 func UnmarshalRLE(r io.Reader) ([][]int, error) {
 	var tiles [][]int
 	scanner := bufio.NewScanner(r)
@@ -42,7 +36,7 @@ scan:
 			rleHeaderRe := regexp.MustCompile(`^x *= *(\d+), *y *= *(\d+)`)
 			matches := rleHeaderRe.FindAllStringSubmatch(scanner.Text(), -1)
 			if len(matches) == 0 {
-				return nil, ErrInvalidHeader
+				return nil, fmt.Errorf("rle: %w", ErrInvalidHeader)
 			}
 			w, err := strconv.Atoi(matches[0][1])
 			if err != nil {
@@ -77,7 +71,7 @@ scan:
 			case 'b':
 				for range runCount {
 					if y > len(tiles)-1 || x > len(tiles[0])-1 {
-						return nil, ErrOverflow
+						return nil, fmt.Errorf("rle: %w", ErrOverflow)
 					}
 					tiles[y][x] = 0
 					x++
@@ -85,7 +79,7 @@ scan:
 			case 'o':
 				for range runCount {
 					if y > len(tiles)-1 || x > len(tiles[0])-1 {
-						return nil, ErrOverflow
+						return nil, fmt.Errorf("rle: %w", ErrOverflow)
 					}
 					tiles[y][x] = 1
 					x++
@@ -104,5 +98,5 @@ scan:
 	if scanner.Err() != nil {
 		return nil, scanner.Err()
 	}
-	return nil, ErrMissingTerminator
+	return nil, fmt.Errorf("rle: %w", ErrMissingTerminator)
 }

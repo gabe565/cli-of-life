@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//go:embed glider.rle
-var gliderRLE []byte
+//go:embed glider.cells
+var gliderPlaintext []byte
 
-func TestUnmarshalRLE(t *testing.T) {
+func TestUnmarshalPlaintext(t *testing.T) {
 	type args struct {
 		r io.Reader
 	}
@@ -23,11 +23,11 @@ func TestUnmarshalRLE(t *testing.T) {
 		want    [][]int
 		wantErr require.ErrorAssertionFunc
 	}{
-		{"glider", args{bytes.NewReader(gliderRLE)}, [][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}}, require.NoError},
+		{"glider", args{bytes.NewReader(gliderPlaintext)}, [][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}}, require.NoError},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := UnmarshalRLE(tt.args.r)
+			got, err := UnmarshalPlaintext(tt.args.r)
 			tt.wantErr(t, err)
 			assert.Equal(t, tt.want, got)
 		})
