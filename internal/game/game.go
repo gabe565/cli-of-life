@@ -93,7 +93,9 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		}
-		return g, Tick(g.ctx)
+		if g.ctx != nil {
+			return g, Tick(g.ctx)
+		}
 	case tea.WindowSizeMsg:
 		if msg.Width != 0 && msg.Height != 0 {
 			g.w, g.h = msg.Width/2, msg.Height-1
@@ -150,6 +152,12 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "play")
 				g.cancel()
 				g.ctx, g.cancel = nil, nil
+			}
+		case key.Matches(msg, g.keymap.tick):
+			if g.ctx == nil {
+				return g, func() tea.Msg {
+					return tick{}
+				}
 			}
 		case key.Matches(msg, g.keymap.placeErase):
 			switch g.mode {
