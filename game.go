@@ -46,9 +46,19 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				var neighbors int
 				for _, d := range directions {
 					nx, ny := x+d.X, y+d.Y
-					if ny >= 0 && ny < len(g.tiles) && nx >= 0 && nx < len(g.tiles[ny]) {
-						neighbors += g.tiles[ny][nx]
+					switch {
+					case nx < 0:
+						nx = len(row) - 1
+					case nx > len(row)-1:
+						nx = 0
 					}
+					switch {
+					case ny < 0:
+						ny = len(g.tiles) - 1
+					case ny > len(g.tiles)-1:
+						ny = 0
+					}
+					neighbors += g.tiles[ny][nx]
 				}
 
 				switch {
