@@ -19,7 +19,7 @@ func New() *cobra.Command {
 
 	cmd.Flags().StringP(config.FileFlag, "f", "", "Loads a pattern file on startup")
 	if err := cmd.RegisterFlagCompletionFunc(config.FileFlag,
-		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 			return []string{".rle", ".cells"}, cobra.ShellCompDirectiveFilterFileExt
 		},
 	); err != nil {
@@ -31,7 +31,7 @@ func New() *cobra.Command {
 	return cmd
 }
 
-func run(cmd *cobra.Command, args []string) error {
+func run(cmd *cobra.Command, _ []string) error {
 	if shell := cmd.Flag(config.CompletionFlag).Value.String(); shell != "" {
 		return completion(cmd, shell)
 	}

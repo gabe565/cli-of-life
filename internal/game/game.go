@@ -72,10 +72,8 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							ny = 0
 						}
 						neighbors += g.tiles[ny][nx]
-					} else {
-						if ny >= 0 && ny < len(g.tiles) && nx >= 0 && nx < len(g.tiles[ny]) {
-							neighbors += g.tiles[ny][nx]
-						}
+					} else if ny >= 0 && ny < len(g.tiles) && nx >= 0 && nx < len(g.tiles[ny]) {
+						neighbors += g.tiles[ny][nx]
 					}
 				}
 
