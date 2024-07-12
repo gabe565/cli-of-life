@@ -97,7 +97,7 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return g, Tick(g.ctx)
 	case tea.WindowSizeMsg:
 		if msg.Width != 0 && msg.Height != 0 {
-			g.w, g.h = msg.Width, msg.Height-1
+			g.w, g.h = msg.Width/2, msg.Height-1
 
 			if len(g.tiles) < g.h {
 				// Increase height
@@ -124,6 +124,7 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.MouseMsg:
 		switch msg.Action {
 		case tea.MouseActionPress, tea.MouseActionMotion:
+			msg.X /= 2
 			if len(g.tiles) > msg.Y && len(g.tiles[msg.Y]) > msg.X {
 				switch g.mode {
 				case ModePlace:
@@ -177,7 +178,9 @@ func (g Game) View() string {
 			for _, cell := range row {
 				if cell == 1 {
 					view.WriteRune('█')
+					view.WriteRune('█')
 				} else {
+					view.WriteByte(' ')
 					view.WriteByte(' ')
 				}
 			}
