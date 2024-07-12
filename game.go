@@ -1,12 +1,14 @@
 package main
 
 import (
+	"strings"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type Game struct {
+	w, h  int
 	tiles [][]int
 }
 
@@ -63,9 +65,10 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return g, Tick
 	case tea.WindowSizeMsg:
-		g.tiles = make([][]int, msg.Height)
-		for i := range msg.Height {
-			g.tiles[i] = make([]int, msg.Width)
+		g.w, g.h = msg.Width, msg.Height-1
+		g.tiles = make([][]int, g.h)
+		for i := range g.h {
+			g.tiles[i] = make([]int, g.w)
 		}
 	case tea.MouseMsg:
 		switch msg.Action {
@@ -90,23 +93,26 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (g Game) View() string {
-	var view string
-	for _, row := range g.tiles {
-		for _, cell := range row {
-			if cell == 1 {
-				view += "█"
-			} else {
-				view += " "
+	var view strings.Builder
+	if len(g.tiles) != 0 {
+		view.Grow(g.w * g.h)
+		for _, row := range g.tiles {
+			for _, cell := range row {
+				if cell == 1 {
+					view.WriteRune('█')
+				} else {
+					view.WriteByte(' ')
+				}
 			}
+			view.WriteByte('\n')
 		}
-		view += "\n"
 	}
-	return view
+	return view.String()
 }
 
 type tick struct{}
 
 func Tick() tea.Msg {
-	time.Sleep(time.Second / 15)
+	time.Sleep(time.Second / 30)
 	return tick{}
 }
