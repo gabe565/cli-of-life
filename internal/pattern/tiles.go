@@ -7,6 +7,18 @@ import (
 	"path/filepath"
 )
 
+type Format string
+
+const (
+	FormatAuto      Format = "auto"
+	FormatRLE       Format = "rle"
+	FormatPlaintext Format = "plaintext"
+)
+
+func FormatStrings() []string {
+	return []string{string(FormatAuto), string(FormatRLE), string(FormatPlaintext)}
+}
+
 var (
 	ErrInvalidHeader     = errors.New("invalid header")
 	ErrMissingTerminator = errors.New("missing terminator")
@@ -14,7 +26,7 @@ var (
 	ErrUnknownExtension  = errors.New("unknown pattern extension")
 )
 
-func UnmarshalFile(path string) ([][]int, error) {
+func UnmarshalFile(path string, format Format) ([][]int, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -23,10 +35,11 @@ func UnmarshalFile(path string) ([][]int, error) {
 		_ = f.Close()
 	}()
 
-	switch filepath.Ext(path) {
-	case ".rle":
+	ext := filepath.Ext(path)
+	switch {
+	case format == FormatRLE, ext == ".rle":
 		return UnmarshalRLE(f)
-	case ".cells":
+	case format == FormatPlaintext, ext == ".cells":
 		return UnmarshalPlaintext(f)
 	default:
 		return nil, fmt.Errorf("%w: %s", ErrUnknownExtension, filepath.Ext(path))

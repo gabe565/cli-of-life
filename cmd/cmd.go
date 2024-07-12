@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"errors"
+	"strings"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gabe565/cli-of-life/internal/config"
 	"github.com/gabe565/cli-of-life/internal/game"
@@ -18,10 +21,18 @@ func New() *cobra.Command {
 	}
 
 	cmd.Flags().StringP(config.FileFlag, "f", "", "Loads a pattern file on startup")
-	if err := cmd.RegisterFlagCompletionFunc(config.FileFlag,
-		func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-			return []string{".rle", ".cells"}, cobra.ShellCompDirectiveFilterFileExt
-		},
+	cmd.Flags().String(config.FileFormatFlag, "auto", "File format (one of: "+strings.Join(pattern.FormatStrings(), ", ")+")")
+	if err := errors.Join(
+		cmd.RegisterFlagCompletionFunc(config.FileFlag,
+			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+				return []string{".rle", ".cells"}, cobra.ShellCompDirectiveFilterFileExt
+			},
+		),
+		cmd.RegisterFlagCompletionFunc(config.FileFormatFlag,
+			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+				return pattern.FormatStrings(), cobra.ShellCompDirectiveNoFileComp
+			},
+		),
 	); err != nil {
 		panic(err)
 	}
@@ -38,8 +49,9 @@ func run(cmd *cobra.Command, _ []string) error {
 
 	var tiles [][]int
 	if file := cmd.Flag(config.FileFlag).Value.String(); file != "" {
+		format := pattern.Format(cmd.Flag(config.FileFormatFlag).Value.String())
 		var err error
-		if tiles, err = pattern.UnmarshalFile(file); err != nil {
+		if tiles, err = pattern.UnmarshalFile(file, format); err != nil {
 			return err
 		}
 	}
