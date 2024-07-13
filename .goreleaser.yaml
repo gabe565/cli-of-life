@@ -3,6 +3,7 @@ project_name: cli-of-life
 before:
   hooks:
     - go run ./internal/generate/completions --date={{ .CommitDate }}
+    - go run ./internal/generate/manpages --version={{ .Version }} --date={{ .CommitDate }}
 builds:
   - env:
       - CGO_ENABLED=0
