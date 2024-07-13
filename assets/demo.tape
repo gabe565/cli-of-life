@@ -4,7 +4,7 @@ Set TypingSpeed 20ms
 
 Set Theme "Builtin Dark"
 # Set Theme "Builtin Light"
-# Set MarginFill "transparent"
+# Set MarginFill "#FFFFFF"
 Set FontSize 14
 Set Width 970
 Set Height 720
