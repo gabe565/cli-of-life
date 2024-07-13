@@ -87,3 +87,74 @@ docker_manifests:
     name_template: ghcr.io/gabe565/{{ .ProjectName }}:{{ .Major }}
   - <<: *docker_manifests
     name_template: ghcr.io/gabe565/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}
+brews:
+  - homepage: https://github.com/gabe565/cli-of-life
+    description: Play Conways Game of Life in your terminal
+    license: Apache2
+    repository:
+      owner: gabe565
+      name: homebrew-tap
+    directory: Formula
+    install: |
+      bin.install "cli-of-life"
+      man1.install "manpages/cli-of-life.1.gz"
+      bash_completion.install "completions/cli-of-life.bash" => "cli-of-life"
+      zsh_completion.install "completions/cli-of-life.zsh" => "_cli-of-life"
+      fish_completion.install "completions/cli-of-life.fish"
+nfpms:
+  - id: packages
+    vendor: Gabe Cook
+    homepage: https://github.com/gabe565/cli-of-life
+    description: Play Conways Game of Life in your terminal
+    license: Apache2
+    maintainer: Gabe Cook <gabe565@gmail.com>
+    formats:
+      - deb
+      - rpm
+    contents:
+      - src: ./manpages/
+        dst: /usr/share/man/man1
+        file_info:
+          mode: 0644
+      - src: ./completions/cli-of-life.bash
+        dst: /usr/share/bash-completion/completions/cli-of-life
+        file_info:
+          mode: 0644
+      - src: ./completions/cli-of-life.fish
+        dst: /usr/share/fish/vendor_completions.d/cli-of-life.fish
+        file_info:
+          mode: 0644
+      - src: ./completions/cli-of-life.zsh
+        dst:  /usr/share/zsh/vendor-completions/_cli-of-life
+        file_info:
+          mode: 0644
+publishers:
+  - name: fury.io
+    ids:
+      - packages
+    dir: "{{ dir .ArtifactPath }}"
+    cmd: curl -sf -Fpackage=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/gabe565/
+aurs:
+  - name: cli-of-life-bin
+    homepage: https://github.com/gabe565/cli-of-life
+    description: Play Conways Game of Life in your terminal
+    maintainers:
+      - Gabe Cook <gabe565@gmail.com>
+    license: Apache2
+    private_key: '{{ .Env.AUR_SSH_KEY }}'
+    git_url: ssh://aur@aur.archlinux.org/cli-of-life-bin.git
+    skip_upload: auto
+    package: |-
+      # bin
+      install -Dm755 "./cli-of-life" "${pkgdir}/usr/bin/cli-of-life"
+      # license
+      install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/cli-of-life/LICENSE"
+      # man pages
+      install -Dm644 "./manpages/cli-of-life.1.gz" "${pkgdir}/usr/share/man/man1/cli-of-life.1.gz"
+      # completions
+      install -Dm644 "./completions/cli-of-life.bash" "${pkgdir}/usr/share/bash-completion/completions/cli-of-life"
+      install -Dm644 "./completions/cli-of-life.zsh" "${pkgdir}/usr/share/zsh/site-functions/_cli-of-life"
+      install -Dm644 "./completions/cli-of-life.fish" "${pkgdir}/usr/share/fish/vendor_completions.d/cli-of-life.fish"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
