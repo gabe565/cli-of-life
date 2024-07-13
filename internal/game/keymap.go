@@ -30,7 +30,7 @@ func newKeymap() keymap {
 		),
 		changeSpeed: key.NewBinding(
 			key.WithKeys("<", ".", ">", ","),
-			key.WithHelp("<>", "change speed"),
+			key.WithHelp("<>", "change speed: 30 fps"),
 		),
 		reset: key.NewBinding(
 			key.WithKeys("r"),
