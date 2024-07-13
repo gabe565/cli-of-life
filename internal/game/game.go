@@ -183,6 +183,34 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				g.mode = ModePlace
 				g.keymap.placeErase.SetHelp(g.keymap.placeErase.Help().Key, "erase")
 			}
+		case key.Matches(msg, g.keymap.moveUp):
+			g.tiles = append(g.tiles[len(g.tiles)-1:], g.tiles[:len(g.tiles)-1]...)
+			if !g.wrap {
+				for i := range g.tiles[0] {
+					g.tiles[0][i] = 0
+				}
+			}
+		case key.Matches(msg, g.keymap.moveLeft):
+			for i, row := range g.tiles {
+				g.tiles[i] = append(row[len(row)-1:], row[:len(row)-1]...)
+				if !g.wrap {
+					g.tiles[i][0] = 0
+				}
+			}
+		case key.Matches(msg, g.keymap.moveDown):
+			g.tiles = append(g.tiles[1:], g.tiles[0])
+			if !g.wrap {
+				for i := range g.tiles[len(g.tiles)-1] {
+					g.tiles[len(g.tiles)-1][i] = 0
+				}
+			}
+		case key.Matches(msg, g.keymap.moveRight):
+			for i, row := range g.tiles {
+				g.tiles[i] = append(row[1:], row[0])
+				if !g.wrap {
+					g.tiles[i][len(row)-1] = 0
+				}
+			}
 		case key.Matches(msg, g.keymap.wrap):
 			g.wrap = !g.wrap
 			if g.wrap {

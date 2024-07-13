@@ -119,6 +119,7 @@ See [usage docs](docs/cli-of-life.md) for cli flag documentation.
 | `Space` | Play/pause                         |
 | `T`     | Tick                               |
 | `M`     | Toggle between placing and erasing |
+| `↑↓←→`  | Move the game board                |
 | `W`     | Toggle wrapping                    |
 | `<`/`>` | Change playback speed              |
 | `R`     | Reset                              |
