@@ -3,7 +3,14 @@
 [![Build](https://github.com/gabe565/cli-of-life/actions/workflows/build.yaml/badge.svg)](https://github.com/gabe565/cli-of-life/actions/workflows/build.yaml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gabe565/cli-of-life)](https://goreportcard.com/report/github.com/gabe565/cli-of-life)
 
-Run Conway's Game of Life in your terminal!
+Play Conway's Game of Life in your terminal!
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/dfda81d9-2211-4ee9-ae10-201716e5a218">
+    <img width="720" alt="cli-of-life demo" src="https://github.com/user-attachments/assets/c5fdf882-af73-4f3e-90cb-e53fd2dcbf35">
+  </picture>
+</p>
 
 ## Installation
 
