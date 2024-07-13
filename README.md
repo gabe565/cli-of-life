@@ -7,6 +7,29 @@ Run Conway's Game of Life in your terminal!
 
 ## Installation
 
+### Docker
+
+<details>
+  <summary>Click to expand</summary>
+
+A Docker image is available at [ghcr.io/gabe565/cli-of-life](https://ghcr.io/gabe565/cli-of-life)
+
+```shell
+sudo docker run --rm -it ghcr.io/gabe565/cli-of-life
+```
+</details>
+
+### Homebrew (macOS, Linux)
+
+<details>
+  <summary>Click to expand</summary>
+
+Install cli-of-life from [gabe565/homebrew-tap](https://github.com/gabe565/homebrew-tap):
+```shell
+brew install gabe565/tap/cli-of-life
+```
+</details>
+
 ### APT (Ubuntu, Debian)
 
 <details>
@@ -66,17 +89,6 @@ Run Conway's Game of Life in your terminal!
 Install [cli-of-life-bin](https://aur.archlinux.org/packages/cli-of-life-bin) with your [AUR helper](https://wiki.archlinux.org/index.php/AUR_helpers) of choice.
 </details>
 
-### Homebrew (macOS, Linux)
-
-<details>
-  <summary>Click to expand</summary>
-
-Install cli-of-life from [gabe565/homebrew-tap](https://github.com/gabe565/homebrew-tap):
-```shell
-brew install gabe565/tap/cli-of-life
-```
-</details>
-
 ### Manual Installation
 
 <details>
@@ -84,3 +96,23 @@ brew install gabe565/tap/cli-of-life
 
 Download and run the [latest release binary](https://github.com/gabe565/cli-of-life/releases/latest) for your system and architecture.
 </details>
+
+## Usage
+Run `cli-of-life` in a terminal to play.
+
+By default, the grid will be empty, but rle/plaintext files can be loaded with `cli-of-life --file FILE.rle`
+
+See [usage docs](docs/cli-of-life.md) for cli flag documentation.
+
+### Keybinds
+
+| Key     | Description                        |
+|---------|------------------------------------|
+| Mouse   | Place cells                        |
+| `Space` | Play/pause                         |
+| `T`     | Tick                               |
+| `M`     | Toggle between placing and erasing |
+| `W`     | Toggle wrapping                    |
+| `<`/`>` | Change playback speed              |
+| `R`     | Reset                              |
+| `Q`     | Quit                               |
