@@ -36,9 +36,8 @@ func UnmarshalPlaintext(r io.Reader) ([][]int, error) {
 		tiles = append(tiles, tileLine)
 	}
 	for i := range tiles {
-		diff := largest - len(tiles[i])
-		if diff > 0 {
-			tiles[i] = append(tiles[i], make([]int, largest-len(tiles[i]))...)
+		if diff := largest - len(tiles[i]); diff > 0 {
+			tiles[i] = append(tiles[i], make([]int, diff)...)
 		}
 	}
 	if scanner.Err() != nil {
