@@ -20,23 +20,33 @@ scan:
 		if bytes.HasPrefix(line, []byte("#")) {
 			continue
 		}
-		if bytes.HasPrefix(line, []byte("x = ")) {
-			rleHeaderRe := regexp.MustCompile(`^x *= *(\d+), *y *= *(\d+)(?:, *rule *= *(.+))?`)
-			matches := rleHeaderRe.FindAllStringSubmatch(scanner.Text(), -1)
+		if len(tiles) == 0 && bytes.HasPrefix(line, []byte("x")) {
+			rleHeaderRe := regexp.MustCompile(`^x *= *(?P<x>\d+), *y *= *(?P<y>\d+)(?:, *rule *= *(?P<rule>.+))?$`)
+			matches := rleHeaderRe.FindStringSubmatch(scanner.Text())
+
 			if len(matches) == 0 {
 				return nil, fmt.Errorf("rle: %w", ErrInvalidHeader)
 			}
-			if matches[0][3] != "" && strings.ToUpper(matches[0][3]) != "B3/S23" && matches[0][3] != "23/3" {
-				return nil, fmt.Errorf("rle: %w: %s", ErrUnsupportedRule, matches[0][3])
+
+			var w, h int
+			var err error
+			for i, name := range rleHeaderRe.SubexpNames() {
+				switch name {
+				case "x":
+					if w, err = strconv.Atoi(matches[i]); err != nil {
+						return nil, err
+					}
+				case "y":
+					if h, err = strconv.Atoi(matches[i]); err != nil {
+						return nil, err
+					}
+				case "rule":
+					if matches[i] != "" && strings.ToUpper(matches[i]) != "B3/S23" && matches[i] != "23/3" {
+						return nil, fmt.Errorf("rle: %w: %s", ErrUnsupportedRule, matches[i])
+					}
+				}
 			}
-			w, err := strconv.Atoi(matches[0][1])
-			if err != nil {
-				return nil, err
-			}
-			h, err := strconv.Atoi(matches[0][2])
-			if err != nil {
-				return nil, err
-			}
+
 			tiles = make([][]int, h)
 			for i := range tiles {
 				tiles[i] = make([]int, w)
