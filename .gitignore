@@ -1,5 +1,6 @@
 .DS_Store
 .idea/
+/completions/
+cli-of-life
 dist/
 patterns/
-cli-of-life

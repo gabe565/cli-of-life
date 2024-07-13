@@ -1,5 +1,8 @@
 version: 2
 project_name: cli-of-life
+before:
+  hooks:
+    - go run ./internal/generate/completions --date={{ .CommitDate }}
 builds:
   - env:
       - CGO_ENABLED=0
