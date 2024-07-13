@@ -125,7 +125,7 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				// Decrease height
 				diff := len(g.tiles) - g.h
 				g.tiles = slices.Delete(g.tiles, 0, diff/2)
-				g.tiles = g.tiles[:g.h]
+				g.tiles = slices.Delete(g.tiles, g.h, len(g.tiles))
 			}
 
 			for i := range g.h {
@@ -139,7 +139,7 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					// Decrease width
 					diff := len(g.tiles[i]) - g.w
 					g.tiles[i] = slices.Delete(g.tiles[i], 0, diff/2)
-					g.tiles[i] = g.tiles[i][:g.w]
+					g.tiles[i] = slices.Delete(g.tiles[i], g.w, len(g.tiles[i]))
 				}
 			}
 		}
