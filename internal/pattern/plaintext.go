@@ -3,6 +3,7 @@ package pattern
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"slices"
 )
@@ -40,5 +41,8 @@ func UnmarshalPlaintext(r io.Reader) ([][]int, error) {
 			tiles[i] = append(tiles[i], make([]int, largest-len(tiles[i]))...)
 		}
 	}
-	return slices.Clip(tiles), scanner.Err()
+	if scanner.Err() != nil {
+		return nil, fmt.Errorf("plaintext: %w", scanner.Err())
+	}
+	return slices.Clip(tiles), nil
 }

@@ -21,11 +21,11 @@ scan:
 			continue
 		}
 		if len(tiles) == 0 && bytes.HasPrefix(line, []byte("x")) {
-			rleHeaderRe := regexp.MustCompile(`^x *= *(?P<x>\d+), *y *= *(?P<y>\d+)(?:, *rule *= *(?P<rule>.+))?$`)
+			rleHeaderRe := regexp.MustCompile(`^x *= *(?P<x>[^,]+), *y *= *(?P<y>[^,]+)(?:, *rule *= *(?P<rule>.+))?$`)
 			matches := rleHeaderRe.FindStringSubmatch(scanner.Text())
 
 			if len(matches) == 0 {
-				return nil, fmt.Errorf("rle: %w", ErrInvalidHeader)
+				return nil, fmt.Errorf("rle: %w: %s", ErrInvalidHeader, line)
 			}
 
 			var w, h int
@@ -34,11 +34,11 @@ scan:
 				switch name {
 				case "x":
 					if w, err = strconv.Atoi(matches[i]); err != nil {
-						return nil, err
+						return nil, fmt.Errorf("rle: parsing header x: %w", err)
 					}
 				case "y":
 					if h, err = strconv.Atoi(matches[i]); err != nil {
-						return nil, err
+						return nil, fmt.Errorf("rle: parsing header y: %w", err)
 					}
 				case "rule":
 					if matches[i] != "" && strings.ToUpper(matches[i]) != "B3/S23" && matches[i] != "23/3" {
@@ -97,7 +97,7 @@ scan:
 		}
 	}
 	if scanner.Err() != nil {
-		return nil, scanner.Err()
+		return nil, fmt.Errorf("rle: %w", scanner.Err())
 	}
 	return nil, fmt.Errorf("rle: %w", ErrMissingTerminator)
 }
