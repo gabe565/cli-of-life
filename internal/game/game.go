@@ -184,6 +184,11 @@ func (g Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case key.Matches(msg, g.keymap.wrap):
 			g.wrap = !g.wrap
+			if g.wrap {
+				g.keymap.wrap.SetHelp(g.keymap.wrap.Help().Key, "disable wrap")
+			} else {
+				g.keymap.wrap.SetHelp(g.keymap.wrap.Help().Key, "enable wrap")
+			}
 		case key.Matches(msg, g.keymap.speedUp):
 			if g.speed < len(speeds)-1 {
 				g.speed++

@@ -20,7 +20,7 @@ func newKeymap() keymap {
 		),
 		wrap: key.NewBinding(
 			key.WithKeys("w"),
-			key.WithHelp("w", "toggle wrap"),
+			key.WithHelp("w", "disable wrap"),
 		),
 		speedUp: key.NewBinding(
 			key.WithKeys(">", "."),
