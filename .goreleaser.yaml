@@ -15,6 +15,7 @@ builds:
       - arm64
     goarm:
       - "7"
+    mod_timestamp: "{{.CommitTimestamp}}"
     ignore:
       - goos: windows
         goarch: arm
