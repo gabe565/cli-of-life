@@ -42,6 +42,9 @@ changelog:
       - '^docs'
       - '^test'
   groups:
+    - title: Breaking Changes
+      order: 0
+      regexp: '\)!:'
     - title: Features
       order: 0
       regexp: "(feat)"
