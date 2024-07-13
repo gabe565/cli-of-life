@@ -26,7 +26,7 @@ scan:
 			if len(matches) == 0 {
 				return nil, fmt.Errorf("rle: %w", ErrInvalidHeader)
 			}
-			if matches[0][3] != "" && strings.ToUpper(matches[0][3]) != "B3/S23" {
+			if matches[0][3] != "" && strings.ToUpper(matches[0][3]) != "B3/S23" && matches[0][3] != "23/3" {
 				return nil, fmt.Errorf("rle: %w: %s", ErrUnsupportedRule, matches[0][3])
 			}
 			w, err := strconv.Atoi(matches[0][1])
