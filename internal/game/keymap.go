@@ -36,7 +36,7 @@ func newKeymap() keymap {
 		),
 		wrap: key.NewBinding(
 			key.WithKeys("w"),
-			key.WithHelp("w", "disable wrap"),
+			key.WithHelp("w", "enable wrap"),
 		),
 		speedUp: key.NewBinding(
 			key.WithKeys(">", "."),
