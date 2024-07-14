@@ -129,15 +129,34 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.MouseMsg:
 		switch msg.Action {
 		case tea.MouseActionPress, tea.MouseActionMotion:
-			msg.X /= 2
-			msg.X += g.x
-			msg.Y += g.y
-			if len(g.tiles) > msg.Y && len(g.tiles[msg.Y]) > msg.X {
-				switch g.mode {
-				case ModePlace:
-					g.tiles[msg.Y][msg.X] = 1
-				case ModeErase:
-					g.tiles[msg.Y][msg.X] = 0
+			switch msg.Button {
+			case tea.MouseButtonLeft:
+				msg.X /= 2
+				msg.X += g.x
+				msg.Y += g.y
+				if len(g.tiles) > msg.Y && len(g.tiles[msg.Y]) > msg.X {
+					switch g.mode {
+					case ModePlace:
+						g.tiles[msg.Y][msg.X] = 1
+					case ModeErase:
+						g.tiles[msg.Y][msg.X] = 0
+					}
+				}
+			case tea.MouseButtonWheelUp:
+				if g.y > 0 {
+					g.y--
+				}
+			case tea.MouseButtonWheelLeft:
+				if g.x > 0 {
+					g.x--
+				}
+			case tea.MouseButtonWheelDown:
+				if g.y < g.BoardH()-g.viewH {
+					g.y++
+				}
+			case tea.MouseButtonWheelRight:
+				if g.x < g.BoardW()-g.viewW {
+					g.x++
 				}
 			}
 		}

@@ -61,7 +61,7 @@ func run(cmd *cobra.Command, _ []string) error {
 	_, err := tea.NewProgram(
 		game.New(tiles),
 		tea.WithAltScreen(),
-		tea.WithMouseCellMotion(),
+		tea.WithMouseAllMotion(),
 	).Run()
 	return err
 }
