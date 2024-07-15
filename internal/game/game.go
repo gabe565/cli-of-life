@@ -158,11 +158,11 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case tea.MouseButtonWheelUp:
 				g.y = max(g.y-1, 0)
 			case tea.MouseButtonWheelLeft:
-				g.x = max(g.x-1, 0)
+				g.x = max(g.x-2, 0)
 			case tea.MouseButtonWheelDown:
 				g.y = min(g.y+1, g.BoardH()-g.viewH)
 			case tea.MouseButtonWheelRight:
-				g.x = min(g.x+1, g.BoardW()-g.viewW)
+				g.x = min(g.x+2, g.BoardW()-g.viewW)
 			}
 		}
 	case tea.KeyMsg:
