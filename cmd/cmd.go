@@ -24,6 +24,7 @@ func New() *cobra.Command {
 
 	cmd.Flags().StringP(config.FileFlag, "f", "", "Loads a pattern file on startup")
 	cmd.Flags().String(config.FileFormatFlag, "auto", "File format (one of: "+strings.Join(pattern.FormatStrings(), ", ")+")")
+	cmd.Flags().String(config.RuleStringFlag, pattern.GameOfLife().String(), "Rule string to use. This will be ignored if a pattern file is loaded.")
 	cmd.Flags().String(config.CompletionFlag, "", "Output command-line completion code for the specified shell (one of: "+strings.Join(shells(), ", ")+")")
 
 	if err := errors.Join(
@@ -35,6 +36,11 @@ func New() *cobra.Command {
 		cmd.RegisterFlagCompletionFunc(config.FileFormatFlag,
 			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 				return pattern.FormatStrings(), cobra.ShellCompDirectiveNoFileComp
+			},
+		),
+		cmd.RegisterFlagCompletionFunc(config.RuleStringFlag,
+			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+				return []string{pattern.GameOfLife().String(), pattern.HighLife().String()}, cobra.ShellCompDirectiveNoFileComp
 			},
 		),
 	); err != nil {
@@ -49,7 +55,14 @@ func run(cmd *cobra.Command, _ []string) error {
 		return completion(cmd, shell)
 	}
 
-	var pat pattern.Pattern
+	var rule pattern.Rule
+	if err := rule.UnmarshalText([]byte(cmd.Flag(config.RuleStringFlag).Value.String())); err != nil {
+		return err
+	}
+
+	pat := pattern.Pattern{
+		Rule: rule,
+	}
 	if file := cmd.Flag(config.FileFlag).Value.String(); file != "" {
 		format := pattern.Format(cmd.Flag(config.FileFormatFlag).Value.String())
 		var err error
