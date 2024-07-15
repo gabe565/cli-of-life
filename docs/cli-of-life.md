@@ -11,7 +11,6 @@ cli-of-life [flags]
 ```
       --completion string    Output command-line completion code for the specified shell (one of: bash, zsh, fish, powershell)
   -f, --file string          Load a pattern file
-      --file-format string   File format (one of: auto, rle, plaintext) (default "auto")
       --height uint          Board height. Will be ignored if a larger pattern is loaded. (default 600)
   -h, --help                 help for cli-of-life
       --play                 Play on startup

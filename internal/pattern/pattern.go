@@ -22,18 +22,6 @@ type Pattern struct {
 	Rule    Rule
 }
 
-type Format string
-
-const (
-	FormatAuto      Format = "auto"
-	FormatRLE       Format = "rle"
-	FormatPlaintext Format = "plaintext"
-)
-
-func FormatStrings() []string {
-	return []string{string(FormatAuto), string(FormatRLE), string(FormatPlaintext)}
-}
-
 var (
 	ErrInvalidHeader       = errors.New("invalid header")
 	ErrPatternTooBig       = errors.New("pattern too big")
@@ -46,7 +34,7 @@ const (
 	ExtPlaintext = ".cells"
 )
 
-func UnmarshalFile(path string, format Format) (Pattern, error) {
+func UnmarshalFile(path string) (Pattern, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return Pattern{}, err
@@ -57,9 +45,9 @@ func UnmarshalFile(path string, format Format) (Pattern, error) {
 
 	ext := filepath.Ext(path)
 	switch {
-	case format == FormatRLE, ext == ExtRLE:
+	case ext == ExtRLE:
 		return UnmarshalRLE(f)
-	case format == FormatPlaintext, ext == ExtPlaintext:
+	case ext == ExtPlaintext:
 		return UnmarshalPlaintext(f)
 	default:
 		pattern, err := Unmarshal(f)
@@ -72,7 +60,7 @@ func UnmarshalFile(path string, format Format) (Pattern, error) {
 
 var ErrResponse = errors.New("received an error response")
 
-func UnmarshalURL(ctx context.Context, url string, format Format) (Pattern, error) {
+func UnmarshalURL(ctx context.Context, url string) (Pattern, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return Pattern{}, err
@@ -93,9 +81,9 @@ func UnmarshalURL(ctx context.Context, url string, format Format) (Pattern, erro
 
 	ext := path.Ext(url)
 	switch {
-	case format == FormatRLE, ext == ExtRLE:
+	case ext == ExtRLE:
 		return UnmarshalRLE(resp.Body)
-	case format == FormatPlaintext, ext == ExtPlaintext:
+	case ext == ExtPlaintext:
 		return UnmarshalPlaintext(resp.Body)
 	default:
 		pattern, err := Unmarshal(resp.Body)

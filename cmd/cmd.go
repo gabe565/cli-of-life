@@ -51,16 +51,15 @@ func run(cmd *cobra.Command, _ []string) error {
 	pat := pattern.Pattern{
 		Rule: rule,
 	}
-	format := pattern.Format(conf.FileFormat)
 	switch {
 	case conf.File != "":
 		var err error
-		if pat, err = pattern.UnmarshalFile(conf.File, format); err != nil {
+		if pat, err = pattern.UnmarshalFile(conf.File); err != nil {
 			return err
 		}
 	case conf.URL != "":
 		var err error
-		if pat, err = pattern.UnmarshalURL(context.Background(), conf.URL, format); err != nil {
+		if pat, err = pattern.UnmarshalURL(context.Background(), conf.URL); err != nil {
 			return err
 		}
 	}

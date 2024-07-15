@@ -3,14 +3,12 @@ package config
 import (
 	"strings"
 
-	"github.com/gabe565/cli-of-life/internal/pattern"
 	"github.com/spf13/pflag"
 )
 
 const (
 	FileFlag       = "file"
 	URLFlag        = "url"
-	FileFormatFlag = "file-format"
 	RuleStringFlag = "rule-string"
 	PlayFlag       = "play"
 	WidthFlag      = "width"
@@ -21,7 +19,6 @@ const (
 func (c *Config) RegisterFlags(fs *pflag.FlagSet) {
 	fs.StringVarP(&c.File, FileFlag, "f", c.File, "Load a pattern file")
 	fs.StringVar(&c.URL, URLFlag, c.URL, "Load a pattern URL")
-	fs.StringVar(&c.FileFormat, FileFormatFlag, c.FileFormat, "File format (one of: "+strings.Join(pattern.FormatStrings(), ", ")+")")
 	fs.StringVar(&c.RuleString, RuleStringFlag, c.RuleString, "Rule string to use. This will be ignored if a pattern file is loaded.")
 	fs.BoolVar(&c.Play, PlayFlag, c.Play, "Play on startup")
 	fs.UintVar(&c.Width, WidthFlag, c.Width, "Board width. Will be ignored if a larger pattern is loaded.")

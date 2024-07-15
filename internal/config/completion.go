@@ -25,11 +25,6 @@ func RegisterCompletion(cmd *cobra.Command) error {
 				return []string{pattern.ExtRLE, pattern.ExtPlaintext}, cobra.ShellCompDirectiveFilterFileExt
 			},
 		),
-		cmd.RegisterFlagCompletionFunc(FileFormatFlag,
-			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-				return pattern.FormatStrings(), cobra.ShellCompDirectiveNoFileComp
-			},
-		),
 		cmd.RegisterFlagCompletionFunc(RuleStringFlag,
 			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 				return []string{pattern.GameOfLife().String(), pattern.HighLife().String()}, cobra.ShellCompDirectiveNoFileComp
