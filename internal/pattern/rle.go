@@ -14,7 +14,6 @@ func UnmarshalRLE(r io.Reader) (Pattern, error) {
 	var pattern Pattern
 	scanner := bufio.NewScanner(r)
 	var x, y int
-	var patternLine int
 	var needsClip bool
 scan:
 	for scanner.Scan() {
@@ -79,70 +78,65 @@ scan:
 				continue
 			}
 
-			var i int
-			for {
-				var runCount int
-				for line[i] >= '0' && line[i] <= '9' {
+			var runCount int
+			for _, b := range line {
+				switch {
+				case b >= '0' && b <= '9':
 					runCount *= 10
-					runCount += int(line[i] - '0')
-					if i++; i > len(line)-1 {
-						continue scan
-					}
-				}
-				if runCount == 0 {
-					runCount = 1
-				}
-
-				switch line[i] {
-				case 'b', 'o':
-					for range runCount {
-						if y > len(pattern.Grid)-1 {
-							diff := max(y+1-len(pattern.Grid), 1)
-							needsClip = true
-							pattern.Grid = slices.Grow(pattern.Grid, diff)
-							for range diff {
-								var w int
-								if len(pattern.Grid) == 0 {
-									w = runCount
-								} else {
-									w = len(pattern.Grid[0])
-								}
-								if w*(y+1) > MaxTiles {
-									return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, x, y)
-								}
-								pattern.Grid = append(pattern.Grid, make([]int, w))
-							}
-						}
-
-						if x > len(pattern.Grid[y])-1 {
-							if (x+runCount)*y > MaxTiles {
-								return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, x, y)
-							}
-							needsClip = true
-							for i, row := range pattern.Grid {
-								pattern.Grid[i] = append(row, make([]int, runCount)...)
-							}
-						}
-
-						switch line[i] {
-						case 'b':
-							pattern.Grid[y][x] = 0
-						case 'o':
-							pattern.Grid[y][x] = 1
-						}
-						x++
-					}
-				case '$':
-					if i != 0 || patternLine != 0 {
+					runCount += int(b - '0')
+				case b == '$':
+					runCount = max(runCount, 1)
+					if x != 0 || y != 0 {
 						y += runCount
 						x = 0
 					}
-				case '!':
+					runCount = 0
+				case b == '!':
 					break scan
-				}
-				patternLine++
-				if i++; i > len(line)-1 {
-					continue scan
+				default:
+					runCount = max(runCount, 1)
+
+					if y > len(pattern.Grid)-1 {
+						diff := max(y-len(pattern.Grid)+1, 1)
+						needsClip = true
+						pattern.Grid = slices.Grow(pattern.Grid, diff)
+						for range diff {
+							var w int
+							if len(pattern.Grid) == 0 {
+								w = runCount
+							} else {
+								w = len(pattern.Grid[0])
+							}
+							if w*(y+1) > MaxTiles {
+								return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, x, y)
+							}
+							pattern.Grid = append(pattern.Grid, make([]int, w))
+						}
+					}
+
+					if x+runCount-1 > len(pattern.Grid[y])-1 {
+						if (x+runCount)*y > MaxTiles {
+							return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, x, y)
+						}
+						needsClip = true
+						for i, row := range pattern.Grid {
+							pattern.Grid[i] = append(row, make([]int, runCount)...)
+						}
+					}
+
+					switch b {
+					case 'b':
+						for range runCount {
+							pattern.Grid[y][x] = 0
+							x++
+						}
+					case 'o':
+						for range runCount {
+							pattern.Grid[y][x] = 1
+							x++
+						}
+					}
+					runCount = 0
 				}
 			}
 		}
