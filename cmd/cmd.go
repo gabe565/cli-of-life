@@ -25,6 +25,7 @@ func New() *cobra.Command {
 	cmd.Flags().StringP(config.FileFlag, "f", "", "Loads a pattern file on startup")
 	cmd.Flags().String(config.FileFormatFlag, "auto", "File format (one of: "+strings.Join(pattern.FormatStrings(), ", ")+")")
 	cmd.Flags().String(config.RuleStringFlag, pattern.GameOfLife().String(), "Rule string to use. This will be ignored if a pattern file is loaded.")
+	cmd.Flags().Bool(config.PlayFlag, false, "Play on startup")
 	cmd.Flags().String(config.CompletionFlag, "", "Output command-line completion code for the specified shell (one of: "+strings.Join(shells(), ", ")+")")
 
 	if err := errors.Join(
@@ -72,7 +73,7 @@ func run(cmd *cobra.Command, _ []string) error {
 	}
 
 	_, err := tea.NewProgram(
-		game.New(pat),
+		game.New(pat, cmd.Flag(config.PlayFlag).Value.String() == "true"),
 		tea.WithAltScreen(),
 		tea.WithMouseAllMotion(),
 	).Run()

@@ -9,6 +9,6 @@ import (
 )
 
 func TestDefaultSpeed(t *testing.T) {
-	game := New(pattern.Pattern{})
+	game := New(pattern.Pattern{}, false)
 	assert.Equal(t, time.Second/30, speeds[game.speed])
 }

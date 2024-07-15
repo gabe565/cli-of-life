@@ -13,6 +13,7 @@ cli-of-life [flags]
   -f, --file string          Loads a pattern file on startup
       --file-format string   File format (one of: auto, rle, plaintext) (default "auto")
   -h, --help                 help for cli-of-life
+      --play                 Play on startup
       --rule-string string   Rule string to use. This will be ignored if a pattern file is loaded. (default "B3/S23")
 ```
 

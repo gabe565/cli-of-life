@@ -33,14 +33,22 @@ const (
 	ModeErase
 )
 
-func New(pat pattern.Pattern) *Game {
+func New(pat pattern.Pattern, play bool) *Game {
 	if pat.Rule.IsZero() {
 		pat.Rule = pattern.GameOfLife()
 	}
 
+	var ctx context.Context
+	var cancel context.CancelFunc
+	if play {
+		ctx, cancel = context.WithCancel(context.Background())
+	}
+
 	game := &Game{
 		pattern: pat,
-		keymap:  newKeymap(),
+		ctx:     ctx,
+		cancel:  cancel,
+		keymap:  newKeymap(play),
 		help:    help.New(),
 		speed:   5,
 	}
@@ -62,6 +70,9 @@ type Game struct {
 }
 
 func (g *Game) Init() tea.Cmd {
+	if g.ctx != nil {
+		return Tick(g.ctx, speeds[g.speed])
+	}
 	return nil
 }
 
