@@ -2,10 +2,13 @@ package pattern
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 )
 
@@ -62,6 +65,42 @@ func UnmarshalFile(path string, format Format) (Pattern, error) {
 		pattern, err := Unmarshal(f)
 		if err != nil {
 			err = fmt.Errorf("%w: %s", err, path)
+		}
+		return pattern, err
+	}
+}
+
+var ErrResponse = errors.New("received an error response")
+
+func UnmarshalURL(ctx context.Context, url string, format Format) (Pattern, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return Pattern{}, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return Pattern{}, err
+	}
+	defer func() {
+		_, _ = io.Copy(io.Discard, resp.Body)
+		_ = resp.Body.Close()
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return Pattern{}, ErrResponse
+	}
+
+	ext := path.Ext(url)
+	switch {
+	case format == FormatRLE, ext == ExtRLE:
+		return UnmarshalRLE(resp.Body)
+	case format == FormatPlaintext, ext == ExtPlaintext:
+		return UnmarshalPlaintext(resp.Body)
+	default:
+		pattern, err := Unmarshal(resp.Body)
+		if err != nil {
+			err = fmt.Errorf("%w: %s", err, url)
 		}
 		return pattern, err
 	}

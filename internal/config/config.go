@@ -4,6 +4,7 @@ import "github.com/gabe565/cli-of-life/internal/pattern"
 
 type Config struct {
 	File       string
+	URL        string
 	FileFormat string
 	RuleString string
 	Play       bool
