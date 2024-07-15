@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"slices"
 	"strconv"
 )
 
@@ -14,6 +15,7 @@ func UnmarshalRLE(r io.Reader) (Pattern, error) {
 	scanner := bufio.NewScanner(r)
 	var x, y int
 	var patternLine int
+	var needsClip bool
 scan:
 	for scanner.Scan() {
 		line := scanner.Bytes()
@@ -84,20 +86,32 @@ scan:
 				}
 
 				switch line[i] {
-				case 'b':
+				case 'b', 'o':
 					for range runCount {
-						if y > len(pattern.Grid)-1 || x > len(pattern.Grid[0])-1 {
-							return pattern, fmt.Errorf("rle: %w", ErrOverflow)
+						if y > len(pattern.Grid)-1 {
+							diff := max(y+1-len(pattern.Grid), 1)
+							needsClip = true
+							for range diff {
+								if len(pattern.Grid) == 0 {
+									pattern.Grid = append(pattern.Grid, make([]int, runCount))
+								} else {
+									pattern.Grid = append(pattern.Grid, make([]int, len(pattern.Grid[0])))
+								}
+							}
 						}
-						pattern.Grid[y][x] = 0
-						x++
-					}
-				case 'o':
-					for range runCount {
-						if y > len(pattern.Grid)-1 || x > len(pattern.Grid[0])-1 {
-							return pattern, fmt.Errorf("rle: %w", ErrOverflow)
+						if x > len(pattern.Grid[y])-1 {
+							needsClip = true
+							for i, row := range pattern.Grid {
+								pattern.Grid[i] = append(row, make([]int, runCount)...)
+							}
 						}
-						pattern.Grid[y][x] = 1
+
+						switch line[i] {
+						case 'b':
+							pattern.Grid[y][x] = 0
+						case 'o':
+							pattern.Grid[y][x] = 1
+						}
 						x++
 					}
 				case '$':
@@ -106,7 +120,7 @@ scan:
 						x = 0
 					}
 				case '!':
-					return pattern, nil
+					break scan
 				}
 				patternLine++
 				if i++; i > len(line)-1 {
@@ -118,5 +132,13 @@ scan:
 	if scanner.Err() != nil {
 		return pattern, fmt.Errorf("rle: %w", scanner.Err())
 	}
+
+	if needsClip {
+		pattern.Grid = slices.Clip(pattern.Grid)
+		for i, row := range pattern.Grid {
+			pattern.Grid[i] = slices.Clip(row)
+		}
+	}
+
 	return pattern, nil
 }

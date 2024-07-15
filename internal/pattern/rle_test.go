@@ -96,6 +96,18 @@ func TestUnmarshalRLE(t *testing.T) {
 			Pattern{Grid: [][]int{{1}}, Rule: GameOfLife()},
 			require.NoError,
 		},
+		{
+			"edge case incorrect x",
+			args{strings.NewReader("x = 0, y = 1\no!")},
+			Pattern{Grid: [][]int{{1}}, Rule: GameOfLife()},
+			require.NoError,
+		},
+		{
+			"edge case incorrect y",
+			args{strings.NewReader("x = 1, y = 0\no!")},
+			Pattern{Grid: [][]int{{1}}, Rule: GameOfLife()},
+			require.NoError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
