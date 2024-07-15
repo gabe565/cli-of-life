@@ -1,8 +1,10 @@
 package pattern
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -31,9 +33,9 @@ func FormatStrings() []string {
 
 var (
 	ErrInvalidHeader       = errors.New("invalid header")
-	ErrUnknownExtension    = errors.New("unknown pattern extension")
 	ErrPatternTooBig       = errors.New("pattern too big")
 	ErrUnexpectedCharacter = errors.New("unexpected character")
+	ErrInferFailed         = errors.New("unable to infer pattern file type")
 )
 
 const (
@@ -57,6 +59,27 @@ func UnmarshalFile(path string, format Format) (Pattern, error) {
 	case format == FormatPlaintext, ext == ExtPlaintext:
 		return UnmarshalPlaintext(f)
 	default:
-		return Pattern{}, fmt.Errorf("%w: %s", ErrUnknownExtension, filepath.Ext(path))
+		pattern, err := Unmarshal(f)
+		if err != nil {
+			err = fmt.Errorf("%w: %s", err, path)
+		}
+		return pattern, err
+	}
+}
+
+func Unmarshal(r io.Reader) (Pattern, error) {
+	buf, err := io.ReadAll(r)
+	if err != nil {
+		return Pattern{}, err
+	}
+
+	firstLine, _, _ := bytes.Cut(bytes.TrimSpace(buf), []byte("\n"))
+	switch {
+	case bytes.HasPrefix(firstLine, []byte("#")), RLEHeaderRegexp().Match(firstLine):
+		return UnmarshalRLE(bytes.NewReader(buf))
+	case bytes.HasPrefix(firstLine, []byte("!")), bytes.HasPrefix(firstLine, []byte(".")), bytes.HasPrefix(firstLine, []byte("O")):
+		return UnmarshalPlaintext(bytes.NewReader(buf))
+	default:
+		return Pattern{}, ErrInferFailed
 	}
 }

@@ -10,6 +10,10 @@ import (
 	"strconv"
 )
 
+func RLEHeaderRegexp() *regexp.Regexp {
+	return regexp.MustCompile(`^x *= *(?P<x>[^,]+), *y *= *(?P<y>[^,]+)(?:, *rule *= *(?P<rule>.+))?$`)
+}
+
 func UnmarshalRLE(r io.Reader) (Pattern, error) {
 	var pattern Pattern
 	scanner := bufio.NewScanner(r)
@@ -33,8 +37,8 @@ scan:
 				}
 			}
 		case len(pattern.Grid) == 0 && bytes.HasPrefix(line, []byte("x")):
-			rleHeaderRe := regexp.MustCompile(`^x *= *(?P<x>[^,]+), *y *= *(?P<y>[^,]+)(?:, *rule *= *(?P<rule>.+))?$`)
-			matches := rleHeaderRe.FindStringSubmatch(scanner.Text())
+			headerRe := RLEHeaderRegexp()
+			matches := headerRe.FindStringSubmatch(scanner.Text())
 
 			if len(matches) == 0 {
 				return pattern, fmt.Errorf("rle: %w: %s", ErrInvalidHeader, line)
@@ -42,7 +46,7 @@ scan:
 
 			var w, h int
 			var err error
-			for i, name := range rleHeaderRe.SubexpNames() {
+			for i, name := range headerRe.SubexpNames() {
 				switch name {
 				case "x":
 					if w, err = strconv.Atoi(matches[i]); err != nil {
