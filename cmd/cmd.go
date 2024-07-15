@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"errors"
-	"strings"
+	"context"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gabe565/cli-of-life/internal/config"
@@ -22,52 +21,36 @@ func New() *cobra.Command {
 		DisableAutoGenTag: true,
 	}
 
-	cmd.Flags().StringP(config.FileFlag, "f", "", "Loads a pattern file on startup")
-	cmd.Flags().String(config.FileFormatFlag, "auto", "File format (one of: "+strings.Join(pattern.FormatStrings(), ", ")+")")
-	cmd.Flags().String(config.RuleStringFlag, pattern.GameOfLife().String(), "Rule string to use. This will be ignored if a pattern file is loaded.")
-	cmd.Flags().Bool(config.PlayFlag, false, "Play on startup")
-	cmd.Flags().String(config.CompletionFlag, "", "Output command-line completion code for the specified shell (one of: "+strings.Join(shells(), ", ")+")")
-
-	if err := errors.Join(
-		cmd.RegisterFlagCompletionFunc(config.FileFlag,
-			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-				return []string{pattern.ExtRLE, pattern.ExtPlaintext}, cobra.ShellCompDirectiveFilterFileExt
-			},
-		),
-		cmd.RegisterFlagCompletionFunc(config.FileFormatFlag,
-			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-				return pattern.FormatStrings(), cobra.ShellCompDirectiveNoFileComp
-			},
-		),
-		cmd.RegisterFlagCompletionFunc(config.RuleStringFlag,
-			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-				return []string{pattern.GameOfLife().String(), pattern.HighLife().String()}, cobra.ShellCompDirectiveNoFileComp
-			},
-		),
-	); err != nil {
+	conf := config.New()
+	conf.RegisterFlags(cmd.Flags())
+	if err := config.RegisterCompletion(cmd); err != nil {
 		panic(err)
 	}
-
+	cmd.SetContext(config.NewContext(context.Background(), conf))
 	return cmd
 }
 
 func run(cmd *cobra.Command, _ []string) error {
-	if shell := cmd.Flag(config.CompletionFlag).Value.String(); shell != "" {
-		return completion(cmd, shell)
+	conf, ok := config.FromContext(cmd.Context())
+	if !ok {
+		panic("command missing config")
+	}
+
+	if conf.Completion != "" {
+		return completion(cmd, conf.Completion)
 	}
 
 	var rule pattern.Rule
-	if err := rule.UnmarshalText([]byte(cmd.Flag(config.RuleStringFlag).Value.String())); err != nil {
+	if err := rule.UnmarshalText([]byte(conf.RuleString)); err != nil {
 		return err
 	}
 
 	pat := pattern.Pattern{
 		Rule: rule,
 	}
-	if file := cmd.Flag(config.FileFlag).Value.String(); file != "" {
-		format := pattern.Format(cmd.Flag(config.FileFormatFlag).Value.String())
+	if conf.File != "" {
 		var err error
-		if pat, err = pattern.UnmarshalFile(file, format); err != nil {
+		if pat, err = pattern.UnmarshalFile(conf.File, pattern.Format(conf.FileFormat)); err != nil {
 			return err
 		}
 	}
@@ -75,7 +58,7 @@ func run(cmd *cobra.Command, _ []string) error {
 	g := game.New(
 		game.WithPattern(pat),
 		game.WithDimensions(400, 400),
-		game.WithPlay(cmd.Flag(config.PlayFlag).Value.String() == "true"),
+		game.WithPlay(conf.Play),
 	)
 
 	_, err := tea.NewProgram(g, tea.WithAltScreen(), tea.WithMouseAllMotion()).Run()
