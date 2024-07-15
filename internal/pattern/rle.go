@@ -118,5 +118,5 @@ scan:
 	if scanner.Err() != nil {
 		return pattern, fmt.Errorf("rle: %w", scanner.Err())
 	}
-	return pattern, fmt.Errorf("rle: %w", ErrMissingTerminator)
+	return pattern, nil
 }

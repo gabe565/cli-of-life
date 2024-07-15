@@ -28,10 +28,9 @@ func FormatStrings() []string {
 }
 
 var (
-	ErrInvalidHeader     = errors.New("invalid header")
-	ErrMissingTerminator = errors.New("missing terminator")
-	ErrOverflow          = errors.New("overflow")
-	ErrUnknownExtension  = errors.New("unknown pattern extension")
+	ErrInvalidHeader    = errors.New("invalid header")
+	ErrOverflow         = errors.New("overflow")
+	ErrUnknownExtension = errors.New("unknown pattern extension")
 )
 
 const (
