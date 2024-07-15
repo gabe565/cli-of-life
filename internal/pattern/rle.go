@@ -18,7 +18,18 @@ scan:
 		line := scanner.Bytes()
 		switch {
 		case bytes.HasPrefix(line, []byte("#")):
-			continue
+			if name, found := bytes.CutPrefix(line, []byte("#N ")); found {
+				pattern.Name = string(bytes.TrimSpace(name))
+			} else if author, found := bytes.CutPrefix(line, []byte("#O ")); found {
+				pattern.Author = string(bytes.TrimSpace(author))
+			} else if len(line) > 3 && bytes.EqualFold(line[:3], []byte("#C ")) {
+				if comment := bytes.TrimSpace(line[2:]); len(comment) != 0 {
+					if len(pattern.Comment) != 0 {
+						pattern.Comment += "\n"
+					}
+					pattern.Comment += string(comment)
+				}
+			}
 		case len(pattern.Grid) == 0 && bytes.HasPrefix(line, []byte("x")):
 			rleHeaderRe := regexp.MustCompile(`^x *= *(?P<x>[^,]+), *y *= *(?P<y>[^,]+)(?:, *rule *= *(?P<rule>.+))?$`)
 			matches := rleHeaderRe.FindStringSubmatch(scanner.Text())

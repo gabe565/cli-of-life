@@ -26,7 +26,13 @@ func TestUnmarshalPlaintext(t *testing.T) {
 		{
 			"glider",
 			args{bytes.NewReader(gliderPlaintext)},
-			Pattern{[][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}}, GameOfLife()},
+			Pattern{
+				Name:    "Glider",
+				Comment: "The smallest, most common, and first discovered spaceship.\nwww.conwaylife.com/wiki/index.php?title=Glider",
+				Author:  "Richard K. Guy",
+				Grid:    [][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}},
+				Rule:    GameOfLife(),
+			},
 			require.NoError,
 		},
 	}

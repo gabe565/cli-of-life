@@ -8,8 +8,11 @@ import (
 )
 
 type Pattern struct {
-	Grid [][]int
-	Rule Rule
+	Name    string
+	Comment string
+	Author  string
+	Grid    [][]int
+	Rule    Rule
 }
 
 type Format string

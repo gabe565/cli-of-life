@@ -27,37 +27,37 @@ func TestUnmarshalRLE(t *testing.T) {
 		{
 			"rule B3/S23",
 			args{strings.NewReader("x = 3, y = 3, rule = B3/S23\n!")},
-			Pattern{[][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, GameOfLife()},
+			Pattern{Grid: [][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, Rule: GameOfLife()},
 			require.NoError,
 		},
 		{
 			"rule b3/s23",
 			args{strings.NewReader("x = 3, y = 3, rule = b3/s23\n!")},
-			Pattern{[][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, GameOfLife()},
+			Pattern{Grid: [][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, Rule: GameOfLife()},
 			require.NoError,
 		},
 		{
 			"rule 23/3",
 			args{strings.NewReader("x = 3, y = 3, rule = 23/3\n!")},
-			Pattern{[][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, GameOfLife()},
+			Pattern{Grid: [][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, Rule: GameOfLife()},
 			require.NoError,
 		},
 		{
 			"high life",
 			args{strings.NewReader("x = 3, y = 3, rule = B36/S23\n!")},
-			Pattern{[][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, HighLife()},
+			Pattern{Grid: [][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, Rule: HighLife()},
 			require.NoError,
 		},
 		{
 			"no rule",
 			args{strings.NewReader("x = 3, y = 3\n!")},
-			Pattern{[][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, GameOfLife()},
+			Pattern{Grid: [][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, Rule: GameOfLife()},
 			require.NoError,
 		},
 		{
 			"no header spacing",
 			args{strings.NewReader("x=3,y=3,rule=B3/S23\n!")},
-			Pattern{[][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, GameOfLife()},
+			Pattern{Grid: [][]int{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, Rule: GameOfLife()},
 			require.NoError,
 		},
 		{
@@ -75,7 +75,13 @@ func TestUnmarshalRLE(t *testing.T) {
 		{
 			"glider",
 			args{bytes.NewReader(gliderRLE)},
-			Pattern{[][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}}, GameOfLife()},
+			Pattern{
+				Name:    "Glider",
+				Comment: "The smallest, most common, and first discovered spaceship. Diagonal, has period 4 and speed c/4.\nwww.conwaylife.com/wiki/index.php?title=Glider",
+				Author:  "Richard K. Guy",
+				Grid:    [][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}},
+				Rule:    GameOfLife(),
+			},
 			require.NoError,
 		},
 	}

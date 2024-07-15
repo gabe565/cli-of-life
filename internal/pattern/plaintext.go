@@ -16,6 +16,16 @@ func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 		line := scanner.Bytes()
 		switch {
 		case bytes.HasPrefix(line, []byte("!")):
+			if name, found := bytes.CutPrefix(line, []byte("!Name: ")); found {
+				pattern.Name = string(bytes.TrimSpace(name))
+			} else if author, found := bytes.CutPrefix(line, []byte("!Author: ")); found {
+				pattern.Author = string(bytes.TrimSpace(author))
+			} else if comment := bytes.TrimSpace(bytes.TrimPrefix(line, []byte("!"))); len(line) != 0 {
+				if len(pattern.Comment) != 0 {
+					pattern.Comment += "\n"
+				}
+				pattern.Comment += string(comment)
+			}
 		default:
 			tileLine := make([]int, len(line))
 			var x int
