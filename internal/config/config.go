@@ -17,7 +17,7 @@ func New() *Config {
 	return &Config{
 		FileFormat: "auto",
 		RuleString: pattern.GameOfLife().String(),
-		Width:      400,
-		Height:     400,
+		Width:      600,
+		Height:     600,
 	}
 }

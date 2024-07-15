@@ -18,8 +18,8 @@ func WithPattern(pat pattern.Pattern) Option {
 
 func WithDimensions(width, height uint) Option {
 	return func(game *Game) {
-		newW := max(int(width), game.BoardW()+100)
-		newH := max(int(height), game.BoardH()+100)
+		newW := max(int(width), game.BoardW()+200)
+		newH := max(int(height), game.BoardH()+200)
 		game.Resize(newW, newH, image.Pt(0, 0))
 	}
 }
