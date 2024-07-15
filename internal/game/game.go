@@ -197,7 +197,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if g.wrap {
 				g.pattern.Grid = append(g.pattern.Grid[len(g.pattern.Grid)-1:], g.pattern.Grid[:len(g.pattern.Grid)-1]...)
 			} else {
-				g.y = max(g.y-1, 0)
+				g.y = max(g.y-2, 0)
 			}
 		case key.Matches(msg, g.keymap.moveLeft):
 			if g.wrap {
@@ -205,13 +205,13 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					g.pattern.Grid[i] = append(row[len(row)-1:], row[:len(row)-1]...)
 				}
 			} else {
-				g.x = max(g.x-1, 0)
+				g.x = max(g.x-2, 0)
 			}
 		case key.Matches(msg, g.keymap.moveDown):
 			if g.wrap {
 				g.pattern.Grid = append(g.pattern.Grid[1:], g.pattern.Grid[0])
 			} else {
-				g.y = min(g.y+1, g.BoardH()-g.viewH)
+				g.y = min(g.y+2, g.BoardH()-g.viewH)
 			}
 		case key.Matches(msg, g.keymap.moveRight):
 			if g.wrap {
@@ -219,7 +219,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					g.pattern.Grid[i] = append(row[1:], row[0])
 				}
 			} else {
-				g.x = min(g.x+1, g.BoardW()-g.viewW)
+				g.x = min(g.x+2, g.BoardW()-g.viewW)
 			}
 		case key.Matches(msg, g.keymap.wrap):
 			g.wrap = !g.wrap
