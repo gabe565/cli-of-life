@@ -37,7 +37,7 @@ func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 				case '.':
 					tileLine[x] = 0
 					x++
-				case 'O':
+				case 'O', '*':
 					tileLine[x] = 1
 					x++
 				}
