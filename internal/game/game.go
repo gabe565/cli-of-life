@@ -211,7 +211,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if g.wrap {
 				g.pattern.Grid = append(g.pattern.Grid[1:], g.pattern.Grid[0])
 			} else {
-				g.y = min(g.y+1, g.BoardH(), g.viewH)
+				g.y = min(g.y+1, g.BoardH()-g.viewH)
 			}
 		case key.Matches(msg, g.keymap.moveRight):
 			if g.wrap {
