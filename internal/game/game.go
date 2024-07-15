@@ -56,6 +56,7 @@ type Game struct {
 	conf         *config.Config
 	viewW, viewH int
 	x, y         int
+	startPattern pattern.Pattern
 	pattern      pattern.Pattern
 	ctx          context.Context
 	cancel       context.CancelFunc
@@ -254,11 +255,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case key.Matches(msg, g.keymap.reset):
-			for _, row := range g.pattern.Grid {
-				for i := range row {
-					row[i] = 0
-				}
-			}
+			g.Reset()
 		case key.Matches(msg, g.keymap.quit):
 			return g, tea.Quit
 		}
@@ -366,4 +363,17 @@ func (g *Game) Resize(w, h int, origin image.Point) {
 func (g *Game) CenterView() {
 	g.x = g.BoardW()/2 - g.viewW/2
 	g.y = g.BoardH()/2 - g.viewH/2
+}
+
+func (g *Game) Reset() {
+	cloned := g.startPattern
+	cloned.Grid = slices.Clone(g.startPattern.Grid)
+	for i, row := range cloned.Grid {
+		cloned.Grid[i] = slices.Clip(row)
+	}
+	w, h := g.BoardW(), g.BoardH()
+	g.pattern = cloned
+	if w != 0 && h != 0 {
+		g.Resize(w, h, image.Pt(0, 0))
+	}
 }
