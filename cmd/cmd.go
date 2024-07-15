@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"runtime/debug"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gabe565/cli-of-life/internal/config"
@@ -55,7 +58,24 @@ func run(cmd *cobra.Command, _ []string) error {
 		}
 	}
 
-	g := game.New(game.WithPattern(pat), game.WithConfig(conf))
-	_, err := tea.NewProgram(g, tea.WithAltScreen(), tea.WithMouseAllMotion()).Run()
+	program := tea.NewProgram(
+		game.New(game.WithPattern(pat), game.WithConfig(conf)),
+		tea.WithAltScreen(),
+		tea.WithMouseAllMotion(),
+		tea.WithoutCatchPanics(),
+	)
+
+	defer func() {
+		if err := recover(); err != nil {
+			program.Kill()
+			_ = program.ReleaseTerminal()
+			//nolint:forbidigo
+			fmt.Printf("Caught panic:\n\n%s\n\nRestoring terminal...\n\n", err)
+			debug.PrintStack()
+			os.Exit(1)
+		}
+	}()
+
+	_, err := program.Run()
 	return err
 }
