@@ -71,6 +71,10 @@ scan:
 			}
 			continue
 		default:
+			if len(line) == 0 {
+				continue
+			}
+
 			var i int
 			for {
 				var runCount int
