@@ -52,7 +52,9 @@ func New(pat pattern.Pattern, play bool) *Game {
 		help:    help.New(),
 		speed:   5,
 	}
-	game.Resize(400, 400, image.Pt(0, 0))
+	newW := max(400, game.BoardW()+100)
+	newH := max(400, game.BoardH()+100)
+	game.Resize(newW, newH, image.Pt(0, 0))
 	return game
 }
 
