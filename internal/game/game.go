@@ -1,11 +1,11 @@
 package game
 
 import (
+	"bytes"
 	"context"
 	"image"
 	"slices"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/help"
@@ -64,6 +64,7 @@ type Game struct {
 	mode         Mode
 	wrap         bool
 	speed        int
+	viewBuf      bytes.Buffer
 }
 
 func (g *Game) Init() tea.Cmd {
@@ -266,23 +267,25 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (g *Game) View() string {
-	var view strings.Builder
+	defer func() {
+		g.viewBuf.Reset()
+	}()
 	if len(g.pattern.Grid) != 0 {
-		view.Grow(g.viewW * g.viewH)
+		g.viewBuf.Grow((g.viewW*2 + 1) * g.viewH)
 		for _, row := range g.pattern.Grid[g.y:min(g.y+g.viewH, len(g.pattern.Grid))] {
 			for _, cell := range row[g.x:min(g.x+g.viewW, len(row))] {
 				if cell == 1 {
-					view.WriteRune('█')
-					view.WriteRune('█')
+					g.viewBuf.WriteRune('█')
+					g.viewBuf.WriteRune('█')
 				} else {
-					view.WriteByte(' ')
-					view.WriteByte(' ')
+					g.viewBuf.WriteByte(' ')
+					g.viewBuf.WriteByte(' ')
 				}
 			}
-			view.WriteByte('\n')
+			g.viewBuf.WriteByte('\n')
 		}
 	}
-	return view.String() + g.help.ShortHelpView(g.keymap.ShortHelp())
+	return g.viewBuf.String() + g.help.ShortHelpView(g.keymap.ShortHelp())
 }
 
 type tick struct{}
