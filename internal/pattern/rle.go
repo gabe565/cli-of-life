@@ -7,11 +7,10 @@ import (
 	"io"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
-func UnmarshalRLE(r io.Reader) ([][]int, error) {
-	var tiles [][]int
+func UnmarshalRLE(r io.Reader) (Pattern, error) {
+	var pattern Pattern
 	scanner := bufio.NewScanner(r)
 	var x, y int
 scan:
@@ -20,12 +19,12 @@ scan:
 		if bytes.HasPrefix(line, []byte("#")) {
 			continue
 		}
-		if len(tiles) == 0 && bytes.HasPrefix(line, []byte("x")) {
+		if len(pattern.Grid) == 0 && bytes.HasPrefix(line, []byte("x")) {
 			rleHeaderRe := regexp.MustCompile(`^x *= *(?P<x>[^,]+), *y *= *(?P<y>[^,]+)(?:, *rule *= *(?P<rule>.+))?$`)
 			matches := rleHeaderRe.FindStringSubmatch(scanner.Text())
 
 			if len(matches) == 0 {
-				return nil, fmt.Errorf("rle: %w: %s", ErrInvalidHeader, line)
+				return pattern, fmt.Errorf("rle: %w: %s", ErrInvalidHeader, line)
 			}
 
 			var w, h int
@@ -34,22 +33,27 @@ scan:
 				switch name {
 				case "x":
 					if w, err = strconv.Atoi(matches[i]); err != nil {
-						return nil, fmt.Errorf("rle: parsing header x: %w", err)
+						return pattern, fmt.Errorf("rle: parsing header x: %w", err)
 					}
 				case "y":
 					if h, err = strconv.Atoi(matches[i]); err != nil {
-						return nil, fmt.Errorf("rle: parsing header y: %w", err)
+						return pattern, fmt.Errorf("rle: parsing header y: %w", err)
 					}
 				case "rule":
-					if matches[i] != "" && strings.ToUpper(matches[i]) != "B3/S23" && matches[i] != "23/3" {
-						return nil, fmt.Errorf("rle: %w: %s", ErrUnsupportedRule, matches[i])
+					switch matches[i] {
+					case "":
+						pattern.Rule = GameOfLife()
+					default:
+						if err := pattern.Rule.UnmarshalText([]byte(matches[i])); err != nil {
+							return pattern, fmt.Errorf("rle: %w", err)
+						}
 					}
 				}
 			}
 
-			tiles = make([][]int, h)
-			for i := range tiles {
-				tiles[i] = make([]int, w)
+			pattern.Grid = make([][]int, h)
+			for i := range pattern.Grid {
+				pattern.Grid[i] = make([]int, w)
 			}
 			continue
 		}
@@ -71,25 +75,25 @@ scan:
 			switch line[i] {
 			case 'b':
 				for range runCount {
-					if y > len(tiles)-1 || x > len(tiles[0])-1 {
-						return nil, fmt.Errorf("rle: %w", ErrOverflow)
+					if y > len(pattern.Grid)-1 || x > len(pattern.Grid[0])-1 {
+						return pattern, fmt.Errorf("rle: %w", ErrOverflow)
 					}
-					tiles[y][x] = 0
+					pattern.Grid[y][x] = 0
 					x++
 				}
 			case 'o':
 				for range runCount {
-					if y > len(tiles)-1 || x > len(tiles[0])-1 {
-						return nil, fmt.Errorf("rle: %w", ErrOverflow)
+					if y > len(pattern.Grid)-1 || x > len(pattern.Grid[0])-1 {
+						return pattern, fmt.Errorf("rle: %w", ErrOverflow)
 					}
-					tiles[y][x] = 1
+					pattern.Grid[y][x] = 1
 					x++
 				}
 			case '$':
 				y += runCount
 				x = 0
 			case '!':
-				return tiles, nil
+				return pattern, nil
 			}
 			if i++; i > len(line)-1 {
 				continue scan
@@ -97,7 +101,7 @@ scan:
 		}
 	}
 	if scanner.Err() != nil {
-		return nil, fmt.Errorf("rle: %w", scanner.Err())
+		return pattern, fmt.Errorf("rle: %w", scanner.Err())
 	}
-	return nil, fmt.Errorf("rle: %w", ErrMissingTerminator)
+	return pattern, fmt.Errorf("rle: %w", ErrMissingTerminator)
 }

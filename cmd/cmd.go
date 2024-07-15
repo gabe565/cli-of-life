@@ -49,17 +49,17 @@ func run(cmd *cobra.Command, _ []string) error {
 		return completion(cmd, shell)
 	}
 
-	var tiles [][]int
+	var pat pattern.Pattern
 	if file := cmd.Flag(config.FileFlag).Value.String(); file != "" {
 		format := pattern.Format(cmd.Flag(config.FileFormatFlag).Value.String())
 		var err error
-		if tiles, err = pattern.UnmarshalFile(file, format); err != nil {
+		if pat, err = pattern.UnmarshalFile(file, format); err != nil {
 			return err
 		}
 	}
 
 	_, err := tea.NewProgram(
-		game.New(tiles),
+		game.New(pat),
 		tea.WithAltScreen(),
 		tea.WithMouseAllMotion(),
 	).Run()

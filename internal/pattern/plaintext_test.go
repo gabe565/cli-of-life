@@ -20,10 +20,15 @@ func TestUnmarshalPlaintext(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    [][]int
+		want    Pattern
 		wantErr require.ErrorAssertionFunc
 	}{
-		{"glider", args{bytes.NewReader(gliderPlaintext)}, [][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}}, require.NoError},
+		{
+			"glider",
+			args{bytes.NewReader(gliderPlaintext)},
+			Pattern{[][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}}, GameOfLife()},
+			require.NoError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

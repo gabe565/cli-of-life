@@ -8,8 +8,8 @@ import (
 	"slices"
 )
 
-func UnmarshalPlaintext(r io.Reader) ([][]int, error) {
-	var tiles [][]int
+func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
+	pattern := Pattern{Rule: GameOfLife()}
 	scanner := bufio.NewScanner(r)
 	var largest int
 	for scanner.Scan() {
@@ -33,15 +33,16 @@ func UnmarshalPlaintext(r io.Reader) ([][]int, error) {
 		if len(tileLine) > largest {
 			largest = len(tileLine)
 		}
-		tiles = append(tiles, tileLine)
+		pattern.Grid = append(pattern.Grid, tileLine)
 	}
-	for i := range tiles {
-		if diff := largest - len(tiles[i]); diff > 0 {
-			tiles[i] = append(tiles[i], make([]int, diff)...)
+	for i := range pattern.Grid {
+		if diff := largest - len(pattern.Grid[i]); diff > 0 {
+			pattern.Grid[i] = append(pattern.Grid[i], make([]int, diff)...)
 		}
 	}
 	if scanner.Err() != nil {
-		return nil, fmt.Errorf("plaintext: %w", scanner.Err())
+		return pattern, fmt.Errorf("plaintext: %w", scanner.Err())
 	}
-	return slices.Clip(tiles), nil
+	pattern.Grid = slices.Clip(pattern.Grid)
+	return pattern, nil
 }

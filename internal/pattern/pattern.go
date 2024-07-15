@@ -7,6 +7,11 @@ import (
 	"path/filepath"
 )
 
+type Pattern struct {
+	Grid [][]int
+	Rule Rule
+}
+
 type Format string
 
 const (
@@ -24,7 +29,6 @@ var (
 	ErrMissingTerminator = errors.New("missing terminator")
 	ErrOverflow          = errors.New("overflow")
 	ErrUnknownExtension  = errors.New("unknown pattern extension")
-	ErrUnsupportedRule   = errors.New("unsupported rule designation")
 )
 
 const (
@@ -32,10 +36,10 @@ const (
 	ExtPlaintext = ".cells"
 )
 
-func UnmarshalFile(path string, format Format) ([][]int, error) {
+func UnmarshalFile(path string, format Format) (Pattern, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return Pattern{}, err
 	}
 	defer func() {
 		_ = f.Close()
@@ -48,6 +52,6 @@ func UnmarshalFile(path string, format Format) ([][]int, error) {
 	case format == FormatPlaintext, ext == ExtPlaintext:
 		return UnmarshalPlaintext(f)
 	default:
-		return nil, fmt.Errorf("%w: %s", ErrUnknownExtension, filepath.Ext(path))
+		return Pattern{}, fmt.Errorf("%w: %s", ErrUnknownExtension, filepath.Ext(path))
 	}
 }
