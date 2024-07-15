@@ -27,6 +27,9 @@ func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 				pattern.Comment += string(comment)
 			}
 		default:
+			if len(line)*(len(pattern.Grid)+1) > MaxTiles {
+				return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, len(line), len(pattern.Grid))
+			}
 			tileLine := make([]int, len(line))
 			var x int
 			for _, b := range line {

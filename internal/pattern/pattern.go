@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 )
 
+const MaxTiles = 33_554_432
+
 type Pattern struct {
 	Name    string
 	Comment string
@@ -30,6 +32,7 @@ func FormatStrings() []string {
 var (
 	ErrInvalidHeader    = errors.New("invalid header")
 	ErrUnknownExtension = errors.New("unknown pattern extension")
+	ErrPatternTooBig    = errors.New("pattern too big")
 )
 
 const (

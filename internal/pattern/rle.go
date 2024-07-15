@@ -65,6 +65,10 @@ scan:
 				}
 			}
 
+			if w*h > MaxTiles {
+				return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, w, h)
+			}
+
 			pattern.Grid = make([][]int, h)
 			for i := range pattern.Grid {
 				pattern.Grid[i] = make([]int, w)
@@ -97,15 +101,23 @@ scan:
 							needsClip = true
 							pattern.Grid = slices.Grow(pattern.Grid, diff)
 							for range diff {
+								var w int
 								if len(pattern.Grid) == 0 {
-									pattern.Grid = append(pattern.Grid, make([]int, runCount))
+									w = runCount
 								} else {
-									pattern.Grid = append(pattern.Grid, make([]int, len(pattern.Grid[0])))
+									w = len(pattern.Grid[0])
 								}
+								if w*(y+1) > MaxTiles {
+									return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, x, y)
+								}
+								pattern.Grid = append(pattern.Grid, make([]int, w))
 							}
 						}
 
 						if x > len(pattern.Grid[y])-1 {
+							if (x+runCount)*y > MaxTiles {
+								return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, x, y)
+							}
 							needsClip = true
 							for i, row := range pattern.Grid {
 								pattern.Grid[i] = append(row, make([]int, runCount)...)
