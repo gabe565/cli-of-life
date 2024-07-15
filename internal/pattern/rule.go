@@ -25,7 +25,13 @@ var ErrUnsupportedRule = errors.New("unsupported rule string")
 
 func (r *Rule) UnmarshalText(text []byte) error {
 	if !bytes.Contains(text, []byte("/")) {
-		return fmt.Errorf("%w: %s", ErrUnsupportedRule, text)
+		switch {
+		case bytes.EqualFold(text, []byte("Life")):
+			*r = GameOfLife()
+			return nil
+		default:
+			return fmt.Errorf("%w: %s", ErrUnsupportedRule, text)
+		}
 	}
 
 	var born, survive []int

@@ -19,6 +19,7 @@ func TestRule_UnmarshalText(t *testing.T) {
 	}{
 		{"B3/S23", args{b: []byte("B3/S23")}, GameOfLife(), require.NoError},
 		{"23/3", args{b: []byte("23/3")}, GameOfLife(), require.NoError},
+		{"Life edge case", args{b: []byte("Life")}, GameOfLife(), require.NoError},
 		{"B36/S23", args{b: []byte("B36/S23")}, HighLife(), require.NoError},
 		{"23/36", args{b: []byte("23/36")}, HighLife(), require.NoError},
 		{"no slash", args{b: []byte("abc")}, Rule{}, require.Error},
