@@ -154,21 +154,13 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 				}
 			case tea.MouseButtonWheelUp:
-				if g.y > 0 {
-					g.y--
-				}
+				g.y = max(g.y-1, 0)
 			case tea.MouseButtonWheelLeft:
-				if g.x > 0 {
-					g.x--
-				}
+				g.x = max(g.x-1, 0)
 			case tea.MouseButtonWheelDown:
-				if g.y < g.BoardH()-g.viewH {
-					g.y++
-				}
+				g.y = min(g.y+1, g.BoardH()-g.viewH)
 			case tea.MouseButtonWheelRight:
-				if g.x < g.BoardW()-g.viewW {
-					g.x++
-				}
+				g.x = min(g.x+1, g.BoardW()-g.viewW)
 			}
 		}
 	case tea.KeyMsg:
@@ -201,30 +193,30 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, g.keymap.moveUp):
 			if g.wrap {
 				g.pattern.Grid = append(g.pattern.Grid[len(g.pattern.Grid)-1:], g.pattern.Grid[:len(g.pattern.Grid)-1]...)
-			} else if g.y > 0 {
-				g.y--
+			} else {
+				g.y = max(g.y-1, 0)
 			}
 		case key.Matches(msg, g.keymap.moveLeft):
 			if g.wrap {
 				for i, row := range g.pattern.Grid {
 					g.pattern.Grid[i] = append(row[len(row)-1:], row[:len(row)-1]...)
 				}
-			} else if g.x > 0 {
-				g.x--
+			} else {
+				g.x = max(g.x-1, 0)
 			}
 		case key.Matches(msg, g.keymap.moveDown):
 			if g.wrap {
 				g.pattern.Grid = append(g.pattern.Grid[1:], g.pattern.Grid[0])
-			} else if g.y < g.BoardH()-g.viewH {
-				g.y++
+			} else {
+				g.y = min(g.y+1, g.BoardH(), g.viewH)
 			}
 		case key.Matches(msg, g.keymap.moveRight):
 			if g.wrap {
 				for i, row := range g.pattern.Grid {
 					g.pattern.Grid[i] = append(row[1:], row[0])
 				}
-			} else if g.x < g.BoardW()-g.viewW {
-				g.x++
+			} else {
+				g.x = min(g.x+1, g.BoardW()-g.viewW)
 			}
 		case key.Matches(msg, g.keymap.wrap):
 			g.wrap = !g.wrap
