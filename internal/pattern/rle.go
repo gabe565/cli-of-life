@@ -95,6 +95,7 @@ scan:
 						if y > len(pattern.Grid)-1 {
 							diff := max(y+1-len(pattern.Grid), 1)
 							needsClip = true
+							pattern.Grid = slices.Grow(pattern.Grid, diff)
 							for range diff {
 								if len(pattern.Grid) == 0 {
 									pattern.Grid = append(pattern.Grid, make([]int, runCount))
@@ -103,6 +104,7 @@ scan:
 								}
 							}
 						}
+
 						if x > len(pattern.Grid[y])-1 {
 							needsClip = true
 							for i, row := range pattern.Grid {
