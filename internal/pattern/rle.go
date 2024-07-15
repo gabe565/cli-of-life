@@ -130,7 +130,8 @@ scan:
 							pattern.Grid[y][x] = 0
 							x++
 						}
-					case 'o':
+					case ' ':
+					default:
 						for range runCount {
 							pattern.Grid[y][x] = 1
 							x++
