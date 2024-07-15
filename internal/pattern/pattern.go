@@ -30,9 +30,10 @@ func FormatStrings() []string {
 }
 
 var (
-	ErrInvalidHeader    = errors.New("invalid header")
-	ErrUnknownExtension = errors.New("unknown pattern extension")
-	ErrPatternTooBig    = errors.New("pattern too big")
+	ErrInvalidHeader       = errors.New("invalid header")
+	ErrUnknownExtension    = errors.New("unknown pattern extension")
+	ErrPatternTooBig       = errors.New("pattern too big")
+	ErrUnexpectedCharacter = errors.New("unexpected character")
 )
 
 const (

@@ -40,6 +40,8 @@ func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 				case 'O', '*':
 					tileLine[x] = 1
 					x++
+				default:
+					return pattern, fmt.Errorf("plaintext: %w: %q in line %q", ErrUnexpectedCharacter, string(b), line)
 				}
 			}
 			if len(tileLine) > largest {
