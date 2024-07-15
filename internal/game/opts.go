@@ -4,6 +4,7 @@ import (
 	"context"
 	"image"
 
+	"github.com/gabe565/cli-of-life/internal/config"
 	"github.com/gabe565/cli-of-life/internal/pattern"
 )
 
@@ -33,5 +34,13 @@ func WithPlay(play bool) Option {
 			game.ctx, game.cancel = nil, nil
 			game.keymap.playPause.SetHelp(game.keymap.playPause.Help().Key, "play")
 		}
+	}
+}
+
+func WithConfig(c *config.Config) Option {
+	return func(game *Game) {
+		game.conf = c
+		WithDimensions(c.Width, c.Height)(game)
+		WithPlay(c.Play)(game)
 	}
 }

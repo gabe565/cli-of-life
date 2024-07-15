@@ -55,12 +55,7 @@ func run(cmd *cobra.Command, _ []string) error {
 		}
 	}
 
-	g := game.New(
-		game.WithPattern(pat),
-		game.WithDimensions(conf.Width, conf.Height),
-		game.WithPlay(conf.Play),
-	)
-
+	g := game.New(game.WithPattern(pat), game.WithConfig(conf))
 	_, err := tea.NewProgram(g, tea.WithAltScreen(), tea.WithMouseAllMotion()).Run()
 	return err
 }

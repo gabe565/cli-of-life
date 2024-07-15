@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/gabe565/cli-of-life/internal/config"
 	"github.com/gabe565/cli-of-life/internal/pattern"
 )
 
@@ -52,6 +53,7 @@ func New(opts ...Option) *Game {
 }
 
 type Game struct {
+	conf         *config.Config
 	viewW, viewH int
 	x, y         int
 	pattern      pattern.Pattern
