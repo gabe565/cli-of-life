@@ -57,7 +57,7 @@ func run(cmd *cobra.Command, _ []string) error {
 
 	g := game.New(
 		game.WithPattern(pat),
-		game.WithDimensions(400, 400),
+		game.WithDimensions(conf.Width, conf.Height),
 		game.WithPlay(conf.Play),
 	)
 
