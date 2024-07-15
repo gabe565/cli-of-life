@@ -13,6 +13,7 @@ func UnmarshalRLE(r io.Reader) (Pattern, error) {
 	var pattern Pattern
 	scanner := bufio.NewScanner(r)
 	var x, y int
+	var patternLine int
 scan:
 	for scanner.Scan() {
 		line := scanner.Bytes()
@@ -100,11 +101,14 @@ scan:
 						x++
 					}
 				case '$':
-					y += runCount
-					x = 0
+					if i != 0 || patternLine != 0 {
+						y += runCount
+						x = 0
+					}
 				case '!':
 					return pattern, nil
 				}
+				patternLine++
 				if i++; i > len(line)-1 {
 					continue scan
 				}
