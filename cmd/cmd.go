@@ -72,10 +72,12 @@ func run(cmd *cobra.Command, _ []string) error {
 		}
 	}
 
-	_, err := tea.NewProgram(
-		game.New(pat, cmd.Flag(config.PlayFlag).Value.String() == "true"),
-		tea.WithAltScreen(),
-		tea.WithMouseAllMotion(),
-	).Run()
+	g := game.New(
+		game.WithPattern(pat),
+		game.WithDimensions(400, 400),
+		game.WithPlay(cmd.Flag(config.PlayFlag).Value.String() == "true"),
+	)
+
+	_, err := tea.NewProgram(g, tea.WithAltScreen(), tea.WithMouseAllMotion()).Run()
 	return err
 }

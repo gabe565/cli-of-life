@@ -4,16 +4,11 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 )
 
-func newKeymap(play bool) keymap {
-	playDesc := "play"
-	if play {
-		playDesc = "pause"
-	}
-
+func newKeymap() keymap {
 	return keymap{
 		playPause: key.NewBinding(
 			key.WithKeys(" ", "enter"),
-			key.WithHelp("space", playDesc),
+			key.WithHelp("space", "play"),
 		),
 		tick: key.NewBinding(
 			key.WithKeys("t"),

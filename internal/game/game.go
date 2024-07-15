@@ -33,28 +33,21 @@ const (
 	ModeErase
 )
 
-func New(pat pattern.Pattern, play bool) *Game {
-	if pat.Rule.IsZero() {
-		pat.Rule = pattern.GameOfLife()
-	}
-
-	var ctx context.Context
-	var cancel context.CancelFunc
-	if play {
-		ctx, cancel = context.WithCancel(context.Background())
-	}
-
+func New(opts ...Option) *Game {
 	game := &Game{
-		pattern: pat,
-		ctx:     ctx,
-		cancel:  cancel,
-		keymap:  newKeymap(play),
-		help:    help.New(),
-		speed:   5,
+		keymap: newKeymap(),
+		help:   help.New(),
+		speed:  5,
 	}
-	newW := max(400, game.BoardW()+100)
-	newH := max(400, game.BoardH()+100)
-	game.Resize(newW, newH, image.Pt(0, 0))
+
+	for _, opt := range opts {
+		opt(game)
+	}
+
+	if game.pattern.Rule.IsZero() {
+		game.pattern.Rule = pattern.GameOfLife()
+	}
+
 	return game
 }
 
