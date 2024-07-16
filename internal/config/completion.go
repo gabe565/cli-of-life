@@ -25,9 +25,18 @@ func RegisterCompletion(cmd *cobra.Command) error {
 				return []string{pattern.ExtRLE, pattern.ExtPlaintext}, cobra.ShellCompDirectiveFilterFileExt
 			},
 		),
+		cmd.RegisterFlagCompletionFunc(URLFlag, cobra.NoFileCompletions),
 		cmd.RegisterFlagCompletionFunc(RuleStringFlag,
 			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 				return []string{pattern.GameOfLife().String(), pattern.HighLife().String()}, cobra.ShellCompDirectiveNoFileComp
+			},
+		),
+		cmd.RegisterFlagCompletionFunc(PlayFlag, cobra.NoFileCompletions),
+		cmd.RegisterFlagCompletionFunc(WidthFlag, cobra.NoFileCompletions),
+		cmd.RegisterFlagCompletionFunc(HeightFlag, cobra.NoFileCompletions),
+		cmd.RegisterFlagCompletionFunc(CompletionFlag,
+			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+				return shells(), cobra.ShellCompDirectiveNoFileComp
 			},
 		),
 	)
