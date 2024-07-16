@@ -9,6 +9,10 @@ builds:
       - CGO_ENABLED=0
     flags:
       - -trimpath
+    ldflags:
+      - -s
+      - -w
+      - -X github.com/gabe565/cli-of-life/cmd.version={{ .Version }}
     goarch:
       - amd64
       - arm

@@ -16,6 +16,7 @@ cli-of-life [flags]
       --play                 Play on startup
       --rule-string string   Rule string to use. This will be ignored if a pattern file is loaded. (default "B3/S23")
       --url string           Load a pattern URL
+  -v, --version              version for cli-of-life
       --width uint           Board width. Will be ignored if a larger pattern is loaded. (default 600)
 ```
 

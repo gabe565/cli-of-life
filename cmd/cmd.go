@@ -13,16 +13,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var version = "beta"
+
 func New() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "cli-of-life",
-		Short: "Play Conway's Game of Life in your terminal",
-		RunE:  run,
-		Args:  cobra.NoArgs,
+		Use:     "cli-of-life",
+		Short:   "Play Conway's Game of Life in your terminal",
+		RunE:    run,
+		Args:    cobra.NoArgs,
+		Version: buildVersion(version),
 
 		ValidArgsFunction: cobra.NoFileCompletions,
 		DisableAutoGenTag: true,
 	}
+	cmd.InitDefaultVersionFlag()
 
 	conf := config.New()
 	conf.RegisterFlags(cmd.Flags())
