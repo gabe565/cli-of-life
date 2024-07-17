@@ -117,10 +117,10 @@ See [usage docs](docs/cli-of-life.md) for cli flag documentation.
 |---------|-------------------------------------------|
 | Mouse   | Place cells                               |
 | `Space` | Play/pause                                |
-| `T`     | Tick                                      |
 | `M`     | Toggle between modes: smart, place, erase |
 | `↑↓←→`  | Move the game board                       |
 | `W`     | Toggle wrapping                           |
 | `<`/`>` | Change playback speed                     |
+| `T`     | Tick                                      |
 | `R`     | Reset                                     |
 | `Q`     | Quit                                      |
