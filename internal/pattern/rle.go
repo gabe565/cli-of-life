@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"io"
 	"regexp"
-	"slices"
 	"strconv"
+
+	"github.com/gabe565/cli-of-life/internal/quadtree"
+	"github.com/gabe565/cli-of-life/internal/rule"
 )
 
 func RLEHeaderRegexp() *regexp.Regexp {
@@ -15,10 +17,11 @@ func RLEHeaderRegexp() *regexp.Regexp {
 }
 
 func UnmarshalRLE(r io.Reader) (Pattern, error) {
-	var pattern Pattern
+	pattern := Pattern{
+		Tree: quadtree.Empty(quadtree.DefaultTreeSize),
+	}
 	scanner := bufio.NewScanner(r)
 	var x, y int
-	var needsClip bool
 scan:
 	for scanner.Scan() {
 		line := scanner.Bytes()
@@ -36,7 +39,7 @@ scan:
 					pattern.Comment += string(comment)
 				}
 			}
-		case len(pattern.Grid) == 0 && bytes.HasPrefix(line, []byte("x")):
+		case bytes.HasPrefix(line, []byte("x")):
 			headerRe := RLEHeaderRegexp()
 			matches := headerRe.FindStringSubmatch(scanner.Text())
 
@@ -59,7 +62,7 @@ scan:
 				case "rule":
 					switch matches[i] {
 					case "":
-						pattern.Rule = GameOfLife()
+						pattern.Rule = rule.GameOfLife()
 					default:
 						if err := pattern.Rule.UnmarshalText([]byte(matches[i])); err != nil {
 							return pattern, fmt.Errorf("rle: %w", err)
@@ -68,15 +71,7 @@ scan:
 				}
 			}
 
-			if w*h > MaxTiles {
-				return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, w, h)
-			}
-
-			pattern.Grid = make([][]int, h)
-			for i := range pattern.Grid {
-				pattern.Grid[i] = make([]int, w)
-			}
-			continue
+			pattern.Tree = pattern.Tree.GrowToFit(w, h)
 		default:
 			if len(line) == 0 {
 				continue
@@ -99,45 +94,16 @@ scan:
 					break scan
 				default:
 					runCount = max(runCount, 1)
-
-					if y > len(pattern.Grid)-1 {
-						diff := max(y-len(pattern.Grid)+1, 1)
-						needsClip = true
-						pattern.Grid = slices.Grow(pattern.Grid, diff)
-						for range diff {
-							var w int
-							if len(pattern.Grid) == 0 {
-								w = runCount
-							} else {
-								w = len(pattern.Grid[0])
-							}
-							if w*(y+1) > MaxTiles {
-								return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, x, y)
-							}
-							pattern.Grid = append(pattern.Grid, make([]int, w))
-						}
-					}
-
-					if x+runCount-1 > len(pattern.Grid[y])-1 {
-						if (x+runCount)*y > MaxTiles {
-							return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, x, y)
-						}
-						needsClip = true
-						for i, row := range pattern.Grid {
-							pattern.Grid[i] = append(row, make([]int, runCount)...)
-						}
-					}
-
 					switch b {
 					case 'b':
 						for range runCount {
-							pattern.Grid[y][x] = 0
+							pattern.Tree = pattern.Tree.Set(x, y, 0)
 							x++
 						}
 					case ' ':
 					default:
 						for range runCount {
-							pattern.Grid[y][x] = 1
+							pattern.Tree = pattern.Tree.Set(x, y, 1)
 							x++
 						}
 					}
@@ -149,13 +115,5 @@ scan:
 	if scanner.Err() != nil {
 		return pattern, fmt.Errorf("rle: %w", scanner.Err())
 	}
-
-	if needsClip {
-		pattern.Grid = slices.Clip(pattern.Grid)
-		for i, row := range pattern.Grid {
-			pattern.Grid[i] = slices.Clip(row)
-		}
-	}
-
 	return pattern, nil
 }

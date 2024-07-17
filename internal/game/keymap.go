@@ -30,10 +30,6 @@ func newKeymap() keymap {
 			key.WithKeys("up", "left", "down", "right"),
 			key.WithHelp("↑↓←→", "move"),
 		),
-		wrap: key.NewBinding(
-			key.WithKeys("w"),
-			key.WithHelp("w", "enable wrap"),
-		),
 		speedUp: key.NewBinding(
 			key.WithKeys(">", "."),
 		),
@@ -56,6 +52,10 @@ func newKeymap() keymap {
 			key.WithKeys("q", "ctrl+c", "esc"),
 			key.WithHelp("q", "quit"),
 		),
+		debug: key.NewBinding(
+			key.WithKeys("`"),
+			key.WithHelp("`", "debug"),
+		),
 	}
 }
 
@@ -66,7 +66,6 @@ type keymap struct {
 	moveLeft  key.Binding
 	moveDown  key.Binding
 	moveRight key.Binding
-	wrap      key.Binding
 	speedUp   key.Binding
 	speedDown key.Binding
 	speed     key.Binding
@@ -74,6 +73,7 @@ type keymap struct {
 	tick      key.Binding
 	reset     key.Binding
 	quit      key.Binding
+	debug     key.Binding
 }
 
 func (k keymap) ShortHelp() []key.Binding {
@@ -81,7 +81,6 @@ func (k keymap) ShortHelp() []key.Binding {
 		k.playPause,
 		k.mode,
 		k.move,
-		k.wrap,
 		k.speed,
 		k.tick,
 		k.reset,

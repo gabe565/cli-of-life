@@ -6,6 +6,7 @@ import (
 	"io"
 	"testing"
 
+	"github.com/gabe565/cli-of-life/internal/rule"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -18,10 +19,11 @@ func TestUnmarshalPlaintext(t *testing.T) {
 		r io.Reader
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    Pattern
-		wantErr require.ErrorAssertionFunc
+		name     string
+		args     args
+		want     Pattern
+		wantGrid [][]int
+		wantErr  require.ErrorAssertionFunc
 	}{
 		{
 			"glider",
@@ -30,9 +32,9 @@ func TestUnmarshalPlaintext(t *testing.T) {
 				Name:    "Glider",
 				Comment: "The smallest, most common, and first discovered spaceship.\nwww.conwaylife.com/wiki/index.php?title=Glider",
 				Author:  "Richard K. Guy",
-				Grid:    [][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}},
-				Rule:    GameOfLife(),
+				Rule:    rule.GameOfLife(),
 			},
+			[][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}},
 			require.NoError,
 		},
 	}
@@ -40,7 +42,10 @@ func TestUnmarshalPlaintext(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := UnmarshalPlaintext(tt.args.r)
 			tt.wantErr(t, err)
+			tree := got.Tree
+			got.Tree = nil
 			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.wantGrid, tree.ToSlice())
 		})
 	}
 }

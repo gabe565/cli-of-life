@@ -1,6 +1,8 @@
 package config
 
-import "github.com/gabe565/cli-of-life/internal/pattern"
+import (
+	"github.com/gabe565/cli-of-life/internal/rule"
+)
 
 type Config struct {
 	File          string
@@ -17,7 +19,7 @@ type Config struct {
 func New() *Config {
 	return &Config{
 		PatternFormat: "auto",
-		RuleString:    pattern.GameOfLife().String(),
+		RuleString:    rule.GameOfLife().String(),
 		Width:         600,
 		Height:        600,
 	}

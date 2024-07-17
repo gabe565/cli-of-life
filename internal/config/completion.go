@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/gabe565/cli-of-life/internal/pattern"
+	"github.com/gabe565/cli-of-life/internal/rule"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +29,7 @@ func RegisterCompletion(cmd *cobra.Command) error {
 		cmd.RegisterFlagCompletionFunc(URLFlag, cobra.NoFileCompletions),
 		cmd.RegisterFlagCompletionFunc(RuleStringFlag,
 			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-				return []string{pattern.GameOfLife().String(), pattern.HighLife().String()}, cobra.ShellCompDirectiveNoFileComp
+				return []string{rule.GameOfLife().String(), rule.HighLife().String()}, cobra.ShellCompDirectiveNoFileComp
 			},
 		),
 		cmd.RegisterFlagCompletionFunc(PlayFlag, cobra.NoFileCompletions),

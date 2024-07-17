@@ -10,6 +10,8 @@ import (
 	"github.com/gabe565/cli-of-life/internal/config"
 	"github.com/gabe565/cli-of-life/internal/game"
 	"github.com/gabe565/cli-of-life/internal/pattern"
+	"github.com/gabe565/cli-of-life/internal/quadtree"
+	"github.com/gabe565/cli-of-life/internal/rule"
 	"github.com/spf13/cobra"
 )
 
@@ -47,14 +49,12 @@ func run(cmd *cobra.Command, _ []string) error {
 		return completion(cmd, conf.Completion)
 	}
 
-	var rule pattern.Rule
-	if err := rule.UnmarshalText([]byte(conf.RuleString)); err != nil {
+	var r rule.Rule
+	if err := r.UnmarshalText([]byte(conf.RuleString)); err != nil {
 		return err
 	}
 
-	pat := pattern.Pattern{
-		Rule: rule,
-	}
+	var pat pattern.Pattern
 	switch {
 	case conf.File != "":
 		var err error
@@ -65,6 +65,11 @@ func run(cmd *cobra.Command, _ []string) error {
 		var err error
 		if pat, err = pattern.UnmarshalURL(context.Background(), conf.URL); err != nil {
 			return err
+		}
+	default:
+		pat = pattern.Pattern{
+			Rule: r,
+			Tree: quadtree.Empty(quadtree.DefaultTreeSize),
 		}
 	}
 

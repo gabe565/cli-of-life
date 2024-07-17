@@ -5,13 +5,18 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"slices"
+
+	"github.com/gabe565/cli-of-life/internal/quadtree"
+	"github.com/gabe565/cli-of-life/internal/rule"
 )
 
 func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
-	pattern := Pattern{Rule: GameOfLife()}
+	pattern := Pattern{
+		Rule: rule.GameOfLife(),
+		Tree: quadtree.Empty(quadtree.DefaultTreeSize),
+	}
 	scanner := bufio.NewScanner(r)
-	var largest int
+	var y int
 	for scanner.Scan() {
 		line := scanner.Bytes()
 		switch {
@@ -27,37 +32,25 @@ func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 				pattern.Comment += string(comment)
 			}
 		default:
-			if len(line)*(len(pattern.Grid)+1) > MaxTiles {
-				return pattern, fmt.Errorf("rle: %w: w=%d, h=%d", ErrPatternTooBig, len(line), len(pattern.Grid))
-			}
-			tileLine := make([]int, len(line))
 			var x int
+			pattern.Tree = pattern.Tree.GrowToFit(x, len(line))
 			for _, b := range line {
 				switch b {
 				case '.':
-					tileLine[x] = 0
+					pattern.Tree = pattern.Tree.Set(x, y, 0)
 					x++
 				case 'O', '*':
-					tileLine[x] = 1
+					pattern.Tree = pattern.Tree.Set(x, y, 1)
 					x++
 				default:
 					return pattern, fmt.Errorf("plaintext: %w: %q in line %q", ErrUnexpectedCharacter, string(b), line)
 				}
 			}
-			if len(tileLine) > largest {
-				largest = len(tileLine)
-			}
-			pattern.Grid = append(pattern.Grid, tileLine)
-		}
-	}
-	for i := range pattern.Grid {
-		if diff := largest - len(pattern.Grid[i]); diff > 0 {
-			pattern.Grid[i] = append(pattern.Grid[i], make([]int, diff)...)
+			y++
 		}
 	}
 	if scanner.Err() != nil {
 		return pattern, fmt.Errorf("plaintext: %w", scanner.Err())
 	}
-	pattern.Grid = slices.Clip(pattern.Grid)
 	return pattern, nil
 }

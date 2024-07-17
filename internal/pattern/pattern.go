@@ -10,6 +10,9 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/gabe565/cli-of-life/internal/quadtree"
+	"github.com/gabe565/cli-of-life/internal/rule"
 )
 
 const MaxTiles = 33_554_432
@@ -18,13 +21,16 @@ type Pattern struct {
 	Name    string
 	Comment string
 	Author  string
-	Grid    [][]int
-	Rule    Rule
+	Tree    *quadtree.Node
+	Rule    rule.Rule
+}
+
+func (p *Pattern) NextGen() {
+	p.Tree = p.Tree.NextGen(&p.Rule)
 }
 
 var (
 	ErrInvalidHeader       = errors.New("invalid header")
-	ErrPatternTooBig       = errors.New("pattern too big")
 	ErrUnexpectedCharacter = errors.New("unexpected character")
 	ErrInferFailed         = errors.New("unable to infer pattern file type")
 )
