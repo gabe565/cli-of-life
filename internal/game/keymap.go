@@ -14,9 +14,9 @@ func newKeymap() keymap {
 			key.WithKeys("t"),
 			key.WithHelp("t", "tick"),
 		),
-		placeErase: key.NewBinding(
+		mode: key.NewBinding(
 			key.WithKeys("m"),
-			key.WithHelp("m", "erase"),
+			key.WithHelp("m", "mode: smart"),
 		),
 		moveUp: key.NewBinding(
 			key.WithKeys("up"),
@@ -62,7 +62,7 @@ func newKeymap() keymap {
 type keymap struct {
 	playPause   key.Binding
 	tick        key.Binding
-	placeErase  key.Binding
+	mode        key.Binding
 	moveUp      key.Binding
 	moveLeft    key.Binding
 	moveDown    key.Binding
@@ -80,7 +80,7 @@ func (k keymap) ShortHelp() []key.Binding {
 	return []key.Binding{
 		k.playPause,
 		k.tick,
-		k.placeErase,
+		k.mode,
 		k.move,
 		k.wrap,
 		k.changeSpeed,

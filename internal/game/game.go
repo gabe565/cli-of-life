@@ -30,15 +30,17 @@ var speeds = []time.Duration{
 type Mode uint8
 
 const (
-	ModePlace Mode = iota
+	ModeSmart Mode = iota
+	ModePlace
 	ModeErase
 )
 
 func New(opts ...Option) *Game {
 	game := &Game{
-		keymap: newKeymap(),
-		help:   help.New(),
-		speed:  5,
+		keymap:   newKeymap(),
+		help:     help.New(),
+		speed:    5,
+		smartVal: -1,
 	}
 
 	for _, opt := range opts {
@@ -63,6 +65,7 @@ type Game struct {
 	keymap       keymap
 	help         help.Model
 	mode         Mode
+	smartVal     int
 	wrap         bool
 	speed        int
 	viewBuf      bytes.Buffer
@@ -151,6 +154,16 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				msg.Y += g.y
 				if len(g.pattern.Grid) > msg.Y && len(g.pattern.Grid[msg.Y]) > msg.X {
 					switch g.mode {
+					case ModeSmart:
+						if g.smartVal == -1 {
+							switch g.pattern.Grid[msg.Y][msg.X] {
+							case 0:
+								g.smartVal = 1
+							case 1:
+								g.smartVal = 0
+							}
+						}
+						g.pattern.Grid[msg.Y][msg.X] = g.smartVal
 					case ModePlace:
 						g.pattern.Grid[msg.Y][msg.X] = 1
 					case ModeErase:
@@ -166,6 +179,8 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case tea.MouseButtonWheelRight:
 				g.x = min(g.x+2, g.BoardW()-g.viewW)
 			}
+		case tea.MouseActionRelease:
+			g.smartVal = -1
 		}
 	case tea.KeyMsg:
 		switch {
@@ -185,14 +200,17 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return tick{}
 				}
 			}
-		case key.Matches(msg, g.keymap.placeErase):
+		case key.Matches(msg, g.keymap.mode):
 			switch g.mode {
+			case ModeSmart:
+				g.mode = ModePlace
+				g.keymap.mode.SetHelp(g.keymap.mode.Help().Key, "mode: place")
 			case ModePlace:
 				g.mode = ModeErase
-				g.keymap.placeErase.SetHelp(g.keymap.placeErase.Help().Key, "place")
+				g.keymap.mode.SetHelp(g.keymap.mode.Help().Key, "mode: erase")
 			case ModeErase:
-				g.mode = ModePlace
-				g.keymap.placeErase.SetHelp(g.keymap.placeErase.Help().Key, "erase")
+				g.mode = ModeSmart
+				g.keymap.mode.SetHelp(g.keymap.mode.Help().Key, "mode: smart")
 			}
 		case key.Matches(msg, g.keymap.moveUp):
 			if g.wrap {
