@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"runtime/debug"
 
@@ -57,11 +58,13 @@ func run(cmd *cobra.Command, _ []string) error {
 	var pat pattern.Pattern
 	switch {
 	case conf.File != "":
+		slog.Info("Loading pattern file", "path", conf.File)
 		var err error
 		if pat, err = pattern.UnmarshalFile(conf.File); err != nil {
 			return err
 		}
 	case conf.URL != "":
+		slog.Info("Loading pattern URL", "url", conf.URL)
 		var err error
 		if pat, err = pattern.UnmarshalURL(context.Background(), conf.URL); err != nil {
 			return err
@@ -91,6 +94,8 @@ func run(cmd *cobra.Command, _ []string) error {
 		}
 	}()
 
+	slog.Info("Starting game")
 	_, err := program.Run()
+	slog.Info("Quitting game")
 	return err
 }
