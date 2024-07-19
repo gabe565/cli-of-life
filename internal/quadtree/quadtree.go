@@ -318,30 +318,26 @@ func (n *Node) Stats() string {
 	return s
 }
 
-func (n *Node) Render(buf *bytes.Buffer, x, y, w, h int, level uint) {
+func (n *Node) Render(buf *bytes.Buffer, rect image.Rectangle, level uint) {
 	size := n.Size()
-	x0 := x
-	if x0 < -size {
-		x0 = -size
+	if rect.Min.X < -size {
+		rect.Min.X = -size
 	}
-	x1 := x + w
-	if x1 > size {
-		x1 = size
+	if rect.Max.X > size {
+		rect.Max.X = size
 	}
-	y0 := y
-	if y0 < -size {
-		y0 = -size
+	if rect.Min.Y < -size {
+		rect.Min.Y = -size
 	}
-	y1 := y + h
-	if y1 > size {
-		y1 = size
+	if rect.Max.Y > size {
+		rect.Max.Y = size
 	}
 	skip := 1
 	if level != 0 {
 		skip = 1 << level
 	}
-	for y := y0; y < y1; y += skip {
-		for x := x0; x < x1; x += skip {
+	for y := rect.Min.Y; y < rect.Max.Y; y += skip {
+		for x := rect.Min.X; x < rect.Max.X; x += skip {
 			node := n.findNode(x, y, level)
 			if node.Value == 0 {
 				buf.WriteByte(' ')

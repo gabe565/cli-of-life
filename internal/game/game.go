@@ -3,6 +3,7 @@ package game
 import (
 	"bytes"
 	"context"
+	"image"
 	"strconv"
 	"strings"
 	"time"
@@ -57,9 +58,9 @@ func New(opts ...Option) *Game {
 
 type Game struct {
 	conf         *config.Config
-	viewW, viewH int
-	gameW, gameH int
-	x, y         int
+	viewSize     image.Point
+	gameSize     image.Point
+	view         image.Point
 	level        uint
 	startPattern pattern.Pattern
 	pattern      pattern.Pattern
@@ -90,15 +91,15 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case tea.WindowSizeMsg:
 		if msg.Width != 0 && msg.Height != 0 {
-			if g.viewW == 0 && g.viewH == 0 {
+			if g.viewSize.X == 0 && g.viewSize.Y == 0 {
 				defer func() {
 					size := g.pattern.Tree.FilledCoords().Size()
-					g.x = size.X/2 - g.gameW/2
-					g.y = size.Y/2 - g.gameH/2
+					g.view.X = size.X/2 - g.gameSize.X/2
+					g.view.Y = size.Y/2 - g.gameSize.Y/2
 				}()
 			}
-			g.viewW, g.viewH = msg.Width<<g.level, msg.Height<<g.level
-			g.gameW, g.gameH = (msg.Width/2)<<g.level, (msg.Height-1)<<g.level
+			g.viewSize.X, g.viewSize.Y = msg.Width<<g.level, msg.Height<<g.level
+			g.gameSize.X, g.gameSize.Y = (msg.Width/2)<<g.level, (msg.Height-1)<<g.level
 		}
 	case tea.MouseMsg:
 		switch msg.Action {
@@ -110,8 +111,8 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				size := g.pattern.Tree.Size()
 				msg.X /= 2
-				msg.X += g.x
-				msg.Y += g.y
+				msg.X += g.view.X
+				msg.Y += g.view.Y
 				if size > msg.Y && size > msg.X {
 					switch g.mode {
 					case ModeSmart:
@@ -183,23 +184,17 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			g.Scroll(DirRight, 2)
 		case key.Matches(msg, g.keymap.zoomIn):
 			if g.level > 0 {
-				centerX := g.x + g.gameW/2
-				centerY := g.y + g.gameH/2
+				center := g.view.Add(g.gameSize.Div(2))
 				g.level--
-				g.gameW /= 2
-				g.gameH /= 2
-				g.x = centerX - g.gameW/2
-				g.y = centerY - g.gameH/2
+				g.gameSize = g.gameSize.Div(2)
+				g.view = center.Sub(g.gameSize.Div(2))
 			}
 		case key.Matches(msg, g.keymap.zoomOut):
 			if g.level < g.pattern.Tree.Level {
-				centerX := g.x + g.gameW/2
-				centerY := g.y + g.gameH/2
+				center := g.view.Add(g.gameSize.Div(2))
 				g.level++
-				g.gameW *= 2
-				g.gameH *= 2
-				g.x = centerX - g.gameW/2
-				g.y = centerY - g.gameH/2
+				g.gameSize = g.gameSize.Mul(2)
+				g.view = center.Sub(g.gameSize.Div(2))
 			}
 		case key.Matches(msg, g.keymap.speedUp):
 			if g.speed < len(speeds)-1 {
@@ -240,12 +235,12 @@ func (g *Game) View() string {
 	}()
 	if g.debug {
 		g.viewBuf.WriteString(g.pattern.Tree.Stats())
-		g.viewBuf.WriteString(strings.Repeat("\n", g.viewH-lipgloss.Height(g.viewBuf.String())))
-	} else if g.gameW != 0 && g.gameH != 0 {
-		g.viewBuf.Grow(g.viewW * g.viewH)
-		g.pattern.Tree.Render(&g.viewBuf, g.x, g.y, g.gameW, g.gameH, g.level)
-		if g.viewH < g.gameH {
-			g.viewBuf.WriteString(strings.Repeat("\n", g.viewH-lipgloss.Height(g.viewBuf.String())))
+		g.viewBuf.WriteString(strings.Repeat("\n", g.viewSize.Y-lipgloss.Height(g.viewBuf.String())))
+	} else if g.gameSize.X != 0 && g.gameSize.Y != 0 {
+		g.viewBuf.Grow(g.viewSize.X * g.viewSize.Y)
+		g.pattern.Tree.Render(&g.viewBuf, image.Rectangle{Min: g.view, Max: g.view.Add(g.gameSize)}, g.level)
+		if g.viewSize.Y < g.gameSize.Y {
+			g.viewBuf.WriteString(strings.Repeat("\n", g.viewSize.Y-lipgloss.Height(g.viewBuf.String())))
 		}
 	}
 	return g.viewBuf.String() + g.help.ShortHelpView(g.keymap.ShortHelp())
@@ -282,20 +277,20 @@ func (g *Game) Scroll(d Direction, speed int) {
 
 	switch d {
 	case DirUp:
-		if g.y -= speed; g.y < -size {
-			g.y = -size
+		if g.view.Y -= speed; g.view.Y < -size {
+			g.view.Y = -size
 		}
 	case DirLeft:
-		if g.x -= speed; g.x < -size {
-			g.x = -size
+		if g.view.X -= speed; g.view.X < -size {
+			g.view.X = -size
 		}
 	case DirDown:
-		if g.y += speed; g.y > size-g.gameH {
-			g.y = size - g.gameH
+		if g.view.Y += speed; g.view.Y > size-g.gameSize.Y {
+			g.view.Y = size - g.gameSize.Y
 		}
 	case DirRight:
-		if g.x += speed; g.x > size-g.gameW {
-			g.x = size - g.gameW
+		if g.view.X += speed; g.view.X > size-g.gameSize.X {
+			g.view.X = size - g.gameSize.X
 		}
 	}
 }
