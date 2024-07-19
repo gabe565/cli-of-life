@@ -50,6 +50,8 @@ func run(cmd *cobra.Command, _ []string) error {
 		return completion(cmd, conf.Completion)
 	}
 
+	quadtree.SetCacheLimit(conf.CacheLimit)
+
 	var r rule.Rule
 	if err := r.UnmarshalText([]byte(conf.RuleString)); err != nil {
 		return err

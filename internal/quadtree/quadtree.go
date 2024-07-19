@@ -7,7 +7,6 @@ import (
 	"math"
 	"slices"
 	"sync"
-	"time"
 
 	"github.com/gabe565/cli-of-life/internal/rule"
 	"golang.org/x/exp/maps"
@@ -30,23 +29,22 @@ type Node struct {
 	Level uint
 	Children
 	Value int
-	seen  time.Time
 	next  *Node
 }
 
 //nolint:gochecknoglobals
 var (
-	nodeMap   = make(map[Children]*Node, 32768)
-	mu        sync.Mutex
-	aliveLeaf = &Node{Value: 1}
-	deadLeaf  = &Node{Value: 0}
-	cacheHit  uint
-	cacheMiss uint
+	nodeMap    = make(map[Children]*Node, 32768)
+	mu         sync.Mutex
+	aliveLeaf  = &Node{Value: 1}
+	deadLeaf   = &Node{Value: 0}
+	cacheLimit int
+	cacheHit   uint
+	cacheMiss  uint
 )
 
 func New(children Children) *Node {
 	if q, ok := nodeMap[children]; ok {
-		q.seen = time.Now()
 		cacheHit++
 		return q
 	}
@@ -55,7 +53,6 @@ func New(children Children) *Node {
 		Level:    children.NE.Level + 1,
 		Children: children,
 		Value:    children.value(),
-		seen:     time.Now(),
 	}
 	if q.Value == 0 || q.Level <= 16 {
 		nodeMap[children] = q
@@ -280,20 +277,11 @@ func (n *Node) NextGeneration(r *rule.Rule) *Node {
 }
 
 func (n *Node) NextGen(r *rule.Rule) *Node {
-	defer func() {
-		if mu.TryLock() {
-			go func() {
-				for k, v := range nodeMap {
-					if time.Since(v.seen) > 10*time.Second {
-						delete(nodeMap, k)
-					}
-				}
-				mu.Unlock()
-			}()
-		}
-	}()
 	mu.Lock()
 	defer mu.Unlock()
+	if len(nodeMap) > cacheLimit {
+		clear(nodeMap)
+	}
 	return n.grow().NextGeneration(r)
 }
 
@@ -421,4 +409,9 @@ func (n *Node) ToSlice() [][]int {
 
 func (n *Node) Size() int {
 	return 1 << (n.Level - 1)
+}
+
+func SetCacheLimit(v uint) {
+	cacheLimit = int(v)
+	nodeMap = make(map[Children]*Node, cacheLimit)
 }

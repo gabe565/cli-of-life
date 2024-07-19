@@ -13,6 +13,7 @@ const (
 	PlayFlag       = "play"
 	WidthFlag      = "width"
 	HeightFlag     = "height"
+	CacheLimitFlag = "cache-limit"
 	CompletionFlag = "completion"
 )
 
@@ -23,5 +24,6 @@ func (c *Config) RegisterFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&c.Play, PlayFlag, c.Play, "Play on startup")
 	fs.UintVar(&c.Width, WidthFlag, c.Width, "Board width. Will be ignored if a larger pattern is loaded.")
 	fs.UintVar(&c.Height, HeightFlag, c.Height, "Board height. Will be ignored if a larger pattern is loaded.")
+	fs.UintVar(&c.CacheLimit, CacheLimitFlag, c.CacheLimit, "Maximum number of entries to keep cached. Higher values will use more memory, but less CPU.")
 	fs.StringVar(&c.Completion, CompletionFlag, c.Completion, "Output command-line completion code for the specified shell (one of: "+strings.Join(shells(), ", ")+")")
 }
