@@ -30,6 +30,18 @@ func newKeymap() keymap {
 			key.WithKeys("up", "left", "down", "right"),
 			key.WithHelp("↑↓←→", "move"),
 		),
+		zoomIn: key.NewBinding(
+			key.WithKeys("+", "="),
+			key.WithHelp("+", "zoom in"),
+		),
+		zoomOut: key.NewBinding(
+			key.WithKeys("-", "_"),
+			key.WithHelp("-", "zoom out"),
+		),
+		zoom: key.NewBinding(
+			key.WithKeys("+", "-"),
+			key.WithHelp("+/-", "zoom"),
+		),
 		speedUp: key.NewBinding(
 			key.WithKeys(">", "."),
 		),
@@ -66,6 +78,9 @@ type keymap struct {
 	moveLeft  key.Binding
 	moveDown  key.Binding
 	moveRight key.Binding
+	zoomIn    key.Binding
+	zoomOut   key.Binding
+	zoom      key.Binding
 	speedUp   key.Binding
 	speedDown key.Binding
 	speed     key.Binding
@@ -81,6 +96,7 @@ func (k keymap) ShortHelp() []key.Binding {
 		k.playPause,
 		k.mode,
 		k.move,
+		k.zoom,
 		k.speed,
 		k.tick,
 		k.reset,

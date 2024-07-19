@@ -60,6 +60,7 @@ type Game struct {
 	viewW, viewH int
 	gameW, gameH int
 	x, y         int
+	level        uint
 	startPattern pattern.Pattern
 	pattern      pattern.Pattern
 	ctx          context.Context
@@ -96,14 +97,17 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					g.y = size.Y/2 - g.gameH/2
 				}()
 			}
-			g.viewW, g.viewH = msg.Width, msg.Height
-			g.gameW, g.gameH = msg.Width/2, msg.Height-1
+			g.viewW, g.viewH = msg.Width<<g.level, msg.Height<<g.level
+			g.gameW, g.gameH = (msg.Width/2)<<g.level, (msg.Height-1)<<g.level
 		}
 	case tea.MouseMsg:
 		switch msg.Action {
 		case tea.MouseActionPress, tea.MouseActionMotion:
 			switch msg.Button {
 			case tea.MouseButtonLeft:
+				if g.level != 0 {
+					break
+				}
 				size := g.pattern.Tree.Size()
 				msg.X /= 2
 				msg.X += g.x
@@ -112,7 +116,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					switch g.mode {
 					case ModeSmart:
 						if g.smartVal == -1 {
-							val := g.pattern.Tree.Get(msg.X, msg.Y)
+							val := g.pattern.Tree.Get(msg.X, msg.Y, 0)
 							switch val {
 							case 0:
 								g.smartVal = 1
@@ -128,13 +132,13 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 				}
 			case tea.MouseButtonWheelUp:
-				g.y = max(g.y-1, -g.pattern.Tree.Size())
+				g.Scroll(DirUp, 1)
 			case tea.MouseButtonWheelLeft:
-				g.x = max(g.x-2, -g.pattern.Tree.Size())
+				g.Scroll(DirLeft, 2)
 			case tea.MouseButtonWheelDown:
-				g.y = min(g.y+1, g.pattern.Tree.Size()-g.gameH)
+				g.Scroll(DirDown, 1)
 			case tea.MouseButtonWheelRight:
-				g.x = min(g.x+2, g.pattern.Tree.Size()-g.gameW)
+				g.Scroll(DirRight, 2)
 			}
 		case tea.MouseActionRelease:
 			g.smartVal = -1
@@ -170,13 +174,33 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				g.keymap.mode.SetHelp(g.keymap.mode.Help().Key, "mode: smart")
 			}
 		case key.Matches(msg, g.keymap.moveUp):
-			g.y = max(g.y-2, -g.pattern.Tree.Size())
+			g.Scroll(DirUp, 2)
 		case key.Matches(msg, g.keymap.moveLeft):
-			g.x = max(g.x-2, -g.pattern.Tree.Size())
+			g.Scroll(DirLeft, 2)
 		case key.Matches(msg, g.keymap.moveDown):
-			g.y = min(g.y+2, g.pattern.Tree.Size()-g.gameH)
+			g.Scroll(DirDown, 2)
 		case key.Matches(msg, g.keymap.moveRight):
-			g.x = min(g.x+2, g.pattern.Tree.Size()-g.gameW)
+			g.Scroll(DirRight, 2)
+		case key.Matches(msg, g.keymap.zoomIn):
+			if g.level > 0 {
+				centerX := g.x + g.gameW/2
+				centerY := g.y + g.gameH/2
+				g.level--
+				g.gameW /= 2
+				g.gameH /= 2
+				g.x = centerX - g.gameW/2
+				g.y = centerY - g.gameH/2
+			}
+		case key.Matches(msg, g.keymap.zoomOut):
+			if g.level < g.pattern.Tree.Level {
+				centerX := g.x + g.gameW/2
+				centerY := g.y + g.gameH/2
+				g.level++
+				g.gameW *= 2
+				g.gameH *= 2
+				g.x = centerX - g.gameW/2
+				g.y = centerY - g.gameH/2
+			}
 		case key.Matches(msg, g.keymap.speedUp):
 			if g.speed < len(speeds)-1 {
 				g.speed++
@@ -219,7 +243,10 @@ func (g *Game) View() string {
 		g.viewBuf.WriteString(strings.Repeat("\n", g.viewH-lipgloss.Height(g.viewBuf.String())))
 	} else if g.gameW != 0 && g.gameH != 0 {
 		g.viewBuf.Grow(g.viewW * g.viewH)
-		g.pattern.Tree.Render(&g.viewBuf, g.x, g.y, g.gameW, g.gameH)
+		g.pattern.Tree.Render(&g.viewBuf, g.x, g.y, g.gameW, g.gameH, g.level)
+		if g.viewH < g.gameH {
+			g.viewBuf.WriteString(strings.Repeat("\n", g.viewH-lipgloss.Height(g.viewBuf.String())))
+		}
 	}
 	return g.viewBuf.String() + g.help.ShortHelpView(g.keymap.ShortHelp())
 }
@@ -236,6 +263,39 @@ func Tick(ctx context.Context, wait time.Duration) tea.Cmd {
 			return nil
 		case <-time.After(wait):
 			return tick{}
+		}
+	}
+}
+
+type Direction uint8
+
+const (
+	DirUp Direction = iota
+	DirLeft
+	DirDown
+	DirRight
+)
+
+func (g *Game) Scroll(d Direction, speed int) {
+	speed *= 1 << g.level
+	size := g.pattern.Tree.Size()
+
+	switch d {
+	case DirUp:
+		if g.y -= speed; g.y < -size {
+			g.y = -size
+		}
+	case DirLeft:
+		if g.x -= speed; g.x < -size {
+			g.x = -size
+		}
+	case DirDown:
+		if g.y += speed; g.y > size-g.gameH {
+			g.y = size - g.gameH
+		}
+	case DirRight:
+		if g.x += speed; g.x > size-g.gameW {
+			g.x = size - g.gameW
 		}
 	}
 }

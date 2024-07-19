@@ -125,8 +125,8 @@ func (n *Node) Set(x, y int, value int) *Node {
 	}
 }
 
-func (n *Node) Get(x, y int) int {
-	leaf := n.findLeaf(x, y)
+func (n *Node) Get(x, y int, level uint) int {
+	leaf := n.findNode(x, y, level)
 	return leaf.Value
 }
 
@@ -134,10 +134,17 @@ func (n *Node) children() []*Node {
 	return []*Node{n.SE, n.SW, n.NW, n.NE}
 }
 
-func (n *Node) findLeaf(x, y int) *Node {
-	if n.Level == 0 {
-		if x < -1 || x > 0 || y < -1 || y > 0 {
+func (n *Node) findNode(x, y int, level uint) *Node {
+	if n.Level == level {
+		allowed := 1
+		if level != 0 {
+			allowed = 1 << (level - 1)
+		}
+		if x < -allowed || x > allowed || y < -allowed || y > allowed {
 			panic(fmt.Sprintf("Reached leaf node with coordinates too big: (%d, %d)", x, y))
+		}
+		if n.Value != 0 {
+			return n
 		}
 		return n
 	}
@@ -147,14 +154,14 @@ func (n *Node) findLeaf(x, y int) *Node {
 	case x >= 0:
 		switch {
 		case y >= 0:
-			return n.SE.findLeaf(x-distance, y-distance)
+			return n.SE.findNode(x-distance, y-distance, level)
 		default:
-			return n.NE.findLeaf(x-distance, y+distance)
+			return n.NE.findNode(x-distance, y+distance, level)
 		}
 	case y >= 0:
-		return n.SW.findLeaf(x+distance, y-distance)
+		return n.SW.findNode(x+distance, y-distance, level)
 	default:
-		return n.NW.findLeaf(x+distance, y+distance)
+		return n.NW.findNode(x+distance, y+distance, level)
 	}
 }
 
@@ -219,7 +226,7 @@ func (n *Node) slowSimulation(r *rule.Rule) *Node {
 	var b uint16
 	for y := -2; y < 2; y++ {
 		for x := -2; x < 2; x++ {
-			b = (b << 1) + uint16(n.Get(x, y))
+			b = (b << 1) + uint16(n.Get(x, y, 0))
 		}
 	}
 	return New(Children{NW: oneGen(b>>5, r), NE: oneGen(b>>4, r), SW: oneGen(b>>1, r), SE: oneGen(b, r)})
@@ -311,7 +318,7 @@ func (n *Node) Stats() string {
 	return s
 }
 
-func (n *Node) Render(buf *bytes.Buffer, x, y, w, h int) {
+func (n *Node) Render(buf *bytes.Buffer, x, y, w, h int, level uint) {
 	size := n.Size()
 	x0 := x
 	if x0 < -size {
@@ -329,9 +336,14 @@ func (n *Node) Render(buf *bytes.Buffer, x, y, w, h int) {
 	if y1 > size {
 		y1 = size
 	}
-	for y := y0; y < y1; y++ {
-		for x := x0; x < x1; x++ {
-			if n.Get(x, y) == 0 {
+	skip := 1
+	if level != 0 {
+		skip = 1 << level
+	}
+	for y := y0; y < y1; y += skip {
+		for x := x0; x < x1; x += skip {
+			node := n.findNode(x, y, level)
+			if node.Value == 0 {
 				buf.WriteByte(' ')
 				buf.WriteByte(' ')
 			} else {
@@ -405,7 +417,7 @@ func (n *Node) ToSlice() [][]int {
 
 	for y := coords.Min.Y; y < coords.Max.Y; y++ {
 		for x := coords.Min.X; x < coords.Max.X; x++ {
-			result[y-coords.Min.Y][x-coords.Min.X] = n.Get(x, y)
+			result[y-coords.Min.Y][x-coords.Min.X] = n.Get(x, y, 0)
 		}
 	}
 	return result
