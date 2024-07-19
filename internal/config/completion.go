@@ -26,7 +26,11 @@ func RegisterCompletion(cmd *cobra.Command) error {
 				return []string{pattern.ExtRLE, pattern.ExtPlaintext}, cobra.ShellCompDirectiveFilterFileExt
 			},
 		),
-		cmd.RegisterFlagCompletionFunc(URLFlag, cobra.NoFileCompletions),
+		cmd.RegisterFlagCompletionFunc(URLFlag,
+			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+				return []string{"https://"}, cobra.ShellCompDirectiveNoFileComp | cobra.ShellCompDirectiveNoSpace
+			},
+		),
 		cmd.RegisterFlagCompletionFunc(RuleStringFlag,
 			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 				return []string{rule.GameOfLife().String(), rule.HighLife().String()}, cobra.ShellCompDirectiveNoFileComp
