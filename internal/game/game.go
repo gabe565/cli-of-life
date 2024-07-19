@@ -188,7 +188,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if g.speed > time.Millisecond {
 				g.speed /= 2
 				tps := int(time.Second / g.speed)
-				g.keymap.speed.SetHelp(g.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" fps")
+				g.keymap.speed.SetHelp(g.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" tps")
 				if g.ctx != nil {
 					g.cancel()
 					g.ctx, g.cancel = context.WithCancel(context.Background())
@@ -198,7 +198,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, g.keymap.speedDown):
 			g.speed *= 2
 			tps := int(time.Second / g.speed)
-			g.keymap.speed.SetHelp(g.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" fps")
+			g.keymap.speed.SetHelp(g.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" tps")
 			if g.ctx != nil {
 				g.cancel()
 				g.ctx, g.cancel = context.WithCancel(context.Background())

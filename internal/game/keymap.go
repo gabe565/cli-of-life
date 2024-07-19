@@ -50,7 +50,7 @@ func newKeymap() keymap {
 		),
 		speed: key.NewBinding(
 			key.WithKeys("<", ".", ">", ","),
-			key.WithHelp("<>", "speed: 30 fps"),
+			key.WithHelp("<>", "speed: 30 tps"),
 		),
 		tick: key.NewBinding(
 			key.WithKeys("t"),
