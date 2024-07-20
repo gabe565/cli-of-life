@@ -19,6 +19,6 @@ func New() *Config {
 	return &Config{
 		PatternFormat: "auto",
 		RuleString:    rule.GameOfLife().String(),
-		CacheLimit:    200_000,
+		CacheLimit:    10_000_000,
 	}
 }

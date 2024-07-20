@@ -9,7 +9,7 @@ cli-of-life [flags]
 ### Options
 
 ```
-      --cache-limit uint     Maximum number of entries to keep cached. Higher values will use more memory, but less CPU. (default 200000)
+      --cache-limit uint     Maximum number of entries to keep cached. Higher values will use more memory, but less CPU. (default 10000000)
       --completion string    Output command-line completion code for the specified shell (one of: bash, zsh, fish, powershell)
   -f, --file string          Load a pattern file
   -h, --help                 help for cli-of-life
