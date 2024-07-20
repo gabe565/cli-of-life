@@ -86,7 +86,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					g.view.Y = size.Y/2 - g.gameSize.Y/2
 				}()
 			}
-			g.viewSize.X, g.viewSize.Y = msg.Width<<g.level, msg.Height<<g.level
+			g.viewSize.X, g.viewSize.Y = msg.Width, msg.Height
 			g.gameSize.X, g.gameSize.Y = (msg.Width/2)<<g.level, (msg.Height-1)<<g.level
 		}
 	case tea.MouseMsg:
