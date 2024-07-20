@@ -12,6 +12,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
 	"github.com/gabe565/cli-of-life/internal/config"
 	"github.com/gabe565/cli-of-life/internal/pattern"
 	"github.com/gabe565/cli-of-life/internal/rule"
@@ -224,10 +225,8 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (g *Game) View() string {
 	g.viewBuf.Reset()
 	if g.debug {
-		g.viewBuf.WriteString(g.pattern.Tree.Stats())
-		if h := g.viewSize.Y - lipgloss.Height(g.viewBuf.String()); h > 0 {
-			g.viewBuf.WriteString(strings.Repeat("\n", h))
-		}
+		stats := lipgloss.Place(g.viewSize.X, g.viewSize.Y-1, lipgloss.Center, lipgloss.Center, g.RenderStats())
+		g.viewBuf.WriteString(stats)
 	} else if g.gameSize.X != 0 && g.gameSize.Y != 0 {
 		g.pattern.Tree.Render(&g.viewBuf, image.Rectangle{Min: g.view, Max: g.view.Add(g.gameSize)}, g.level)
 		if g.viewSize.Y < g.gameSize.Y {
@@ -235,6 +234,32 @@ func (g *Game) View() string {
 		}
 	}
 	return g.viewBuf.String() + g.help.ShortHelpView(g.keymap.ShortHelp())
+}
+
+func (g *Game) RenderStats() string {
+	stats := g.pattern.Tree.Stats()
+	t := table.New().
+		StyleFunc(func(_, col int) lipgloss.Style {
+			s := lipgloss.NewStyle().Padding(0, 1)
+			switch col {
+			case 0:
+				return s.Bold(true)
+			case 1:
+				return s.Width(15)
+			}
+			return s
+		}).
+		Row("Generation", strconv.Itoa(stats.Generation)).
+		Row("Level", strconv.Itoa(stats.Level)).
+		Row("Population", strconv.Itoa(stats.Population)).
+		Row("Cache Size", strconv.Itoa(stats.CacheSize)).
+		Row("Cache Hit", strconv.Itoa(stats.CacheHit)).
+		Row("Cache Miss", strconv.Itoa(stats.CacheMiss)).
+		Row("Cache Ratio", strconv.FormatFloat(float64(stats.CacheRatio()), 'f', 3, 32))
+	return lipgloss.JoinVertical(lipgloss.Center,
+		lipgloss.NewStyle().Bold(true).Render("Stats"),
+		t.Render(),
+	)
 }
 
 type tick struct{}

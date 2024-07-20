@@ -1,18 +1,27 @@
 package quadtree
 
-import (
-	"fmt"
-)
+type Stats struct {
+	Generation int
+	Level      int
+	Population int
+	CacheSize  int
+	CacheHit   int
+	CacheMiss  int
+}
 
-func (n *Node) Stats() string {
+func (s *Stats) CacheRatio() float32 {
+	return float32(cacheHit) / float32(cacheMiss)
+}
+
+func (n *Node) Stats() Stats {
 	mu.Lock()
 	defer mu.Unlock()
-	s := fmt.Sprintln("Generation: ", generation)
-	s += fmt.Sprintln("Level:      ", n.Level)
-	s += fmt.Sprintln("Population: ", n.Value)
-	s += fmt.Sprintln("Cache Size: ", len(nodeMap))
-	s += fmt.Sprintln("Cache Hit:  ", cacheHit)
-	s += fmt.Sprintln("Cache Miss: ", cacheMiss)
-	s += fmt.Sprintln("Cache Ratio:", float32(cacheHit)/float32(cacheMiss))
-	return s
+	return Stats{
+		Generation: int(generation),
+		Level:      int(n.Level),
+		Population: n.Value,
+		CacheSize:  len(nodeMap),
+		CacheHit:   int(cacheHit),
+		CacheMiss:  int(cacheMiss),
+	}
 }
