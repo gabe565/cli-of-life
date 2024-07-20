@@ -221,7 +221,9 @@ func (g *Game) View() string {
 	}()
 	if g.debug {
 		g.viewBuf.WriteString(g.pattern.Tree.Stats())
-		g.viewBuf.WriteString(strings.Repeat("\n", g.viewSize.Y-lipgloss.Height(g.viewBuf.String())))
+		if h := g.viewSize.Y - lipgloss.Height(g.viewBuf.String()); h > 0 {
+			g.viewBuf.WriteString(strings.Repeat("\n", h))
+		}
 	} else if g.gameSize.X != 0 && g.gameSize.Y != 0 {
 		g.viewBuf.Grow(g.viewSize.X * g.viewSize.Y)
 		g.pattern.Tree.Render(&g.viewBuf, image.Rectangle{Min: g.view, Max: g.view.Add(g.gameSize)}, g.level)
