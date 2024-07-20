@@ -261,7 +261,7 @@ func TestNode_NextGeneration(t *testing.T) {
 }
 
 func TestNode_Size(t *testing.T) {
-	for i := range uint(16) {
+	for i := range uint8(16) {
 		t.Run(strconv.Itoa(int(i)), func(t *testing.T) {
 			node := Empty(i)
 			expect := int(math.Pow(2, float64(i)-1))

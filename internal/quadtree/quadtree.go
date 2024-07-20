@@ -25,8 +25,8 @@ func (c *Children) value() int {
 }
 
 type Node struct {
-	Level uint
 	Children
+	Level uint8
 	Value int
 	next  *Node
 }
@@ -59,7 +59,7 @@ func New(children Children) *Node {
 	return q
 }
 
-func Empty(level uint) *Node {
+func Empty(level uint8) *Node {
 	if level == 0 || level+1 == 0 || level+2 == 0 {
 		return deadLeaf
 	}
@@ -121,7 +121,7 @@ func (n *Node) Set(x, y int, value int) *Node {
 	}
 }
 
-func (n *Node) Get(x, y int, level uint) int {
+func (n *Node) Get(x, y int, level uint8) int {
 	leaf := n.findNode(x, y, level)
 	return leaf.Value
 }
@@ -130,7 +130,7 @@ func (n *Node) children() []*Node {
 	return []*Node{n.SE, n.SW, n.NW, n.NE}
 }
 
-func (n *Node) findNode(x, y int, level uint) *Node {
+func (n *Node) findNode(x, y int, level uint8) *Node {
 	if n.Level == level {
 		allowed := 1
 		if level != 0 {

@@ -49,7 +49,7 @@ type Game struct {
 	viewSize     image.Point
 	gameSize     image.Point
 	view         image.Point
-	level        uint
+	level        uint8
 	startPattern pattern.Pattern
 	pattern      pattern.Pattern
 	ctx          context.Context

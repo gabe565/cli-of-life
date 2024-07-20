@@ -28,7 +28,7 @@ func init() { //nolint:gochecknoinits
 	colors = append(colors, lipgloss.NewStyle())
 }
 
-func (n *Node) Render(buf *bytes.Buffer, rect image.Rectangle, level uint) {
+func (n *Node) Render(buf *bytes.Buffer, rect image.Rectangle, level uint8) {
 	size := n.Size()
 	if rect.Min.X < -size {
 		rect.Min.X = -size
