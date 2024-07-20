@@ -37,8 +37,6 @@ func RegisterCompletion(cmd *cobra.Command) error {
 			},
 		),
 		cmd.RegisterFlagCompletionFunc(PlayFlag, cobra.NoFileCompletions),
-		cmd.RegisterFlagCompletionFunc(WidthFlag, cobra.NoFileCompletions),
-		cmd.RegisterFlagCompletionFunc(HeightFlag, cobra.NoFileCompletions),
 		cmd.RegisterFlagCompletionFunc(CacheLimitFlag, cobra.NoFileCompletions),
 		cmd.RegisterFlagCompletionFunc(CompletionFlag,
 			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
