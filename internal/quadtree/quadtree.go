@@ -1,7 +1,6 @@
 package quadtree
 
 import (
-	"bytes"
 	"fmt"
 	"image"
 	"math"
@@ -304,39 +303,6 @@ func (n *Node) Stats() string {
 		s += fmt.Sprintln(k, buckets[k])
 	}
 	return s
-}
-
-func (n *Node) Render(buf *bytes.Buffer, rect image.Rectangle, level uint) {
-	size := n.Size()
-	if rect.Min.X < -size {
-		rect.Min.X = -size
-	}
-	if rect.Max.X > size {
-		rect.Max.X = size
-	}
-	if rect.Min.Y < -size {
-		rect.Min.Y = -size
-	}
-	if rect.Max.Y > size {
-		rect.Max.Y = size
-	}
-	skip := 1
-	if level != 0 {
-		skip = 1 << level
-	}
-	for y := rect.Min.Y; y < rect.Max.Y; y += skip {
-		for x := rect.Min.X; x < rect.Max.X; x += skip {
-			node := n.findNode(x, y, level)
-			if node.Value == 0 {
-				buf.WriteByte(' ')
-				buf.WriteByte(' ')
-			} else {
-				buf.WriteRune('█')
-				buf.WriteRune('█')
-			}
-		}
-		buf.WriteByte('\n')
-	}
 }
 
 type VisitCallback func(x, y int, n *Node)
