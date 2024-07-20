@@ -15,16 +15,16 @@ func newKeymap() keymap {
 			key.WithHelp("m", "mode: smart"),
 		),
 		moveUp: key.NewBinding(
-			key.WithKeys("up"),
+			key.WithKeys("up", "w"),
 		),
 		moveLeft: key.NewBinding(
-			key.WithKeys("left"),
+			key.WithKeys("left", "a"),
 		),
 		moveDown: key.NewBinding(
-			key.WithKeys("down"),
+			key.WithKeys("down", "s"),
 		),
 		moveRight: key.NewBinding(
-			key.WithKeys("right"),
+			key.WithKeys("right", "d"),
 		),
 		move: key.NewBinding(
 			key.WithKeys("up", "left", "down", "right"),
