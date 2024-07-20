@@ -92,6 +92,8 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			g.viewSize.X, g.viewSize.Y = msg.Width, msg.Height
 			g.gameSize.X, g.gameSize.Y = (msg.Width/2)<<g.level, (msg.Height-1)<<g.level
+			g.viewBuf.Reset()
+			g.viewBuf.Grow(g.viewSize.X * g.viewSize.Y)
 		}
 	case tea.MouseMsg:
 		switch msg.Action {
@@ -227,7 +229,6 @@ func (g *Game) View() string {
 			g.viewBuf.WriteString(strings.Repeat("\n", h))
 		}
 	} else if g.gameSize.X != 0 && g.gameSize.Y != 0 {
-		g.viewBuf.Grow(g.viewSize.X * g.viewSize.Y)
 		g.pattern.Tree.Render(&g.viewBuf, image.Rectangle{Min: g.view, Max: g.view.Add(g.gameSize)}, g.level)
 		if g.viewSize.Y < g.gameSize.Y {
 			g.viewBuf.WriteString(strings.Repeat("\n", g.viewSize.Y-lipgloss.Height(g.viewBuf.String())))
