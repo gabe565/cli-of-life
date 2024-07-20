@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	DefaultTreeSize = 16
+	DefaultTreeSize = 32
 	MaxLevel        = 63
 )
 
