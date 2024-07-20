@@ -120,12 +120,15 @@ func (n *Node) NextGeneration(r *rule.Rule) *Node {
 	return nextGen
 }
 
-func (n *Node) NextGen(r *rule.Rule) *Node {
+func (n *Node) NextGen(r *rule.Rule, generations uint) *Node {
 	mu.Lock()
 	defer mu.Unlock()
 	if len(nodeMap) > cacheLimit {
 		clear(nodeMap)
 	}
-	generation++
-	return n.grow().NextGeneration(r)
+	for range generations {
+		n = n.grow().NextGeneration(r)
+	}
+	generation += generations
+	return n
 }

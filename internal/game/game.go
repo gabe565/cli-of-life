@@ -73,7 +73,11 @@ func (g *Game) Init() tea.Cmd {
 func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tick:
-		g.pattern.NextGen()
+		generations := uint(1)
+		if g.speed < time.Second/240 {
+			generations = uint(time.Second / 240 / g.speed)
+		}
+		g.pattern.NextGen(generations)
 		if g.ctx != nil {
 			return g, Tick(g.ctx, g.speed)
 		}
@@ -185,7 +189,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				g.view = center.Sub(g.gameSize.Div(2))
 			}
 		case key.Matches(msg, g.keymap.speedUp):
-			if g.speed > time.Millisecond {
+			if g.speed > 5*time.Microsecond {
 				g.speed /= 2
 				tps := int(time.Second / g.speed)
 				g.keymap.speed.SetHelp(g.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" tps")
