@@ -216,9 +216,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (g *Game) View() string {
-	defer func() {
-		g.viewBuf.Reset()
-	}()
+	g.viewBuf.Reset()
 	if g.debug {
 		g.viewBuf.WriteString(g.pattern.Tree.Stats())
 		if h := g.viewSize.Y - lipgloss.Height(g.viewBuf.String()); h > 0 {
