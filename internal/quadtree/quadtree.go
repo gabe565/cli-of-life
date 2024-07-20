@@ -33,6 +33,7 @@ var (
 	mu         sync.Mutex
 	aliveLeaf  = &Node{Value: 1}
 	deadLeaf   = &Node{Value: 0}
+	generation uint
 	cacheLimit int
 	cacheHit   uint
 	cacheMiss  uint

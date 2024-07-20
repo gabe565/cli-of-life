@@ -126,5 +126,6 @@ func (n *Node) NextGen(r *rule.Rule) *Node {
 	if len(nodeMap) > cacheLimit {
 		clear(nodeMap)
 	}
+	generation++
 	return n.grow().NextGeneration(r)
 }
