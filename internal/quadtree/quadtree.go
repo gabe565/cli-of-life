@@ -29,7 +29,7 @@ type Node struct {
 
 //nolint:gochecknoglobals
 var (
-	nodeMap    = make(map[Children]*Node, 32768)
+	nodeMap    = make(map[Children]*Node)
 	mu         sync.Mutex
 	aliveLeaf  = &Node{Value: 1}
 	deadLeaf   = &Node{Value: 0}
@@ -232,5 +232,5 @@ func (n *Node) Size() int {
 
 func SetCacheLimit(v uint) {
 	cacheLimit = int(v)
-	nodeMap = make(map[Children]*Node, cacheLimit)
+	nodeMap = make(map[Children]*Node, min(cacheLimit, 100_000))
 }
