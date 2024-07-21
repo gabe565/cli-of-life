@@ -7,7 +7,7 @@ import (
 )
 
 func (n *Node) centeredSubnode() *Node {
-	return New(Children{
+	return memoizedNew.Call(Children{
 		NW: n.NW.SE,
 		NE: n.NE.SW,
 		SW: n.SW.NE,
@@ -16,7 +16,7 @@ func (n *Node) centeredSubnode() *Node {
 }
 
 func (n *Node) centeredNHorizontal() *Node {
-	return New(Children{
+	return memoizedNew.Call(Children{
 		NW: n.NW.NE.SE,
 		NE: n.NE.NW.SW,
 		SW: n.NW.SE.NE,
@@ -25,7 +25,7 @@ func (n *Node) centeredNHorizontal() *Node {
 }
 
 func (n *Node) centeredSHorizontal() *Node {
-	return New(Children{
+	return memoizedNew.Call(Children{
 		NW: n.SW.NE.SE,
 		NE: n.SE.NW.SW,
 		SW: n.SW.SE.NE,
@@ -34,7 +34,7 @@ func (n *Node) centeredSHorizontal() *Node {
 }
 
 func (n *Node) centeredWVertical() *Node {
-	return New(Children{
+	return memoizedNew.Call(Children{
 		NW: n.NW.SW.SE,
 		NE: n.NW.SE.SW,
 		SW: n.SW.NW.NE,
@@ -43,7 +43,7 @@ func (n *Node) centeredWVertical() *Node {
 }
 
 func (n *Node) centeredEVertical() *Node {
-	return New(Children{
+	return memoizedNew.Call(Children{
 		NW: n.NE.SW.SE,
 		NE: n.NE.SE.SW,
 		SW: n.SE.NW.NE,
@@ -52,7 +52,7 @@ func (n *Node) centeredEVertical() *Node {
 }
 
 func (n *Node) centeredSubSubnode() *Node {
-	return New(Children{
+	return memoizedNew.Call(Children{
 		NW: n.NW.SE.SE,
 		NE: n.NE.SW.SW,
 		SW: n.SW.NE.NE,
@@ -70,7 +70,7 @@ func (n *Node) slowSimulation(r *rule.Rule) *Node {
 			b = (b << 1) + uint16(n.Get(x, y, 0))
 		}
 	}
-	return New(Children{NW: oneGen(b>>5, r), NE: oneGen(b>>4, r), SW: oneGen(b>>1, r), SE: oneGen(b, r)})
+	return memoizedNew.Call(Children{NW: oneGen(b>>5, r), NE: oneGen(b>>4, r), SW: oneGen(b>>1, r), SE: oneGen(b, r)})
 }
 
 func oneGen(bitmask uint16, r *rule.Rule) *Node {
@@ -109,11 +109,11 @@ func (n *Node) NextGeneration(r *rule.Rule) *Node {
 	n21 := n.centeredSHorizontal()
 	n22 := n.SE.centeredSubnode()
 
-	nextGen := New(Children{
-		NW: New(Children{NW: n00, NE: n01, SW: n10, SE: n11}).NextGeneration(r),
-		NE: New(Children{NW: n01, NE: n02, SW: n11, SE: n12}).NextGeneration(r),
-		SW: New(Children{NW: n10, NE: n11, SW: n20, SE: n21}).NextGeneration(r),
-		SE: New(Children{NW: n11, NE: n12, SW: n21, SE: n22}).NextGeneration(r),
+	nextGen := memoizedNew.Call(Children{
+		NW: memoizedNew.Call(Children{NW: n00, NE: n01, SW: n10, SE: n11}).NextGeneration(r),
+		NE: memoizedNew.Call(Children{NW: n01, NE: n02, SW: n11, SE: n12}).NextGeneration(r),
+		SW: memoizedNew.Call(Children{NW: n10, NE: n11, SW: n20, SE: n21}).NextGeneration(r),
+		SE: memoizedNew.Call(Children{NW: n11, NE: n12, SW: n21, SE: n22}).NextGeneration(r),
 	})
 
 	n.next = nextGen
@@ -121,10 +121,8 @@ func (n *Node) NextGeneration(r *rule.Rule) *Node {
 }
 
 func (n *Node) NextGen(r *rule.Rule, generations uint) *Node {
-	mu.Lock()
-	defer mu.Unlock()
-	if len(nodeMap) > cacheLimit {
-		clear(nodeMap)
+	if memoizedNew.Len() > cacheLimit {
+		memoizedNew.Clear()
 	}
 	for range generations {
 		n = n.grow().NextGeneration(r)

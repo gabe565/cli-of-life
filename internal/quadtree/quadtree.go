@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"image"
 	"math"
-	"sync"
+
+	"github.com/gabe565/cli-of-life/internal/memoizer"
 )
 
 const (
@@ -29,31 +30,23 @@ type Node struct {
 
 //nolint:gochecknoglobals
 var (
-	nodeMap    = make(map[Children]*Node)
-	mu         sync.Mutex
+	memoizedNew = memoizer.New(New,
+		memoizer.WithCondition[Children, Node](func(n *Node) bool {
+			return n.Value == 0 || n.Level <= 16
+		}),
+	)
 	aliveLeaf  = &Node{Value: 1}
 	deadLeaf   = &Node{Value: 0}
 	generation uint
 	cacheLimit int
-	cacheHit   uint
-	cacheMiss  uint
 )
 
 func New(children Children) *Node {
-	if q, ok := nodeMap[children]; ok {
-		cacheHit++
-		return q
-	}
-	cacheMiss++
-	q := &Node{
-		Level:    children.NE.Level + 1,
+	return &Node{
+		Level:    children.NW.Level + 1,
 		Children: children,
 		Value:    children.value(),
 	}
-	if q.Value == 0 || q.Level <= 16 {
-		nodeMap[children] = q
-	}
-	return q
 }
 
 func Empty(level uint8) *Node {
@@ -61,7 +54,7 @@ func Empty(level uint8) *Node {
 		return deadLeaf
 	}
 	child := Empty(level - 1)
-	return New(Children{NW: child, NE: child, SW: child, SE: child})
+	return memoizedNew.Call(Children{NW: child, NE: child, SW: child, SE: child})
 }
 
 func (n *Node) grow() *Node {
@@ -73,11 +66,11 @@ func (n *Node) grow() *Node {
 	}
 
 	emptyChild := Empty(n.Level - 1)
-	return New(Children{
-		NW: New(Children{NW: emptyChild, NE: emptyChild, SW: emptyChild, SE: n.NW}),
-		NE: New(Children{NW: emptyChild, NE: emptyChild, SW: n.NE, SE: emptyChild}),
-		SW: New(Children{NW: emptyChild, NE: n.SW, SW: emptyChild, SE: emptyChild}),
-		SE: New(Children{NW: n.SE, NE: emptyChild, SW: emptyChild, SE: emptyChild}),
+	return memoizedNew.Call(Children{
+		NW: memoizedNew.Call(Children{NW: emptyChild, NE: emptyChild, SW: emptyChild, SE: n.NW}),
+		NE: memoizedNew.Call(Children{NW: emptyChild, NE: emptyChild, SW: n.NE, SE: emptyChild}),
+		SW: memoizedNew.Call(Children{NW: emptyChild, NE: n.SW, SW: emptyChild, SE: emptyChild}),
+		SE: memoizedNew.Call(Children{NW: n.SE, NE: emptyChild, SW: emptyChild, SE: emptyChild}),
 	})
 }
 
@@ -107,14 +100,14 @@ func (n *Node) Set(x, y int, value int) *Node {
 	case x >= 0:
 		switch {
 		case y >= 0:
-			return New(Children{NW: n.NW, NE: n.NE, SW: n.SW, SE: n.SE.Set(x-distance, y-distance, value)})
+			return memoizedNew.Call(Children{NW: n.NW, NE: n.NE, SW: n.SW, SE: n.SE.Set(x-distance, y-distance, value)})
 		default:
-			return New(Children{NW: n.NW, NE: n.NE.Set(x-distance, y+distance, value), SW: n.SW, SE: n.SE})
+			return memoizedNew.Call(Children{NW: n.NW, NE: n.NE.Set(x-distance, y+distance, value), SW: n.SW, SE: n.SE})
 		}
 	case y >= 0:
-		return New(Children{NW: n.NW, NE: n.NE, SW: n.SW.Set(x+distance, y-distance, value), SE: n.SE})
+		return memoizedNew.Call(Children{NW: n.NW, NE: n.NE, SW: n.SW.Set(x+distance, y-distance, value), SE: n.SE})
 	default:
-		return New(Children{NW: n.NW.Set(x+distance, y+distance, value), NE: n.NE, SW: n.SW, SE: n.SE})
+		return memoizedNew.Call(Children{NW: n.NW.Set(x+distance, y+distance, value), NE: n.NE, SW: n.SW, SE: n.SE})
 	}
 }
 
@@ -232,5 +225,4 @@ func (n *Node) Size() int {
 
 func SetCacheLimit(v uint) {
 	cacheLimit = int(v)
-	nodeMap = make(map[Children]*Node, min(cacheLimit, 100_000))
 }
