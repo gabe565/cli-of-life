@@ -11,6 +11,7 @@ import (
 	"github.com/gabe565/cli-of-life/internal/config"
 	"github.com/gabe565/cli-of-life/internal/game"
 	"github.com/gabe565/cli-of-life/internal/pattern"
+	"github.com/gabe565/cli-of-life/internal/pprof"
 	"github.com/gabe565/cli-of-life/internal/quadtree"
 	"github.com/gabe565/cli-of-life/internal/rule"
 	"github.com/spf13/cobra"
@@ -41,6 +42,14 @@ func New() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, _ []string) error {
+	if pprof.Enabled {
+		go func() {
+			if err := pprof.ListenAndServe(); err != nil {
+				slog.Error("Failed to start debug server", "error", err.Error())
+			}
+		}()
+	}
+
 	conf, ok := config.FromContext(cmd.Context())
 	if !ok {
 		panic("command missing config")
