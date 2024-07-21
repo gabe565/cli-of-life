@@ -74,12 +74,12 @@ func (n *Node) grow() *Node {
 		panic(fmt.Sprint("Can't grow baby tree of level:", n.level))
 	}
 
-	emptyChild := memoizedEmpty.Call(n.level - 1)
+	e := memoizedEmpty.Call(n.level - 1)
 	return memoizedNew.Call(Children{
-		NW: memoizedNew.Call(Children{NW: emptyChild, NE: emptyChild, SW: emptyChild, SE: n.NW}),
-		NE: memoizedNew.Call(Children{NW: emptyChild, NE: emptyChild, SW: n.NE, SE: emptyChild}),
-		SW: memoizedNew.Call(Children{NW: emptyChild, NE: n.SW, SW: emptyChild, SE: emptyChild}),
-		SE: memoizedNew.Call(Children{NW: n.SE, NE: emptyChild, SW: emptyChild, SE: emptyChild}),
+		NW: memoizedNew.Call(Children{NW: e, NE: e, SW: e, SE: n.NW}),
+		NE: memoizedNew.Call(Children{NW: e, NE: e, SW: n.NE, SE: e}),
+		SW: memoizedNew.Call(Children{NW: e, NE: n.SW, SW: e, SE: e}),
+		SE: memoizedNew.Call(Children{NW: n.SE, NE: e, SW: e, SE: e}),
 	})
 }
 
@@ -104,19 +104,19 @@ func (n *Node) Set(x, y int, value int) *Node {
 		}
 	}
 
-	distance := 1 << (n.level - 2)
+	w := 1 << (n.level - 2)
 	switch {
 	case x >= 0:
 		switch {
 		case y >= 0:
-			return memoizedNew.Call(Children{NW: n.NW, NE: n.NE, SW: n.SW, SE: n.SE.Set(x-distance, y-distance, value)})
+			return memoizedNew.Call(Children{NW: n.NW, NE: n.NE, SW: n.SW, SE: n.SE.Set(x-w, y-w, value)})
 		default:
-			return memoizedNew.Call(Children{NW: n.NW, NE: n.NE.Set(x-distance, y+distance, value), SW: n.SW, SE: n.SE})
+			return memoizedNew.Call(Children{NW: n.NW, NE: n.NE.Set(x-w, y+w, value), SW: n.SW, SE: n.SE})
 		}
 	case y >= 0:
-		return memoizedNew.Call(Children{NW: n.NW, NE: n.NE, SW: n.SW.Set(x+distance, y-distance, value), SE: n.SE})
+		return memoizedNew.Call(Children{NW: n.NW, NE: n.NE, SW: n.SW.Set(x+w, y-w, value), SE: n.SE})
 	default:
-		return memoizedNew.Call(Children{NW: n.NW.Set(x+distance, y+distance, value), NE: n.NE, SW: n.SW, SE: n.SE})
+		return memoizedNew.Call(Children{NW: n.NW.Set(x+w, y+w, value), NE: n.NE, SW: n.SW, SE: n.SE})
 	}
 }
 
@@ -144,19 +144,19 @@ func (n *Node) findNode(x, y int, level uint8) *Node {
 		return n
 	}
 
-	distance := 1 << (n.level - 2)
+	w := 1 << (n.level - 2)
 	switch {
 	case x >= 0:
 		switch {
 		case y >= 0:
-			return n.SE.findNode(x-distance, y-distance, level)
+			return n.SE.findNode(x-w, y-w, level)
 		default:
-			return n.NE.findNode(x-distance, y+distance, level)
+			return n.NE.findNode(x-w, y+w, level)
 		}
 	case y >= 0:
-		return n.SW.findNode(x+distance, y-distance, level)
+		return n.SW.findNode(x+w, y-w, level)
 	default:
-		return n.NW.findNode(x+distance, y+distance, level)
+		return n.NW.findNode(x+w, y+w, level)
 	}
 }
 
@@ -176,11 +176,11 @@ func (n *Node) visit(x, y int, callback VisitCallback) {
 			callback(x, y, n)
 		}
 	default:
-		distance := n.Size()
-		n.SE.visit(x+distance, y+distance, callback)
-		n.SW.visit(x, y+distance, callback)
+		w := n.Size()
+		n.SE.visit(x+w, y+w, callback)
+		n.SW.visit(x, y+w, callback)
 		n.NW.visit(x, y, callback)
-		n.NE.visit(x+distance, y, callback)
+		n.NE.visit(x+w, y, callback)
 	}
 }
 
