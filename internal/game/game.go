@@ -104,7 +104,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if g.level != 0 {
 					break
 				}
-				size := g.pattern.Tree.Size()
+				size := g.pattern.Tree.Width() / 2
 				msg.X /= 2
 				msg.X += g.view.X
 				msg.Y += g.view.Y
@@ -289,24 +289,24 @@ const (
 
 func (g *Game) Scroll(d Direction, speed int) {
 	speed *= 1 << g.level
-	size := g.pattern.Tree.Size()
+	w := g.pattern.Tree.Width() / 2
 
 	switch d {
 	case DirUp:
-		if g.view.Y -= speed; g.view.Y < -size {
-			g.view.Y = -size
+		if g.view.Y -= speed; g.view.Y < -w {
+			g.view.Y = -w
 		}
 	case DirLeft:
-		if g.view.X -= speed; g.view.X < -size {
-			g.view.X = -size
+		if g.view.X -= speed; g.view.X < -w {
+			g.view.X = -w
 		}
 	case DirDown:
-		if g.view.Y += speed; g.view.Y > size-g.gameSize.Y {
-			g.view.Y = size - g.gameSize.Y
+		if g.view.Y += speed; g.view.Y > w-g.gameSize.Y {
+			g.view.Y = w - g.gameSize.Y
 		}
 	case DirRight:
-		if g.view.X += speed; g.view.X > size-g.gameSize.X {
-			g.view.X = size - g.gameSize.X
+		if g.view.X += speed; g.view.X > w-g.gameSize.X {
+			g.view.X = w - g.gameSize.X
 		}
 	}
 }

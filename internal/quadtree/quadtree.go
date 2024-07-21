@@ -84,10 +84,10 @@ func (n *Node) grow() *Node {
 }
 
 func (n *Node) GrowToFit(x, y int) *Node {
-	maxCoordinate := n.Size()
-	for x > maxCoordinate || y > maxCoordinate || x < -maxCoordinate || y < -maxCoordinate {
+	w := n.Width() / 2
+	for x > w || y > w || x < -w || y < -w {
 		n = n.grow()
-		maxCoordinate = n.Size()
+		w = n.Width() / 2
 	}
 	return n
 }
@@ -163,8 +163,8 @@ func (n *Node) findNode(x, y int, level uint8) *Node {
 type VisitCallback func(x, y int, n *Node)
 
 func (n *Node) Visit(callback VisitCallback) {
-	size := n.Size()
-	n.visit(-size, -size, callback)
+	w := n.Width() / 2
+	n.visit(-w, -w, callback)
 }
 
 func (n *Node) visit(x, y int, callback VisitCallback) {
@@ -176,7 +176,7 @@ func (n *Node) visit(x, y int, callback VisitCallback) {
 			callback(x, y, n)
 		}
 	default:
-		w := n.Size()
+		w := n.Width() / 2
 		n.SE.visit(x+w, y+w, callback)
 		n.SW.visit(x, y+w, callback)
 		n.NW.visit(x, y, callback)
@@ -228,8 +228,8 @@ func (n *Node) ToSlice() [][]int {
 	return result
 }
 
-func (n *Node) Size() int {
-	return 1 << (n.level - 1)
+func (n *Node) Width() int {
+	return 1 << n.level
 }
 
 func SetCacheLimit(v uint) {

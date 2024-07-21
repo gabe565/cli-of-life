@@ -260,12 +260,12 @@ func TestNode_NextGeneration(t *testing.T) {
 	assert.NotNil(t, node.next)
 }
 
-func TestNode_Size(t *testing.T) {
+func TestNode_Width(t *testing.T) {
 	for i := range uint8(16) {
 		t.Run(strconv.Itoa(int(i)), func(t *testing.T) {
 			node := Empty(i)
-			expect := int(math.Pow(2, float64(i)-1))
-			assert.EqualValues(t, expect, node.Size())
+			expect := int(math.Pow(2, float64(i)))
+			assert.EqualValues(t, expect, node.Width())
 		})
 	}
 }

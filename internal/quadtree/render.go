@@ -29,18 +29,18 @@ func init() { //nolint:gochecknoinits
 }
 
 func (n *Node) Render(buf *bytes.Buffer, rect image.Rectangle, level uint8) {
-	size := n.Size()
-	if rect.Min.X < -size {
-		rect.Min.X = -size
+	w := n.Width() / 2
+	if rect.Min.X < -w {
+		rect.Min.X = -w
 	}
-	if rect.Max.X > size {
-		rect.Max.X = size
+	if rect.Max.X > w {
+		rect.Max.X = w
 	}
-	if rect.Min.Y < -size {
-		rect.Min.Y = -size
+	if rect.Min.Y < -w {
+		rect.Min.Y = -w
 	}
-	if rect.Max.Y > size {
-		rect.Max.Y = size
+	if rect.Max.Y > w {
+		rect.Max.Y = w
 	}
 	skip := 1
 	if level != 0 {
