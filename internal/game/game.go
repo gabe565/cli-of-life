@@ -112,7 +112,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					switch g.mode {
 					case ModeSmart:
 						if g.smartVal == -1 {
-							val := g.pattern.Tree.Get(msg.X, msg.Y, 0)
+							val := g.pattern.Tree.Get(msg.X, msg.Y, 0).Value()
 							switch val {
 							case 0:
 								g.smartVal = 1

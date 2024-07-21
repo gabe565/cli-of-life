@@ -48,22 +48,22 @@ func TestNode_Set(t *testing.T) {
 		for i := range 10 {
 			x, y := i-5*3, i-5*i
 			node = node.GrowToFit(x, y).Set(x, y, 1)
-			assert.EqualValues(t, 1, node.Get(x, y, 0))
+			assert.EqualValues(t, 1, node.Get(x, y, 0).value)
 			node = node.Set(x, y, 0)
-			assert.EqualValues(t, 0, node.Get(x, y, 0))
+			assert.EqualValues(t, 0, node.Get(x, y, 0).value)
 		}
 
 		// check that not all cells get set
 		node = node.Set(1, 1, 1)
-		assert.Equal(t, 0, node.Get(2, 2, 0))
+		assert.Equal(t, 0, node.Get(2, 2, 0).value)
 	})
 }
 
 func TestNode_Get(t *testing.T) {
 	node := Empty(1).GrowToFit(55, 233)
-	assert.Equal(t, 0, node.Get(55, 233, 0))
+	assert.Equal(t, 0, node.Get(55, 233, 0).value)
 	node = node.Set(55, 233, 1)
-	assert.Equal(t, 1, node.Get(55, 233, 0))
+	assert.Equal(t, 1, node.Get(55, 233, 0).value)
 	treeCorrectness(t, node)
 }
 

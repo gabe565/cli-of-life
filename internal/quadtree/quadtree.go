@@ -120,16 +120,11 @@ func (n *Node) Set(x, y int, value int) *Node {
 	}
 }
 
-func (n *Node) Get(x, y int, level uint8) int {
-	leaf := n.findNode(x, y, level)
-	return leaf.value
-}
-
 func (n *Node) children() []*Node {
 	return []*Node{n.SE, n.SW, n.NW, n.NE}
 }
 
-func (n *Node) findNode(x, y int, level uint8) *Node {
+func (n *Node) Get(x, y int, level uint8) *Node {
 	if n.level == level {
 		allowed := 1
 		if level != 0 {
@@ -149,14 +144,14 @@ func (n *Node) findNode(x, y int, level uint8) *Node {
 	case x >= 0:
 		switch {
 		case y >= 0:
-			return n.SE.findNode(x-w, y-w, level)
+			return n.SE.Get(x-w, y-w, level)
 		default:
-			return n.NE.findNode(x-w, y+w, level)
+			return n.NE.Get(x-w, y+w, level)
 		}
 	case y >= 0:
-		return n.SW.findNode(x+w, y-w, level)
+		return n.SW.Get(x+w, y-w, level)
 	default:
-		return n.NW.findNode(x+w, y+w, level)
+		return n.NW.Get(x+w, y+w, level)
 	}
 }
 
@@ -222,7 +217,7 @@ func (n *Node) ToSlice() [][]int {
 
 	for y := coords.Min.Y; y < coords.Max.Y; y++ {
 		for x := coords.Min.X; x < coords.Max.X; x++ {
-			result[y-coords.Min.Y][x-coords.Min.X] = n.Get(x, y, 0)
+			result[y-coords.Min.Y][x-coords.Min.X] = n.Get(x, y, 0).value
 		}
 	}
 	return result
