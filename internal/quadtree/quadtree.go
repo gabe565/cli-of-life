@@ -35,10 +35,11 @@ var (
 			return n.Value == 0 || n.Level <= 16
 		}),
 	)
-	aliveLeaf  = &Node{Value: 1}
-	deadLeaf   = &Node{Value: 0}
-	generation uint
-	cacheLimit int
+	memoizedEmpty = memoizer.New(Empty)
+	aliveLeaf     = &Node{Value: 1}
+	deadLeaf      = &Node{Value: 0}
+	generation    uint
+	cacheLimit    int
 )
 
 func newNode(children Children) *Node {
@@ -65,7 +66,7 @@ func (n *Node) grow() *Node {
 		panic(fmt.Sprint("Can't grow baby tree of level:", n.Level))
 	}
 
-	emptyChild := Empty(n.Level - 1)
+	emptyChild := memoizedEmpty.Call(n.Level - 1)
 	return memoizedNew.Call(Children{
 		NW: memoizedNew.Call(Children{NW: emptyChild, NE: emptyChild, SW: emptyChild, SE: n.NW}),
 		NE: memoizedNew.Call(Children{NW: emptyChild, NE: emptyChild, SW: n.NE, SE: emptyChild}),
