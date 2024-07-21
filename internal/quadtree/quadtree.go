@@ -104,7 +104,7 @@ func (n *Node) Set(x, y int, value int) *Node {
 		}
 	}
 
-	distance := int(1) << (n.level - 2)
+	distance := 1 << (n.level - 2)
 	switch {
 	case x >= 0:
 		switch {
@@ -144,7 +144,7 @@ func (n *Node) findNode(x, y int, level uint8) *Node {
 		return n
 	}
 
-	distance := int(1) << (n.level - 2)
+	distance := 1 << (n.level - 2)
 	switch {
 	case x >= 0:
 		switch {
