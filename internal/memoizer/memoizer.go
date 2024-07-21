@@ -2,9 +2,9 @@ package memoizer
 
 import "sync"
 
-func New[K comparable, V any](fn func(K) *V, opts ...Opt[K, V]) *Memoizer[K, V] {
+func New[K comparable, V any](fn func(K) V, opts ...Opt[K, V]) *Memoizer[K, V] {
 	m := &Memoizer[K, V]{
-		m:  make(map[K]*V),
+		m:  make(map[K]V),
 		fn: fn,
 	}
 	for _, opt := range opts {
@@ -14,15 +14,15 @@ func New[K comparable, V any](fn func(K) *V, opts ...Opt[K, V]) *Memoizer[K, V] 
 }
 
 type Memoizer[K comparable, V any] struct {
-	m      map[K]*V
+	m      map[K]V
 	hits   uint
 	misses uint
-	fn     func(K) *V
-	cmp    func(*V) bool
+	fn     func(K) V
+	cmp    func(V) bool
 	mu     sync.Mutex
 }
 
-func (m *Memoizer[K, V]) Call(k K) *V {
+func (m *Memoizer[K, V]) Call(k K) V {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if v, ok := m.m[k]; ok {
@@ -66,5 +66,8 @@ type Stats struct {
 }
 
 func (s *Stats) CacheRatio() float32 {
+	if s.CacheHit == 0 && s.CacheMiss == 0 {
+		return 0
+	}
 	return float32(s.CacheHit) / float32(s.CacheMiss)
 }

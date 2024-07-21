@@ -30,8 +30,8 @@ type Node struct {
 
 //nolint:gochecknoglobals
 var (
-	memoizedNew = memoizer.New(New,
-		memoizer.WithCondition[Children, Node](func(n *Node) bool {
+	memoizedNew = memoizer.New(newNode,
+		memoizer.WithCondition[Children, *Node](func(n *Node) bool {
 			return n.Value == 0 || n.Level <= 16
 		}),
 	)
@@ -41,7 +41,7 @@ var (
 	cacheLimit int
 )
 
-func New(children Children) *Node {
+func newNode(children Children) *Node {
 	return &Node{
 		Level:    children.NW.Level + 1,
 		Children: children,

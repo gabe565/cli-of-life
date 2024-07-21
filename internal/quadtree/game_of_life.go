@@ -91,7 +91,7 @@ func oneGen(bitmask uint16, r *rule.Rule) *Node {
 	return deadLeaf
 }
 
-func (n *Node) NextGeneration(r *rule.Rule) *Node {
+func (n *Node) nextGeneration(r *rule.Rule) *Node {
 	switch {
 	case n.next != nil:
 		return n.next
@@ -110,22 +110,22 @@ func (n *Node) NextGeneration(r *rule.Rule) *Node {
 	n22 := n.SE.centeredSubnode()
 
 	nextGen := memoizedNew.Call(Children{
-		NW: memoizedNew.Call(Children{NW: n00, NE: n01, SW: n10, SE: n11}).NextGeneration(r),
-		NE: memoizedNew.Call(Children{NW: n01, NE: n02, SW: n11, SE: n12}).NextGeneration(r),
-		SW: memoizedNew.Call(Children{NW: n10, NE: n11, SW: n20, SE: n21}).NextGeneration(r),
-		SE: memoizedNew.Call(Children{NW: n11, NE: n12, SW: n21, SE: n22}).NextGeneration(r),
+		NW: memoizedNew.Call(Children{NW: n00, NE: n01, SW: n10, SE: n11}).nextGeneration(r),
+		NE: memoizedNew.Call(Children{NW: n01, NE: n02, SW: n11, SE: n12}).nextGeneration(r),
+		SW: memoizedNew.Call(Children{NW: n10, NE: n11, SW: n20, SE: n21}).nextGeneration(r),
+		SE: memoizedNew.Call(Children{NW: n11, NE: n12, SW: n21, SE: n22}).nextGeneration(r),
 	})
 
 	n.next = nextGen
 	return nextGen
 }
 
-func (n *Node) NextGen(r *rule.Rule, generations uint) *Node {
+func (n *Node) NextGeneration(r *rule.Rule, generations uint) *Node {
 	if memoizedNew.Len() > cacheLimit {
 		memoizedNew.Clear()
 	}
 	for range generations {
-		n = n.grow().NextGeneration(r)
+		n = n.grow().nextGeneration(r)
 	}
 	generation += generations
 	return n

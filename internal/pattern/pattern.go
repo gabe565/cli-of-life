@@ -26,7 +26,7 @@ type Pattern struct {
 }
 
 func (p *Pattern) NextGen(generations uint) {
-	p.Tree = p.Tree.NextGen(&p.Rule, generations)
+	p.Tree = p.Tree.NextGeneration(&p.Rule, generations)
 }
 
 var (
