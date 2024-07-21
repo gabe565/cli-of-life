@@ -51,19 +51,19 @@ func (n *Node) Render(buf *bytes.Buffer, rect image.Rectangle, level uint8) {
 	for y := rect.Min.Y; y < rect.Max.Y; y += skip {
 		for x := rect.Min.X; x < rect.Max.X; x += skip {
 			node := n.findNode(x, y, level)
-			if node.Value == current {
+			if node.value == current {
 				consecutive++
 			} else {
 				if current != -1 {
 					printCells(buf, current, consecutive, c)
 				}
-				current = node.Value
+				current = node.value
 				consecutive = 1
 				switch {
-				case level == 0, node.Value == 0:
+				case level == 0, node.value == 0:
 					c = len(colors) - 1
 				default:
-					c = node.Value * (len(colors) - 1) / (1 << (level + 1))
+					c = node.value * (len(colors) - 1) / (1 << (level + 1))
 					if c > len(colors)-1 {
 						c = len(colors) - 1
 					}

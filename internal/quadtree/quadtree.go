@@ -18,35 +18,43 @@ type Children struct {
 }
 
 func (c *Children) value() int {
-	return c.SE.Value + c.SW.Value + c.NW.Value + c.NE.Value
+	return c.SE.value + c.SW.value + c.NW.value + c.NE.value
 }
 
 type Node struct {
 	Children
-	Level uint8
-	Value int
+	level uint8
+	value int
 	next  *Node
+}
+
+func (n *Node) Level() uint8 {
+	return n.level
+}
+
+func (n *Node) Value() int {
+	return n.value
 }
 
 //nolint:gochecknoglobals
 var (
 	memoizedNew = memoizer.New(newNode,
 		memoizer.WithCondition[Children, *Node](func(n *Node) bool {
-			return n.Value == 0 || n.Level <= 16
+			return n.value == 0 || n.level <= 16
 		}),
 	)
 	memoizedEmpty = memoizer.New(Empty)
-	aliveLeaf     = &Node{Value: 1}
-	deadLeaf      = &Node{Value: 0}
+	aliveLeaf     = &Node{value: 1}
+	deadLeaf      = &Node{value: 0}
 	generation    uint
 	cacheLimit    int
 )
 
 func newNode(children Children) *Node {
 	return &Node{
-		Level:    children.NW.Level + 1,
+		level:    children.NW.level + 1,
 		Children: children,
-		Value:    children.value(),
+		value:    children.value(),
 	}
 }
 
@@ -60,13 +68,13 @@ func Empty(level uint8) *Node {
 
 func (n *Node) grow() *Node {
 	switch {
-	case n.Level >= MaxLevel:
-		panic(fmt.Sprint("QuadTree can't grow beyond level:", n.Level))
-	case n.Level == 0:
-		panic(fmt.Sprint("Can't grow baby tree of level:", n.Level))
+	case n.level >= MaxLevel:
+		panic(fmt.Sprint("QuadTree can't grow beyond level:", n.level))
+	case n.level == 0:
+		panic(fmt.Sprint("Can't grow baby tree of level:", n.level))
 	}
 
-	emptyChild := memoizedEmpty.Call(n.Level - 1)
+	emptyChild := memoizedEmpty.Call(n.level - 1)
 	return memoizedNew.Call(Children{
 		NW: memoizedNew.Call(Children{NW: emptyChild, NE: emptyChild, SW: emptyChild, SE: n.NW}),
 		NE: memoizedNew.Call(Children{NW: emptyChild, NE: emptyChild, SW: n.NE, SE: emptyChild}),
@@ -85,7 +93,7 @@ func (n *Node) GrowToFit(x, y int) *Node {
 }
 
 func (n *Node) Set(x, y int, value int) *Node {
-	if n.Level == 0 {
+	if n.level == 0 {
 		switch {
 		case x < -1, x > 0, y < -1, y > 0:
 			panic(fmt.Sprintf("Reached leaf node with coordinates too big: (%d, %d)", x, y))
@@ -96,7 +104,7 @@ func (n *Node) Set(x, y int, value int) *Node {
 		}
 	}
 
-	distance := int(1) << (n.Level - 2)
+	distance := int(1) << (n.level - 2)
 	switch {
 	case x >= 0:
 		switch {
@@ -114,7 +122,7 @@ func (n *Node) Set(x, y int, value int) *Node {
 
 func (n *Node) Get(x, y int, level uint8) int {
 	leaf := n.findNode(x, y, level)
-	return leaf.Value
+	return leaf.value
 }
 
 func (n *Node) children() []*Node {
@@ -122,7 +130,7 @@ func (n *Node) children() []*Node {
 }
 
 func (n *Node) findNode(x, y int, level uint8) *Node {
-	if n.Level == level {
+	if n.level == level {
 		allowed := 1
 		if level != 0 {
 			allowed = 1 << (level - 1)
@@ -130,13 +138,13 @@ func (n *Node) findNode(x, y int, level uint8) *Node {
 		if x < -allowed || x > allowed || y < -allowed || y > allowed {
 			panic(fmt.Sprintf("Reached leaf node with coordinates too big: (%d, %d)", x, y))
 		}
-		if n.Value != 0 {
+		if n.value != 0 {
 			return n
 		}
 		return n
 	}
 
-	distance := int(1) << (n.Level - 2)
+	distance := int(1) << (n.level - 2)
 	switch {
 	case x >= 0:
 		switch {
@@ -161,10 +169,10 @@ func (n *Node) Visit(callback VisitCallback) {
 
 func (n *Node) visit(x, y int, callback VisitCallback) {
 	switch {
-	case n.Value == 0:
+	case n.value == 0:
 		return
-	case n.Level == 0:
-		if n.Value != 0 {
+	case n.level == 0:
+		if n.value != 0 {
 			callback(x, y, n)
 		}
 	default:
@@ -221,7 +229,7 @@ func (n *Node) ToSlice() [][]int {
 }
 
 func (n *Node) Size() int {
-	return 1 << (n.Level - 1)
+	return 1 << (n.level - 1)
 }
 
 func SetCacheLimit(v uint) {

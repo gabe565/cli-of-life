@@ -39,14 +39,14 @@ func treeWithRandomPattern(level uint) (*Node, *big.Int) {
 }
 
 func treeCorrectness(t *testing.T, node *Node) {
-	if node.Level == 0 {
+	if node.level == 0 {
 		for _, child := range node.children() {
 			assert.Nil(t, child, "Leaf nodes shouldn't have child nodes")
 		}
 	} else {
 		for _, child := range node.children() {
 			if child != nil {
-				assert.Equal(t, node.Level-1, child.Level)
+				assert.Equal(t, node.level-1, child.level)
 				treeCorrectness(t, child)
 			}
 		}

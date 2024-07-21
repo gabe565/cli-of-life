@@ -61,7 +61,7 @@ func (n *Node) centeredSubSubnode() *Node {
 }
 
 func (n *Node) slowSimulation(r *rule.Rule) *Node {
-	if n.Level != 2 {
+	if n.level != 2 {
 		panic("slowSimulation only possible for quadtree of size 2")
 	}
 	var b uint16
@@ -95,7 +95,7 @@ func (n *Node) nextGeneration(r *rule.Rule) *Node {
 	switch {
 	case n.next != nil:
 		return n.next
-	case n.Level == 2:
+	case n.level == 2:
 		return n.slowSimulation(r)
 	}
 

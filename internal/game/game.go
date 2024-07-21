@@ -185,7 +185,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				g.view = center.Sub(g.gameSize.Div(2))
 			}
 		case key.Matches(msg, g.keymap.zoomOut):
-			if g.level < g.pattern.Tree.Level {
+			if g.level < g.pattern.Tree.Level() {
 				center := g.view.Add(g.gameSize.Div(2))
 				g.level++
 				g.gameSize = g.gameSize.Mul(2)

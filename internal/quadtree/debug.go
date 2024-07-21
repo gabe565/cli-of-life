@@ -17,8 +17,8 @@ func (n *Node) Stats() Stats {
 	s := memoizedNew.Stats()
 	return Stats{
 		Generation: int(generation),
-		Level:      int(n.Level),
-		Population: n.Value,
+		Level:      int(n.level),
+		Population: n.value,
 		Stats:      s,
 	}
 }

@@ -14,13 +14,13 @@ import (
 func TestEmpty(t *testing.T) {
 	t.Run("level 0", func(t *testing.T) {
 		node := Empty(0)
-		assert.EqualValues(t, 0, node.Level)
+		assert.EqualValues(t, 0, node.level)
 	})
 
 	t.Run("level -1", func(t *testing.T) {
 		node := Empty(0)
-		node = Empty(node.Level - 1)
-		assert.EqualValues(t, 0, node.Level)
+		node = Empty(node.level - 1)
+		assert.EqualValues(t, 0, node.level)
 	})
 
 	t.Run("level 7 correctness", func(t *testing.T) {
@@ -31,7 +31,7 @@ func TestEmpty(t *testing.T) {
 func TestNode_GrowToFit(t *testing.T) {
 	node := Empty(1).
 		GrowToFit(63, 63)
-	assert.EqualValues(t, 7, node.Level)
+	assert.EqualValues(t, 7, node.level)
 	treeCorrectness(t, node)
 }
 
@@ -81,8 +81,8 @@ func TestNode_Visit(t *testing.T) {
 		case 1:
 			assert.EqualValues(t, 232, y, "y")
 		}
-		assert.EqualValues(t, 0, node.Level, "level")
-		assert.EqualValues(t, 1, node.Value, "value")
+		assert.EqualValues(t, 0, node.level, "level")
+		assert.EqualValues(t, 1, node.value, "value")
 		callCount++
 	})
 	assert.Equal(t, 2, callCount)
@@ -92,31 +92,31 @@ func Test_oneGen(t *testing.T) {
 	r := rule.GameOfLife()
 
 	t.Run("dying", func(t *testing.T) {
-		assert.EqualValues(t, 0, oneGen(0xFFFF, &r).Value)
+		assert.EqualValues(t, 0, oneGen(0xFFFF, &r).value)
 	})
 
 	t.Run("none alive", func(t *testing.T) {
-		assert.EqualValues(t, 0, oneGen(0x0000, &r).Value)
+		assert.EqualValues(t, 0, oneGen(0x0000, &r).value)
 	})
 
 	t.Run("live neighbors", func(t *testing.T) {
 		// 0b0111_0000_0000
-		assert.EqualValues(t, 1, oneGen(0x0700, &r).Value)
+		assert.EqualValues(t, 1, oneGen(0x0700, &r).value)
 	})
 
 	t.Run("live neighbors and self is alive", func(t *testing.T) {
 		// 0b0011_0010_0000
-		assert.EqualValues(t, 1, oneGen(0x0320, &r).Value)
+		assert.EqualValues(t, 1, oneGen(0x0320, &r).value)
 	})
 
 	t.Run("live neighbors and self is alive", func(t *testing.T) {
 		// 0b0010_0010_0000
-		assert.EqualValues(t, 0, oneGen(0x0220, &r).Value)
+		assert.EqualValues(t, 0, oneGen(0x0220, &r).value)
 	})
 
 	t.Run("live neighbors below", func(t *testing.T) {
 		// 0b0000_0000_0111
-		assert.EqualValues(t, 1, oneGen(0x0007, &r).Value)
+		assert.EqualValues(t, 1, oneGen(0x0007, &r).value)
 	})
 }
 
