@@ -30,7 +30,7 @@ func New(opts ...Option) *Game {
 	game := &Game{
 		keymap:   newKeymap(),
 		help:     help.New(),
-		speed:    time.Second / 30,
+		speed:    5,
 		smartVal: -1,
 	}
 
@@ -59,14 +59,14 @@ type Game struct {
 	help         help.Model
 	mode         Mode
 	smartVal     int
-	speed        time.Duration
+	speed        int
 	viewBuf      bytes.Buffer
 	debug        bool
 }
 
 func (g *Game) Init() tea.Cmd {
 	if g.ctx != nil {
-		return Tick(g.ctx, g.speed)
+		return Tick(g.ctx, speeds[g.speed])
 	}
 	return nil
 }
@@ -75,12 +75,12 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tick:
 		generations := uint(1)
-		if g.speed < time.Second/240 {
-			generations = uint(time.Second / 240 / g.speed)
+		if speeds[g.speed] < time.Second/240 {
+			generations = uint(time.Second / 240 / speeds[g.speed])
 		}
 		g.pattern.NextGen(generations)
 		if g.ctx != nil {
-			return g, Tick(g.ctx, g.speed)
+			return g, Tick(g.ctx, speeds[g.speed])
 		}
 	case tea.WindowSizeMsg:
 		if msg.Width != 0 && msg.Height != 0 {
@@ -145,7 +145,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if g.ctx == nil {
 				g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "pause")
 				g.ctx, g.cancel = context.WithCancel(context.Background())
-				return g, Tick(g.ctx, g.speed)
+				return g, Tick(g.ctx, speeds[g.speed])
 			} else {
 				g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "play")
 				g.cancel()
@@ -192,24 +192,26 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				g.view = center.Sub(g.gameSize.Div(2))
 			}
 		case key.Matches(msg, g.keymap.speedUp):
-			if g.speed > 5*time.Microsecond {
-				g.speed /= 2
-				tps := int(time.Second / g.speed)
+			if g.speed < len(speeds)-1 {
+				g.speed++
+				tps := int(time.Second / speeds[g.speed])
 				g.keymap.speed.SetHelp(g.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" tps")
 				if g.ctx != nil {
 					g.cancel()
 					g.ctx, g.cancel = context.WithCancel(context.Background())
-					return g, Tick(g.ctx, g.speed)
+					return g, Tick(g.ctx, speeds[g.speed])
 				}
 			}
 		case key.Matches(msg, g.keymap.speedDown):
-			g.speed *= 2
-			tps := int(time.Second / g.speed)
-			g.keymap.speed.SetHelp(g.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" tps")
-			if g.ctx != nil {
-				g.cancel()
-				g.ctx, g.cancel = context.WithCancel(context.Background())
-				return g, Tick(g.ctx, g.speed)
+			if g.speed > 0 {
+				g.speed--
+				tps := int(time.Second / speeds[g.speed])
+				g.keymap.speed.SetHelp(g.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" tps")
+				if g.ctx != nil {
+					g.cancel()
+					g.ctx, g.cancel = context.WithCancel(context.Background())
+					return g, Tick(g.ctx, speeds[g.speed])
+				}
 			}
 		case key.Matches(msg, g.keymap.reset):
 			g.pattern = g.startPattern
