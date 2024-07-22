@@ -133,9 +133,6 @@ func (n *Node) Get(x, y int, level uint8) *Node {
 		if x < -allowed || x > allowed || y < -allowed || y > allowed {
 			panic(fmt.Sprintf("Reached leaf node with coordinates too big: (%d, %d)", x, y))
 		}
-		if n.value != 0 {
-			return n
-		}
 		return n
 	}
 
@@ -167,9 +164,7 @@ func (n *Node) visit(p image.Point, callback VisitCallback) {
 	case n.value == 0:
 		return
 	case n.level == 0:
-		if n.value != 0 {
-			callback(p, n)
-		}
+		callback(p, n)
 	default:
 		w := n.Width() / 2
 		n.SE.visit(p.Add(image.Pt(w, w)), callback)
