@@ -97,6 +97,8 @@ func (n *Node) Set(x, y int, value int) *Node {
 		switch {
 		case x < -1, x > 0, y < -1, y > 0:
 			panic(fmt.Sprintf("Reached leaf node with coordinates too big: (%d, %d)", x, y))
+		case value == n.value:
+			return n
 		case value == 0:
 			return deadLeaf
 		default:
