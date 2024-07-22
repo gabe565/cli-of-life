@@ -155,52 +155,52 @@ func (n *Node) Get(x, y int, level uint8) *Node {
 	}
 }
 
-type VisitCallback func(x, y int, n *Node)
+type VisitCallback func(p image.Point, n *Node)
 
 func (n *Node) Visit(callback VisitCallback) {
 	w := n.Width() / 2
-	n.visit(-w, -w, callback)
+	n.visit(image.Pt(-w, -w), callback)
 }
 
-func (n *Node) visit(x, y int, callback VisitCallback) {
+func (n *Node) visit(p image.Point, callback VisitCallback) {
 	switch {
 	case n.value == 0:
 		return
 	case n.level == 0:
 		if n.value != 0 {
-			callback(x, y, n)
+			callback(p, n)
 		}
 	default:
 		w := n.Width() / 2
-		n.SE.visit(x+w, y+w, callback)
-		n.SW.visit(x, y+w, callback)
-		n.NW.visit(x, y, callback)
-		n.NE.visit(x+w, y, callback)
+		n.SE.visit(p.Add(image.Pt(w, w)), callback)
+		n.SW.visit(p.Add(image.Pt(0, w)), callback)
+		n.NW.visit(p, callback)
+		n.NE.visit(p.Add(image.Pt(w, 0)), callback)
 	}
 }
 
 func (n *Node) FilledCoords() image.Rectangle {
 	x0, y0 := math.MaxInt, math.MaxInt
 	x1, y1 := math.MinInt, math.MinInt
-	n.Visit(func(x, y int, _ *Node) {
-		if x < x0 {
-			x0 = x
+	n.Visit(func(p image.Point, _ *Node) {
+		if p.X < x0 {
+			x0 = p.X
 		}
-		if y < y0 {
-			y0 = y
+		if p.Y < y0 {
+			y0 = p.Y
 		}
-		if x > x1 {
-			x1 = x
+		if p.X > x1 {
+			x1 = p.X + 1
 		}
-		if y > y1 {
-			y1 = y
+		if p.Y > y1 {
+			y1 = p.Y + 1
 		}
 	})
 
 	if x0 == math.MaxInt || y0 == math.MaxInt || x1 == math.MinInt || y1 == math.MinInt {
 		return image.Rectangle{}
 	}
-	return image.Rect(x0, y0, x1+1, y1+1)
+	return image.Rect(x0, y0, x1, y1)
 }
 
 func (n *Node) ToSlice() [][]int {

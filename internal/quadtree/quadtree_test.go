@@ -73,13 +73,12 @@ func TestNode_Visit(t *testing.T) {
 		Set(55, 232, 1).
 		Set(55, 233, 1)
 	var callCount int
-	node.Visit(func(x, y int, node *Node) {
-		assert.EqualValues(t, 55, x, "x")
+	node.Visit(func(p image.Point, node *Node) {
 		switch callCount {
 		case 0:
-			assert.EqualValues(t, 233, y, "y")
+			assert.Equal(t, image.Pt(55, 233), p)
 		case 1:
-			assert.EqualValues(t, 232, y, "y")
+			assert.Equal(t, image.Pt(55, 232), p)
 		}
 		assert.EqualValues(t, 0, node.level, "level")
 		assert.EqualValues(t, 1, node.value, "value")
