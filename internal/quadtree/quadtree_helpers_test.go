@@ -1,6 +1,7 @@
 package quadtree
 
 import (
+	"image"
 	"math/big"
 	"math/rand"
 	"testing"
@@ -26,11 +27,9 @@ func treeWithRandomPattern(level uint) (*Node, *big.Int) {
 	for x := range edgeLength {
 		for y := range edgeLength {
 			bitPosition := x*edgeLength + y
-			ux := x - edgeLength/2
-			uy := y - edgeLength/2
-
 			if randomNumber.Bit(bitPosition) != 0 {
-				node = node.Set(ux, uy, 1)
+				p := image.Pt(x-edgeLength/2, y-edgeLength/2)
+				node = node.Set(p, 1)
 			}
 		}
 	}
@@ -58,8 +57,8 @@ func treeCorrectness(t *testing.T, node *Node) {
 // 1 | 0
 func slashLevelOne() *Node {
 	return Empty(1).
-		Set(0, -1, 1).
-		Set(-1, 0, 1)
+		Set(image.Pt(0, -1), 1).
+		Set(image.Pt(-1, 0), 1)
 }
 
 // backslashLevelOne returns a level one tree with the following pattern
@@ -67,6 +66,6 @@ func slashLevelOne() *Node {
 // 0 | 1
 func backslashLevelOne() *Node {
 	return Empty(1).
-		Set(0, 0, 1).
-		Set(-1, -1, 1)
+		Set(image.Pt(0, 0), 1).
+		Set(image.Pt(-1, -1), 1)
 }

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"image"
 	"io"
 	"regexp"
 	"strconv"
@@ -21,7 +22,7 @@ func UnmarshalRLE(r io.Reader) (Pattern, error) {
 		Tree: quadtree.Empty(quadtree.DefaultTreeSize),
 	}
 	scanner := bufio.NewScanner(r)
-	var x, y int
+	var p image.Point
 scan:
 	for scanner.Scan() {
 		line := scanner.Bytes()
@@ -71,7 +72,7 @@ scan:
 				}
 			}
 
-			pattern.Tree = pattern.Tree.GrowToFit(w, h)
+			pattern.Tree = pattern.Tree.GrowToFit(image.Pt(w, h))
 		default:
 			if len(line) == 0 {
 				continue
@@ -85,9 +86,9 @@ scan:
 					runCount += int(b - '0')
 				case b == '$':
 					runCount = max(runCount, 1)
-					if x != 0 || y != 0 {
-						y += runCount
-						x = 0
+					if p.X != 0 || p.Y != 0 {
+						p.Y += runCount
+						p.X = 0
 					}
 					runCount = 0
 				case b == '!':
@@ -97,14 +98,14 @@ scan:
 					switch b {
 					case 'b':
 						for range runCount {
-							pattern.Tree = pattern.Tree.Set(x, y, 0)
-							x++
+							pattern.Tree = pattern.Tree.Set(p, 0)
+							p.X++
 						}
 					case ' ':
 					default:
 						for range runCount {
-							pattern.Tree = pattern.Tree.Set(x, y, 1)
-							x++
+							pattern.Tree = pattern.Tree.Set(p, 1)
+							p.X++
 						}
 					}
 					runCount = 0

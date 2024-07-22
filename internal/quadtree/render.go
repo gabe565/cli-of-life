@@ -50,7 +50,7 @@ func (n *Node) Render(buf *bytes.Buffer, rect image.Rectangle, level uint8) {
 	current := -1
 	for y := rect.Min.Y; y < rect.Max.Y; y += skip {
 		for x := rect.Min.X; x < rect.Max.X; x += skip {
-			node := n.Get(x, y, level)
+			node := n.Get(image.Pt(x, y), level)
 			if node.value == current {
 				consecutive++
 			} else {

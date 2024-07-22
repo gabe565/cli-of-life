@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"image"
 	"io"
 
 	"github.com/gabe565/cli-of-life/internal/quadtree"
@@ -16,7 +17,7 @@ func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 		Tree: quadtree.Empty(quadtree.DefaultTreeSize),
 	}
 	scanner := bufio.NewScanner(r)
-	var y int
+	var p image.Point
 	for scanner.Scan() {
 		line := scanner.Bytes()
 		switch {
@@ -32,21 +33,21 @@ func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 				pattern.Comment += string(comment)
 			}
 		default:
-			var x int
-			pattern.Tree = pattern.Tree.GrowToFit(x, len(line))
+			pattern.Tree = pattern.Tree.GrowToFit(p.Add(image.Pt(0, len(line))))
 			for _, b := range line {
 				switch b {
 				case '.':
-					pattern.Tree = pattern.Tree.Set(x, y, 0)
-					x++
+					pattern.Tree = pattern.Tree.Set(p, 0)
+					p.X++
 				case 'O', '*':
-					pattern.Tree = pattern.Tree.Set(x, y, 1)
-					x++
+					pattern.Tree = pattern.Tree.Set(p, 1)
+					p.X++
 				default:
 					return pattern, fmt.Errorf("plaintext: %w: %q in line %q", ErrUnexpectedCharacter, string(b), line)
 				}
 			}
-			y++
+			p.X = 0
+			p.Y++
 		}
 	}
 	if scanner.Err() != nil {

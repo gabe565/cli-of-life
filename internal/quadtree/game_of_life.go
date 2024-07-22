@@ -1,6 +1,7 @@
 package quadtree
 
 import (
+	"image"
 	"slices"
 
 	"github.com/gabe565/cli-of-life/internal/rule"
@@ -67,7 +68,7 @@ func (n *Node) slowSimulation(r *rule.Rule) *Node {
 	var b uint16
 	for y := -2; y < 2; y++ {
 		for x := -2; x < 2; x++ {
-			b = (b << 1) + uint16(n.Get(x, y, 0).value)
+			b = (b << 1) + uint16(n.Get(image.Pt(x, y), 0).value)
 		}
 	}
 	return memoizedNew.Call(Children{NW: oneGen(b>>5, r), NE: oneGen(b>>4, r), SW: oneGen(b>>1, r), SE: oneGen(b, r)})

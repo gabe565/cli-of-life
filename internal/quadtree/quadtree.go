@@ -83,20 +83,20 @@ func (n *Node) grow() *Node {
 	})
 }
 
-func (n *Node) GrowToFit(x, y int) *Node {
+func (n *Node) GrowToFit(p image.Point) *Node {
 	w := n.Width() / 2
-	for x > w || y > w || x < -w || y < -w {
+	for p.X > w || p.Y > w || p.X < -w || p.Y < -w {
 		n = n.grow()
 		w = n.Width() / 2
 	}
 	return n
 }
 
-func (n *Node) Set(x, y int, value int) *Node {
+func (n *Node) Set(p image.Point, value int) *Node {
 	if n.level == 0 {
 		switch {
-		case x < -1, x > 0, y < -1, y > 0:
-			panic(fmt.Sprintf("Reached leaf node with coordinates too big: (%d, %d)", x, y))
+		case p.X < -1, p.X > 0, p.Y < -1, p.Y > 0:
+			panic(fmt.Sprintf("Reached leaf node with coordinates too big: (%d, %d)", p.X, p.Y))
 		case value == n.value:
 			return n
 		case value == 0:
@@ -108,17 +108,17 @@ func (n *Node) Set(x, y int, value int) *Node {
 
 	w := 1 << (n.level - 2)
 	switch {
-	case x >= 0:
+	case p.X >= 0:
 		switch {
-		case y >= 0:
-			return memoizedNew.Call(Children{NW: n.NW, NE: n.NE, SW: n.SW, SE: n.SE.Set(x-w, y-w, value)})
+		case p.Y >= 0:
+			return memoizedNew.Call(Children{NW: n.NW, NE: n.NE, SW: n.SW, SE: n.SE.Set(p.Sub(image.Pt(w, w)), value)})
 		default:
-			return memoizedNew.Call(Children{NW: n.NW, NE: n.NE.Set(x-w, y+w, value), SW: n.SW, SE: n.SE})
+			return memoizedNew.Call(Children{NW: n.NW, NE: n.NE.Set(p.Add(image.Pt(-w, w)), value), SW: n.SW, SE: n.SE})
 		}
-	case y >= 0:
-		return memoizedNew.Call(Children{NW: n.NW, NE: n.NE, SW: n.SW.Set(x+w, y-w, value), SE: n.SE})
+	case p.Y >= 0:
+		return memoizedNew.Call(Children{NW: n.NW, NE: n.NE, SW: n.SW.Set(p.Add(image.Pt(w, -w)), value), SE: n.SE})
 	default:
-		return memoizedNew.Call(Children{NW: n.NW.Set(x+w, y+w, value), NE: n.NE, SW: n.SW, SE: n.SE})
+		return memoizedNew.Call(Children{NW: n.NW.Set(p.Add(image.Pt(w, w)), value), NE: n.NE, SW: n.SW, SE: n.SE})
 	}
 }
 
@@ -126,31 +126,31 @@ func (n *Node) children() []*Node {
 	return []*Node{n.SE, n.SW, n.NW, n.NE}
 }
 
-func (n *Node) Get(x, y int, level uint8) *Node {
+func (n *Node) Get(p image.Point, level uint8) *Node {
 	if n.level == level {
 		allowed := 1
 		if level != 0 {
 			allowed = 1 << (level - 1)
 		}
-		if x < -allowed || x > allowed || y < -allowed || y > allowed {
-			panic(fmt.Sprintf("Reached leaf node with coordinates too big: (%d, %d)", x, y))
+		if p.X < -allowed || p.X > allowed || p.Y < -allowed || p.Y > allowed {
+			panic(fmt.Sprintf("Reached leaf node with coordinates too big: (%d, %d)", p.X, p.Y))
 		}
 		return n
 	}
 
 	w := 1 << (n.level - 2)
 	switch {
-	case x >= 0:
+	case p.X >= 0:
 		switch {
-		case y >= 0:
-			return n.SE.Get(x-w, y-w, level)
+		case p.Y >= 0:
+			return n.SE.Get(p.Sub(image.Pt(w, w)), level)
 		default:
-			return n.NE.Get(x-w, y+w, level)
+			return n.NE.Get(p.Add(image.Pt(-w, w)), level)
 		}
-	case y >= 0:
-		return n.SW.Get(x+w, y-w, level)
+	case p.Y >= 0:
+		return n.SW.Get(p.Add(image.Pt(w, -w)), level)
 	default:
-		return n.NW.Get(x+w, y+w, level)
+		return n.NW.Get(p.Add(image.Pt(w, w)), level)
 	}
 }
 
@@ -214,7 +214,7 @@ func (n *Node) ToSlice() [][]int {
 
 	for y := coords.Min.Y; y < coords.Max.Y; y++ {
 		for x := coords.Min.X; x < coords.Max.X; x++ {
-			result[y-coords.Min.Y][x-coords.Min.X] = n.Get(x, y, 0).value
+			result[y-coords.Min.Y][x-coords.Min.X] = n.Get(image.Pt(x, y), 0).value
 		}
 	}
 	return result

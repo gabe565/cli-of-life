@@ -30,16 +30,16 @@ func TestEmpty(t *testing.T) {
 
 func TestNode_GrowToFit(t *testing.T) {
 	node := Empty(1).
-		GrowToFit(63, 63)
+		GrowToFit(image.Pt(63, 63))
 	assert.EqualValues(t, 7, node.level)
 	treeCorrectness(t, node)
 }
 
 func TestNode_Set(t *testing.T) {
 	t.Run("panics", func(t *testing.T) {
-		node := Empty(1).GrowToFit(3, 3)
+		node := Empty(1).GrowToFit(image.Pt(3, 3))
 		assert.Panics(t, func() {
-			node = node.Set(8, 8, 1)
+			node = node.Set(image.Pt(8, 8), 1)
 		})
 	})
 
@@ -47,31 +47,31 @@ func TestNode_Set(t *testing.T) {
 		node := Empty(1)
 		for i := range 10 {
 			x, y := i-5*3, i-5*i
-			node = node.GrowToFit(x, y).Set(x, y, 1)
-			assert.EqualValues(t, 1, node.Get(x, y, 0).value)
-			node = node.Set(x, y, 0)
-			assert.EqualValues(t, 0, node.Get(x, y, 0).value)
+			node = node.GrowToFit(image.Pt(x, y)).Set(image.Pt(x, y), 1)
+			assert.EqualValues(t, 1, node.Get(image.Pt(x, y), 0).value)
+			node = node.Set(image.Pt(x, y), 0)
+			assert.EqualValues(t, 0, node.Get(image.Pt(x, y), 0).value)
 		}
 
 		// check that not all cells get set
-		node = node.Set(1, 1, 1)
-		assert.Equal(t, 0, node.Get(2, 2, 0).value)
+		node = node.Set(image.Pt(1, 1), 1)
+		assert.Equal(t, 0, node.Get(image.Pt(2, 2), 0).value)
 	})
 }
 
 func TestNode_Get(t *testing.T) {
-	node := Empty(1).GrowToFit(55, 233)
-	assert.Equal(t, 0, node.Get(55, 233, 0).value)
-	node = node.Set(55, 233, 1)
-	assert.Equal(t, 1, node.Get(55, 233, 0).value)
+	node := Empty(1).GrowToFit(image.Pt(55, 233))
+	assert.Equal(t, 0, node.Get(image.Pt(55, 233), 0).value)
+	node = node.Set(image.Pt(55, 233), 1)
+	assert.Equal(t, 1, node.Get(image.Pt(55, 233), 0).value)
 	treeCorrectness(t, node)
 }
 
 func TestNode_Visit(t *testing.T) {
 	node := Empty(1).
-		GrowToFit(55, 233).
-		Set(55, 232, 1).
-		Set(55, 233, 1)
+		GrowToFit(image.Pt(55, 233)).
+		Set(image.Pt(55, 232), 1).
+		Set(image.Pt(55, 233), 1)
 	var callCount int
 	node.Visit(func(p image.Point, node *Node) {
 		switch callCount {
@@ -121,8 +121,8 @@ func Test_oneGen(t *testing.T) {
 
 func TestNode_centeredSubnode(t *testing.T) {
 	node := Empty(3).
-		Set(1, 1, 1).
-		Set(-1, -1, 1)
+		Set(image.Pt(1, 1), 1).
+		Set(image.Pt(-1, -1), 1)
 	center := node.centeredSubnode().grow()
 	assert.Equal(t, node, center)
 }
@@ -130,16 +130,16 @@ func TestNode_centeredSubnode(t *testing.T) {
 func TestNode_centeredNHorizontal(t *testing.T) {
 	t.Run("backslash", func(t *testing.T) {
 		node := Empty(3).
-			Set(-1, -3, 1).
-			Set(0, -2, 1).
+			Set(image.Pt(-1, -3), 1).
+			Set(image.Pt(0, -2), 1).
 			centeredNHorizontal()
 		assert.Equal(t, backslashLevelOne(), node)
 	})
 
 	t.Run("slash", func(t *testing.T) {
 		node := Empty(3).
-			Set(0, -3, 1).
-			Set(-1, -2, 1).
+			Set(image.Pt(0, -3), 1).
+			Set(image.Pt(-1, -2), 1).
 			centeredNHorizontal()
 		assert.Equal(t, slashLevelOne(), node)
 	})
@@ -148,16 +148,16 @@ func TestNode_centeredNHorizontal(t *testing.T) {
 func TestNode_centeredSHorizontal(t *testing.T) {
 	t.Run("backslash", func(t *testing.T) {
 		node := Empty(3).
-			Set(-1, 1, 1).
-			Set(0, 2, 1).
+			Set(image.Pt(-1, 1), 1).
+			Set(image.Pt(0, 2), 1).
 			centeredSHorizontal()
 		assert.Equal(t, backslashLevelOne(), node)
 	})
 
 	t.Run("slash", func(t *testing.T) {
 		node := Empty(3).
-			Set(0, 1, 1).
-			Set(-1, 2, 1).
+			Set(image.Pt(0, 1), 1).
+			Set(image.Pt(-1, 2), 1).
 			centeredSHorizontal()
 		assert.Equal(t, slashLevelOne(), node)
 	})
@@ -166,16 +166,16 @@ func TestNode_centeredSHorizontal(t *testing.T) {
 func TestNode_centeredWVertical(t *testing.T) {
 	t.Run("backslash", func(t *testing.T) {
 		node := Empty(3).
-			Set(-3, -1, 1).
-			Set(-2, 0, 1).
+			Set(image.Pt(-3, -1), 1).
+			Set(image.Pt(-2, 0), 1).
 			centeredWVertical()
 		assert.Equal(t, backslashLevelOne(), node)
 	})
 
 	t.Run("slash", func(t *testing.T) {
 		node := Empty(3).
-			Set(-2, -1, 1).
-			Set(-3, 0, 1).
+			Set(image.Pt(-2, -1), 1).
+			Set(image.Pt(-3, 0), 1).
 			centeredWVertical()
 		assert.Equal(t, slashLevelOne(), node)
 	})
@@ -184,16 +184,16 @@ func TestNode_centeredWVertical(t *testing.T) {
 func TestNode_centeredEVertical(t *testing.T) {
 	t.Run("backslash", func(t *testing.T) {
 		node := Empty(3).
-			Set(1, -1, 1).
-			Set(2, 0, 1).
+			Set(image.Pt(1, -1), 1).
+			Set(image.Pt(2, 0), 1).
 			centeredEVertical()
 		assert.Equal(t, backslashLevelOne(), node)
 	})
 
 	t.Run("slash", func(t *testing.T) {
 		node := Empty(3).
-			Set(2, -1, 1).
-			Set(1, 0, 1).
+			Set(image.Pt(2, -1), 1).
+			Set(image.Pt(1, 0), 1).
 			centeredEVertical()
 		assert.Equal(t, slashLevelOne(), node)
 	})
@@ -217,16 +217,16 @@ func TestNode_slowSimulation(t *testing.T) {
 	// 0 | 1
 	t.Run("SW empty", func(t *testing.T) {
 		node := Empty(2).
-			Set(-1, -1, 1).
-			Set(0, -1, 1).
-			Set(0, 0, 1).
+			Set(image.Pt(-1, -1), 1).
+			Set(image.Pt(0, -1), 1).
+			Set(image.Pt(0, 0), 1).
 			slowSimulation(&r)
 
 		expect := Empty(1).
-			Set(0, 0, 1).
-			Set(-1, 0, 1).
-			Set(-1, -1, 1).
-			Set(0, -1, 1)
+			Set(image.Pt(0, 0), 1).
+			Set(image.Pt(-1, 0), 1).
+			Set(image.Pt(-1, -1), 1).
+			Set(image.Pt(0, -1), 1)
 		assert.Equal(t, expect, node)
 
 		// next generation should be full
@@ -242,7 +242,7 @@ func TestNode_slowSimulation(t *testing.T) {
 		node := Empty(2)
 		for x := -2; x < 2; x++ {
 			for y := -2; y < 2; y++ {
-				node = node.Set(x, y, 1)
+				node = node.Set(image.Pt(x, y), 1)
 			}
 		}
 		node = node.slowSimulation(&r)
@@ -276,21 +276,21 @@ func TestNode_FilledCoords(t *testing.T) {
 		want image.Rectangle
 	}{
 		{"empty", Empty(1), image.Rectangle{}},
-		{"1 cell", Empty(1).Set(0, 0, 1), image.Rect(0, 0, 1, 1)},
+		{"1 cell", Empty(1).Set(image.Pt(0, 0), 1), image.Rect(0, 0, 1, 1)},
 		{
 			"square",
 			Empty(2).
-				Set(0, 0, 1).
-				Set(0, 1, 1).
-				Set(1, 0, 1).
-				Set(1, 1, 1),
+				Set(image.Pt(0, 0), 1).
+				Set(image.Pt(0, 1), 1).
+				Set(image.Pt(1, 0), 1).
+				Set(image.Pt(1, 1), 1),
 			image.Rect(0, 0, 2, 2),
 		},
 		{
 			"negative",
 			Empty(3).
-				Set(-2, -2, 1).
-				Set(2, 2, 1),
+				Set(image.Pt(-2, -2), 1).
+				Set(image.Pt(2, 2), 1),
 			image.Rect(-2, -2, 3, 3),
 		},
 	}
@@ -310,31 +310,31 @@ func TestNode_ToSlice(t *testing.T) {
 		{
 			"positive glider",
 			Empty(3).
-				Set(1, 0, 1).
-				Set(2, 1, 1).
-				Set(0, 2, 1).
-				Set(1, 2, 1).
-				Set(2, 2, 1),
+				Set(image.Pt(1, 0), 1).
+				Set(image.Pt(2, 1), 1).
+				Set(image.Pt(0, 2), 1).
+				Set(image.Pt(1, 2), 1).
+				Set(image.Pt(2, 2), 1),
 			[][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}},
 		},
 		{
 			"split positive/negative glider",
 			Empty(3).
-				Set(0, -1, 1).
-				Set(1, 0, 1).
-				Set(-1, 1, 1).
-				Set(0, 1, 1).
-				Set(1, 1, 1),
+				Set(image.Pt(0, -1), 1).
+				Set(image.Pt(1, 0), 1).
+				Set(image.Pt(-1, 1), 1).
+				Set(image.Pt(0, 1), 1).
+				Set(image.Pt(1, 1), 1),
 			[][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}},
 		},
 		{
 			"negative glider",
 			Empty(3).
-				Set(-2, -3, 1).
-				Set(-1, -2, 1).
-				Set(-3, -1, 1).
-				Set(-2, -1, 1).
-				Set(-1, -1, 1),
+				Set(image.Pt(-2, -3), 1).
+				Set(image.Pt(-1, -2), 1).
+				Set(image.Pt(-3, -1), 1).
+				Set(image.Pt(-2, -1), 1).
+				Set(image.Pt(-1, -1), 1),
 			[][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}},
 		},
 	}

@@ -112,7 +112,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					switch g.mode {
 					case ModeSmart:
 						if g.smartVal == -1 {
-							val := g.pattern.Tree.Get(msg.X, msg.Y, 0).Value()
+							val := g.pattern.Tree.Get(image.Pt(msg.X, msg.Y), 0).Value()
 							switch val {
 							case 0:
 								g.smartVal = 1
@@ -120,11 +120,11 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 								g.smartVal = 0
 							}
 						}
-						g.pattern.Tree = g.pattern.Tree.Set(msg.X, msg.Y, g.smartVal)
+						g.pattern.Tree = g.pattern.Tree.Set(image.Pt(msg.X, msg.Y), g.smartVal)
 					case ModePlace:
-						g.pattern.Tree = g.pattern.Tree.Set(msg.X, msg.Y, 1)
+						g.pattern.Tree = g.pattern.Tree.Set(image.Pt(msg.X, msg.Y), 1)
 					case ModeErase:
-						g.pattern.Tree = g.pattern.Tree.Set(msg.X, msg.Y, 0)
+						g.pattern.Tree = g.pattern.Tree.Set(image.Pt(msg.X, msg.Y), 0)
 					}
 				}
 			case tea.MouseButtonWheelUp:
