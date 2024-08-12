@@ -32,6 +32,7 @@ func New(opts ...Option) *cobra.Command {
 		DisableAutoGenTag: true,
 	}
 
+	config.InitLog()
 	conf := config.New()
 	conf.RegisterFlags(cmd.Flags())
 	if err := config.RegisterCompletion(cmd); err != nil {
