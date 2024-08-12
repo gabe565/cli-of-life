@@ -107,17 +107,17 @@ Download and run the [latest release binary](https://github.com/gabe565/cli-of-l
 ## Usage
 Run `cli-of-life` in a terminal to play.
 
-By default, the grid will be empty, but rle/plaintext files can be loaded with `cli-of-life --file FILE.rle` or `cli-of-life --url https://...`
+By default, the grid will be empty, but rle/plaintext files can be loaded with `cli-of-life FILE.rle` or `cli-of-life https://...`
 
 For full command-line reference, see [docs](docs/cli-of-life.md).
 
 ### Examples
 
 ```shell
-$ cli-of-life --url https://conwaylife.com/patterns/gosperglidergun.rle
-$ cli-of-life --url https://conwaylife.com/patterns/3blocktwinbeesshuttle.rle
-$ cli-of-life --url https://conwaylife.com/patterns/breeder1.rle
-$ cli-of-life --url https://conwaylife.com/patterns/replicator.rle
+$ cli-of-life https://conwaylife.com/patterns/gosperglidergun.rle
+$ cli-of-life https://conwaylife.com/patterns/3blocktwinbeesshuttle.rle
+$ cli-of-life https://conwaylife.com/patterns/breeder1.rle
+$ cli-of-life https://conwaylife.com/patterns/replicator.rle
 ```
 
 See the [LifeWiki for pattern files](https://conwaylife.com/wiki/Category:Patterns).

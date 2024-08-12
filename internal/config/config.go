@@ -5,8 +5,8 @@ import (
 )
 
 type Config struct {
-	File          string
-	URL           string
+	Pattern string
+
 	PatternFormat string
 	RuleString    string
 	Play          bool

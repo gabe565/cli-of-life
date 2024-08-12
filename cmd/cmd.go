@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/url"
 	"os"
 	"runtime/debug"
 
@@ -20,12 +21,14 @@ import (
 
 func New(opts ...Option) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "cli-of-life",
+		Use:   "cli-of-life [file | url]",
 		Short: "Play Conway's Game of Life in your terminal",
 		RunE:  run,
-		Args:  cobra.NoArgs,
+		Args:  cobra.MaximumNArgs(1),
 
-		ValidArgsFunction: cobra.NoFileCompletions,
+		ValidArgsFunction: func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+			return []string{pattern.ExtRLE, pattern.ExtPlaintext}, cobra.ShellCompDirectiveFilterFileExt
+		},
 		DisableAutoGenTag: true,
 	}
 
@@ -43,7 +46,7 @@ func New(opts ...Option) *cobra.Command {
 	return cmd
 }
 
-func run(cmd *cobra.Command, _ []string) error {
+func run(cmd *cobra.Command, args []string) error {
 	if pprof.Enabled {
 		go func() {
 			if err := pprof.ListenAndServe(); err != nil {
@@ -66,32 +69,43 @@ func run(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
+	if len(args) == 1 {
+		conf.Pattern = args[0]
+	}
+
 	var pat pattern.Pattern
 	var err error
 	switch {
-	case conf.File != "":
-		slog.Info("Loading pattern file", "path", conf.File)
-		if pat, err = pattern.UnmarshalFile(conf.File); err != nil {
+	case conf.Pattern != "":
+		u, err := url.Parse(conf.Pattern)
+		if err != nil {
 			return err
 		}
-	case conf.URL != "":
-		slog.Info("Loading pattern URL", "url", conf.URL)
-		if pat, err = pattern.UnmarshalURL(context.Background(), conf.URL); err != nil {
-			return err
+
+		switch u.Scheme {
+		case "http", "https":
+			slog.Info("Loading pattern URL", "url", conf.Pattern)
+			if pat, err = pattern.UnmarshalURL(context.Background(), conf.Pattern); err != nil {
+				return err
+			}
+		default:
+			slog.Info("Loading pattern file", "path", conf.Pattern)
+			if pat, err = pattern.UnmarshalFile(conf.Pattern); err != nil {
+				return err
+			}
 		}
+		slog.Info("Loaded pattern", "pattern", pat)
 	case !isatty.IsTerminal(os.Stdin.Fd()) && !isatty.IsCygwinTerminal(os.Stdin.Fd()):
 		slog.Info("Loading pattern from stdin")
 		if pat, err = pattern.Unmarshal(os.Stdin); err != nil {
 			return err
 		}
+		slog.Info("Loaded pattern", "pattern", pat)
 	default:
 		pat = pattern.Pattern{
 			Rule: r,
 			Tree: quadtree.New(),
 		}
-	}
-	if pat.Name != "" {
-		slog.Info("Loaded pattern", "pattern", pat)
 	}
 
 	pat.Tree.SetMaxCache(conf.CacheLimit)
