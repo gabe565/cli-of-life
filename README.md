@@ -129,8 +129,8 @@ See the [LifeWiki for pattern files](https://conwaylife.com/wiki/Category:Patter
 | mouse   | Place cells                               |
 | `space` | Play/pause                                |
 | `m`     | Toggle between modes: smart, place, erase |
-| `↑↓←→`  | Move the game board                       |
-| `w`     | Toggle wrapping                           |
+| `wasd`  | Move the game board                       |
+| `-`/`+` | Zoom                                      |
 | `<`/`>` | Change playback speed                     |
 | `t`     | Tick                                      |
 | `r`     | Reset                                     |
