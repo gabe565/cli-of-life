@@ -28,7 +28,7 @@ func newKeymap() keymap {
 		),
 		move: key.NewBinding(
 			key.WithKeys("up", "left", "down", "right"),
-			key.WithHelp("↑↓←→", "move"),
+			key.WithHelp("wasd", "move"),
 		),
 		zoomIn: key.NewBinding(
 			key.WithKeys("+", "="),
