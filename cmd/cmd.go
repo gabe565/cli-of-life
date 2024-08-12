@@ -14,6 +14,7 @@ import (
 	"github.com/gabe565/cli-of-life/internal/pprof"
 	"github.com/gabe565/cli-of-life/internal/quadtree"
 	"github.com/gabe565/cli-of-life/internal/rule"
+	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
 )
 
@@ -66,17 +67,21 @@ func run(cmd *cobra.Command, _ []string) error {
 	}
 
 	var pat pattern.Pattern
+	var err error
 	switch {
 	case conf.File != "":
 		slog.Info("Loading pattern file", "path", conf.File)
-		var err error
 		if pat, err = pattern.UnmarshalFile(conf.File); err != nil {
 			return err
 		}
 	case conf.URL != "":
 		slog.Info("Loading pattern URL", "url", conf.URL)
-		var err error
 		if pat, err = pattern.UnmarshalURL(context.Background(), conf.URL); err != nil {
+			return err
+		}
+	case !isatty.IsTerminal(os.Stdin.Fd()) && !isatty.IsCygwinTerminal(os.Stdin.Fd()):
+		slog.Info("Loading pattern from stdin")
+		if pat, err = pattern.Unmarshal(os.Stdin); err != nil {
 			return err
 		}
 	default:
@@ -107,7 +112,7 @@ func run(cmd *cobra.Command, _ []string) error {
 	}()
 
 	slog.Info("Starting game")
-	_, err := program.Run()
+	_, err = program.Run()
 	slog.Info("Quitting game")
 	return err
 }
