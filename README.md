@@ -135,3 +135,12 @@ See the [LifeWiki for pattern files](https://conwaylife.com/wiki/Category:Patter
 | `t`     | Tick                                      |
 | `r`     | Reset                                     |
 | `q`     | Quit                                      |
+
+## References
+- [LifeWiki](https://conwaylife.com/wiki/Main_Page)
+- [An Algorithm for Compressing Space and Time](https://www.drdobbs.com/jvm/an-algorithm-for-compressing-space-and-t/184406478) by Tomas G. Rokicki ([GitHub Mirror](https://github.com/mafm/HashLife))
+- [Conway's Game of Life Blog Series](https://ericlippert.com/category/conwayslife/) by [Eric Lippert](https://github.com/ericlippert)
+- [noctilu/quadtree](https://github.com/noctilu/quadtree)
+- [HashLife](https://www.dev-mind.blog/hashlife/) by [ninguem](https://github.com/ngmsoftware)
+- [An implementation of Hashlife in Python](https://johnhw.github.io/hashlife/index.md.html) by [John H Williamson](https://github.com/johnhw)
+- [rowett/lifeviewer](https://github.com/rowett/lifeviewer)
