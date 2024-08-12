@@ -17,20 +17,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version = "beta"
-
-func New() *cobra.Command {
+func New(opts ...Option) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "cli-of-life",
-		Short:   "Play Conway's Game of Life in your terminal",
-		RunE:    run,
-		Args:    cobra.NoArgs,
-		Version: buildVersion(version),
+		Use:   "cli-of-life",
+		Short: "Play Conway's Game of Life in your terminal",
+		RunE:  run,
+		Args:  cobra.NoArgs,
 
 		ValidArgsFunction: cobra.NoFileCompletions,
 		DisableAutoGenTag: true,
 	}
-	cmd.InitDefaultVersionFlag()
 
 	conf := config.New()
 	conf.RegisterFlags(cmd.Flags())
@@ -38,6 +34,11 @@ func New() *cobra.Command {
 		panic(err)
 	}
 	cmd.SetContext(config.NewContext(context.Background(), conf))
+
+	for _, opt := range opts {
+		opt(cmd)
+	}
+
 	return cmd
 }
 
