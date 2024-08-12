@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"path"
@@ -23,8 +24,25 @@ type Pattern struct {
 	Rule    rule.Rule
 }
 
-func (p *Pattern) Step(steps uint) {
+func (p Pattern) Step(steps uint) {
 	p.Tree.Step(&p.Rule, steps)
+}
+
+var _ slog.LogValuer = Pattern{}
+
+func (p Pattern) LogValue() slog.Value {
+	attrs := make([]slog.Attr, 0, 4)
+	if p.Name != "" {
+		attrs = append(attrs, slog.String("name", p.Name))
+	}
+	if p.Author != "" {
+		attrs = append(attrs, slog.String("author", p.Author))
+	}
+	attrs = append(attrs,
+		slog.String("rule", p.Rule.String()),
+		slog.String("size", p.Tree.FilledCoords().Size().String()),
+	)
+	return slog.GroupValue(attrs...)
 }
 
 var (

@@ -90,6 +90,9 @@ func run(cmd *cobra.Command, _ []string) error {
 			Tree: quadtree.New(),
 		}
 	}
+	if pat.Name != "" {
+		slog.Info("Loaded pattern", "pattern", pat)
+	}
 
 	pat.Tree.SetMaxCache(conf.CacheLimit)
 
