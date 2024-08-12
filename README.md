@@ -7,8 +7,8 @@ Play Conway's Game of Life in your terminal!
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/dfda81d9-2211-4ee9-ae10-201716e5a218">
-    <img width="720" alt="cli-of-life demo" src="https://github.com/user-attachments/assets/c5fdf882-af73-4f3e-90cb-e53fd2dcbf35">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/e4b018cd-bcc8-4439-9c99-35d4114a9854">
+    <img width="720" alt="cli-of-life demo" src="https://github.com/user-attachments/assets/999139eb-6ec7-4b47-bc37-076d15202a31">
   </picture>
 </p>
 

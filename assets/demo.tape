@@ -13,53 +13,41 @@ Set WindowBar Colorful
 Set BorderRadius 10
 
 Hide
-Type@0 'PATH="$PWD:$PATH"; clear'
+Type@0 'cli-of-life() ( ./cli-of-life "$@" 2>/dev/null ); clear'
 Enter
 Sleep 100ms
 Show
 Sleep 50ms
 
-Type "cli-of-life --file=patterns/gosperglidergun.rle"
+Type "cli-of-life --play https://conwaylife.com/patterns/gosperglidergun.rle"
 Sleep 400ms
 Enter
-Sleep 200ms
-Type "w "
-Sleep 5s
-Type "q"
-Sleep 250ms
-
-Type "cli-of-life --file=patterns/gabrielsp138.rle"
-Sleep 400ms
-Enter
-Sleep 200ms
-Type " "
 Sleep 4s
 Type "q"
 Sleep 250ms
 
-Type "cli-of-life --file=patterns/3blocktwinbeesshuttle.rle"
+Type "cli-of-life --play https://conwaylife.com/patterns/3blocktwinbeesshuttle.rle"
 Sleep 400ms
 Enter
-Sleep 200ms
-Type " "
-Sleep 4s
-Type "q"
-Sleep 250ms
-
-Type "cli-of-life --file=patterns/biblockfuse.rle"
-Sleep 400ms
-Enter
-Sleep 200ms
-Type " "
 Sleep 3s
 Type "q"
 Sleep 250ms
 
-Type "cli-of-life --file=patterns/piheptomino.rle"
+Type "cli-of-life --play https://conwaylife.com/patterns/breeder1.rle"
 Sleep 400ms
 Enter
 Sleep 200ms
-Type " "
-Sleep 6.5s
+Type@200ms "-->wddd-->wddd-->>>--wddddddd"
+Sleep 3s
+Type "<<<<<"
+Type@250ms "++++++++"
+Sleep 1s
+Type "q"
+Sleep 250ms
+
+Type "cli-of-life --play https://conwaylife.com/patterns/gabrielsp138.rle"
+Sleep 400ms
+Enter
+Sleep 3s
 Type "q"
 Sleep 250ms
