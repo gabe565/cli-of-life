@@ -254,7 +254,7 @@ func TestNode_slowSimulation(t *testing.T) {
 // more testing should happen on universe level
 func TestNode_NextGeneration(t *testing.T) {
 	node := Empty(4).grow()
-	next := node.nextGeneration(ptr.To(rule.GameOfLife())).grow()
+	next := node.step(ptr.To(rule.GameOfLife())).grow()
 	assert.Equal(t, node, next)
 	assert.NotNil(t, node.next)
 }

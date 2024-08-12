@@ -19,7 +19,7 @@ func RLEHeaderRegexp() *regexp.Regexp {
 
 func UnmarshalRLE(r io.Reader) (Pattern, error) {
 	pattern := Pattern{
-		Tree: quadtree.Empty(quadtree.DefaultTreeSize),
+		Tree: quadtree.New(),
 	}
 	scanner := bufio.NewScanner(r)
 	var p image.Point
@@ -72,7 +72,7 @@ scan:
 				}
 			}
 
-			pattern.Tree = pattern.Tree.GrowToFit(image.Pt(w, h))
+			pattern.Tree.GrowToFit(image.Pt(w, h))
 		default:
 			if len(line) == 0 {
 				continue
@@ -98,13 +98,13 @@ scan:
 					switch b {
 					case 'b':
 						for range runCount {
-							pattern.Tree = pattern.Tree.Set(p, 0)
+							pattern.Tree.Set(p, 0)
 							p.X++
 						}
 					case ' ':
 					default:
 						for range runCount {
-							pattern.Tree = pattern.Tree.Set(p, 1)
+							pattern.Tree.Set(p, 1)
 							p.X++
 						}
 					}
@@ -116,5 +116,6 @@ scan:
 	if scanner.Err() != nil {
 		return pattern, fmt.Errorf("rle: %w", scanner.Err())
 	}
+	pattern.Tree.SetReset()
 	return pattern, nil
 }

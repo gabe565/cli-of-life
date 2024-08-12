@@ -15,18 +15,16 @@ import (
 	"github.com/gabe565/cli-of-life/internal/rule"
 )
 
-const MaxTiles = 33_554_432
-
 type Pattern struct {
 	Name    string
 	Comment string
 	Author  string
-	Tree    *quadtree.Node
+	Tree    *quadtree.Gosper
 	Rule    rule.Rule
 }
 
-func (p *Pattern) NextGen(generations uint) {
-	p.Tree = p.Tree.NextGeneration(&p.Rule, generations)
+func (p *Pattern) Step(steps uint) {
+	p.Tree.Step(&p.Rule, steps)
 }
 
 var (

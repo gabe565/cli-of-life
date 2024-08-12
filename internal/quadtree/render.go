@@ -29,28 +29,15 @@ func init() { //nolint:gochecknoinits
 }
 
 func (n *Node) Render(buf *bytes.Buffer, rect image.Rectangle, level uint8) {
-	w := n.Width() / 2
-	if rect.Min.X < -w {
-		rect.Min.X = -w
-	}
-	if rect.Max.X > w {
-		rect.Max.X = w
-	}
-	if rect.Min.Y < -w {
-		rect.Min.Y = -w
-	}
-	if rect.Max.Y > w {
-		rect.Max.Y = w
-	}
-	skip := 1
-	if level != 0 {
-		skip = 1 << level
-	}
+	skip := 1 << level
 	var c, consecutive int
 	current := -1
 	for y := rect.Min.Y; y < rect.Max.Y; y += skip {
 		for x := rect.Min.X; x < rect.Max.X; x += skip {
 			node := n.Get(image.Pt(x, y), level)
+			if node == nil {
+				node = deadLeaf
+			}
 			if node.value == current {
 				consecutive++
 			} else {

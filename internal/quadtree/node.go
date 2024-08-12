@@ -8,10 +8,7 @@ import (
 	"github.com/gabe565/cli-of-life/internal/memoizer"
 )
 
-const (
-	DefaultTreeSize = 32
-	MaxLevel        = 63
-)
+const MaxLevel = 63
 
 type Children struct {
 	NW, NE, SW, SE *Node
@@ -46,8 +43,6 @@ var (
 	memoizedEmpty = memoizer.New(Empty)
 	aliveLeaf     = &Node{value: 1}
 	deadLeaf      = &Node{value: 0}
-	generation    uint
-	cacheLimit    int
 )
 
 func newNode(children Children) *Node {
@@ -64,6 +59,10 @@ func Empty(level uint8) *Node {
 	}
 	child := Empty(level - 1)
 	return memoizedNew.Call(Children{NW: child, NE: child, SW: child, SE: child})
+}
+
+func (n *Node) IsEmpty() bool {
+	return n.value == 0
 }
 
 func (n *Node) grow() *Node {
@@ -83,9 +82,16 @@ func (n *Node) grow() *Node {
 	})
 }
 
+func (n *Node) IsEdgesEmpty() bool {
+	return n.NW.NW.IsEmpty() && n.NW.NE.IsEmpty() && n.NE.NW.IsEmpty() &&
+		n.NE.NE.IsEmpty() && n.NE.SE.IsEmpty() && n.SE.NE.IsEmpty() &&
+		n.SE.SE.IsEmpty() && n.SE.SW.IsEmpty() && n.SW.SE.IsEmpty() &&
+		n.SW.SW.IsEmpty() && n.SW.NW.IsEmpty() && n.NW.SW.IsEmpty()
+}
+
 func (n *Node) GrowToFit(p image.Point) *Node {
 	w := n.Width() / 2
-	for p.X > w || p.Y > w || p.X < -w || p.Y < -w {
+	for p.X < -w || p.Y < -w || p.X >= w || p.Y >= w {
 		n = n.grow()
 		w = n.Width() / 2
 	}
@@ -127,14 +133,7 @@ func (n *Node) children() []*Node {
 }
 
 func (n *Node) Get(p image.Point, level uint8) *Node {
-	if n.level == level {
-		allowed := 1
-		if level != 0 {
-			allowed = 1 << (level - 1)
-		}
-		if p.X < -allowed || p.X > allowed || p.Y < -allowed || p.Y > allowed {
-			panic(fmt.Sprintf("Reached leaf node with coordinates too big: (%d, %d)", p.X, p.Y))
-		}
+	if n == nil || n.level == level {
 		return n
 	}
 
@@ -222,8 +221,4 @@ func (n *Node) ToSlice() [][]int {
 
 func (n *Node) Width() int {
 	return 1 << n.level
-}
-
-func SetCacheLimit(v uint) {
-	cacheLimit = int(v)
 }

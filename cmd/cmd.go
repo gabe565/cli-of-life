@@ -59,8 +59,6 @@ func run(cmd *cobra.Command, _ []string) error {
 		return completion(cmd, conf.Completion)
 	}
 
-	quadtree.SetCacheLimit(conf.CacheLimit)
-
 	var r rule.Rule
 	if err := r.UnmarshalText([]byte(conf.RuleString)); err != nil {
 		return err
@@ -83,9 +81,11 @@ func run(cmd *cobra.Command, _ []string) error {
 	default:
 		pat = pattern.Pattern{
 			Rule: r,
-			Tree: quadtree.Empty(quadtree.DefaultTreeSize),
+			Tree: quadtree.New(),
 		}
 	}
+
+	pat.Tree.SetMaxCache(conf.CacheLimit)
 
 	program := tea.NewProgram(
 		game.New(game.WithPattern(pat), game.WithConfig(conf)),

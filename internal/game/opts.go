@@ -11,8 +11,7 @@ type Option func(game *Game)
 
 func WithPattern(pat pattern.Pattern) Option {
 	return func(game *Game) {
-		game.startPattern = pat
-		game.pattern = game.startPattern
+		game.pattern = pat
 	}
 }
 

@@ -46,22 +46,21 @@ func New(opts ...Option) *Game {
 }
 
 type Game struct {
-	conf         *config.Config
-	viewSize     image.Point
-	gameSize     image.Point
-	view         image.Point
-	level        uint8
-	startPattern pattern.Pattern
-	pattern      pattern.Pattern
-	ctx          context.Context
-	cancel       context.CancelFunc
-	keymap       keymap
-	help         help.Model
-	mode         Mode
-	smartVal     int
-	speed        int
-	viewBuf      bytes.Buffer
-	debug        bool
+	conf     *config.Config
+	viewSize image.Point
+	gameSize image.Point
+	view     image.Point
+	level    uint8
+	pattern  pattern.Pattern
+	ctx      context.Context
+	cancel   context.CancelFunc
+	keymap   keymap
+	help     help.Model
+	mode     Mode
+	smartVal int
+	speed    int
+	viewBuf  bytes.Buffer
+	debug    bool
 }
 
 func (g *Game) Init() tea.Cmd {
@@ -74,22 +73,18 @@ func (g *Game) Init() tea.Cmd {
 func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tick:
-		generations := uint(1)
+		steps := uint(1)
 		if speeds[g.speed] < time.Second/240 {
-			generations = uint(time.Second / 240 / speeds[g.speed])
+			steps += uint(time.Second / 240 / speeds[g.speed])
 		}
-		g.pattern.NextGen(generations)
+		g.pattern.Step(steps)
 		if g.ctx != nil {
 			return g, Tick(g.ctx, speeds[g.speed])
 		}
 	case tea.WindowSizeMsg:
 		if msg.Width != 0 && msg.Height != 0 {
 			if g.viewSize.X == 0 && g.viewSize.Y == 0 {
-				defer func() {
-					size := g.pattern.Tree.FilledCoords().Size()
-					g.view.X = size.X/2 - g.gameSize.X/2
-					g.view.Y = size.Y/2 - g.gameSize.Y/2
-				}()
+				defer g.center()
 			}
 			g.viewSize.X, g.viewSize.Y = msg.Width, msg.Height
 			g.gameSize.X, g.gameSize.Y = (msg.Width/2)<<g.level, (msg.Height-1)<<g.level
@@ -104,28 +99,24 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if g.level != 0 {
 					break
 				}
-				size := g.pattern.Tree.Width() / 2
 				msg.X /= 2
 				msg.X += g.view.X
 				msg.Y += g.view.Y
-				if size > msg.Y && size > msg.X {
-					switch g.mode {
-					case ModeSmart:
-						if g.smartVal == -1 {
-							val := g.pattern.Tree.Get(image.Pt(msg.X, msg.Y), 0).Value()
-							switch val {
-							case 0:
-								g.smartVal = 1
-							case 1:
-								g.smartVal = 0
-							}
+				switch g.mode {
+				case ModeSmart:
+					if g.smartVal == -1 {
+						val := g.pattern.Tree.Get(image.Pt(msg.X, msg.Y))
+						if val {
+							g.smartVal = 0
+						} else {
+							g.smartVal = 1
 						}
-						g.pattern.Tree = g.pattern.Tree.Set(image.Pt(msg.X, msg.Y), g.smartVal)
-					case ModePlace:
-						g.pattern.Tree = g.pattern.Tree.Set(image.Pt(msg.X, msg.Y), 1)
-					case ModeErase:
-						g.pattern.Tree = g.pattern.Tree.Set(image.Pt(msg.X, msg.Y), 0)
 					}
+					g.pattern.Tree.Set(image.Pt(msg.X, msg.Y), g.smartVal)
+				case ModePlace:
+					g.pattern.Tree.Set(image.Pt(msg.X, msg.Y), 1)
+				case ModeErase:
+					g.pattern.Tree.Set(image.Pt(msg.X, msg.Y), 0)
 				}
 			case tea.MouseButtonWheelUp:
 				g.Scroll(DirUp, 1)
@@ -185,7 +176,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				g.view = center.Sub(g.gameSize.Div(2))
 			}
 		case key.Matches(msg, g.keymap.zoomOut):
-			if g.level < g.pattern.Tree.Level() {
+			if g.level < g.pattern.Tree.Level()-2 {
 				center := g.view.Add(g.gameSize.Div(2))
 				g.level++
 				g.gameSize = g.gameSize.Mul(2)
@@ -214,7 +205,10 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case key.Matches(msg, g.keymap.reset):
-			g.pattern = g.startPattern
+			g.pattern.Tree.Reset()
+			g.level = 0
+			g.gameSize.X, g.gameSize.Y = g.viewSize.X/2, g.viewSize.Y-1
+			g.center()
 		case key.Matches(msg, g.keymap.quit):
 			return g, tea.Quit
 		case key.Matches(msg, g.keymap.debug):
@@ -251,7 +245,8 @@ func (g *Game) RenderStats() string {
 			}
 			return s
 		}).
-		Row("Generation", strconv.Itoa(stats.Generation)).
+		Row("Steps", strconv.Itoa(stats.Steps)).
+		Row("Generation", strconv.Itoa(int(stats.Generation))).
 		Row("Level", strconv.Itoa(stats.Level)).
 		Row("Population", strconv.Itoa(stats.Population)).
 		Row("Cache Size", strconv.Itoa(stats.CacheSize)).
@@ -262,6 +257,12 @@ func (g *Game) RenderStats() string {
 		lipgloss.NewStyle().Bold(true).Render("Stats"),
 		t.Render(),
 	)
+}
+
+func (g *Game) center() {
+	size := g.pattern.Tree.FilledCoords().Size()
+	g.view.X = size.X/2 - g.gameSize.X/2
+	g.view.Y = size.Y/2 - g.gameSize.Y/2
 }
 
 type tick struct{}
@@ -291,24 +292,15 @@ const (
 
 func (g *Game) Scroll(d Direction, speed int) {
 	speed *= 1 << g.level
-	w := g.pattern.Tree.Width() / 2
 
 	switch d {
 	case DirUp:
-		if g.view.Y -= speed; g.view.Y < -w {
-			g.view.Y = -w
-		}
+		g.view.Y -= speed
 	case DirLeft:
-		if g.view.X -= speed; g.view.X < -w {
-			g.view.X = -w
-		}
+		g.view.X -= speed
 	case DirDown:
-		if g.view.Y += speed; g.view.Y > w-g.gameSize.Y {
-			g.view.Y = w - g.gameSize.Y
-		}
+		g.view.Y += speed
 	case DirRight:
-		if g.view.X += speed; g.view.X > w-g.gameSize.X {
-			g.view.X = w - g.gameSize.X
-		}
+		g.view.X += speed
 	}
 }

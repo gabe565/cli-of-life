@@ -14,7 +14,7 @@ import (
 func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 	pattern := Pattern{
 		Rule: rule.GameOfLife(),
-		Tree: quadtree.Empty(quadtree.DefaultTreeSize),
+		Tree: quadtree.New(),
 	}
 	scanner := bufio.NewScanner(r)
 	var p image.Point
@@ -33,14 +33,14 @@ func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 				pattern.Comment += string(comment)
 			}
 		default:
-			pattern.Tree = pattern.Tree.GrowToFit(p.Add(image.Pt(0, len(line))))
+			pattern.Tree.GrowToFit(p.Add(image.Pt(0, len(line))))
 			for _, b := range line {
 				switch b {
 				case '.':
-					pattern.Tree = pattern.Tree.Set(p, 0)
+					pattern.Tree.Set(p, 0)
 					p.X++
 				case 'O', '*':
-					pattern.Tree = pattern.Tree.Set(p, 1)
+					pattern.Tree.Set(p, 1)
 					p.X++
 				default:
 					return pattern, fmt.Errorf("plaintext: %w: %q in line %q", ErrUnexpectedCharacter, string(b), line)
@@ -53,5 +53,6 @@ func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 	if scanner.Err() != nil {
 		return pattern, fmt.Errorf("plaintext: %w", scanner.Err())
 	}
+	pattern.Tree.SetReset()
 	return pattern, nil
 }
