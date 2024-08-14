@@ -1,6 +1,6 @@
 module github.com/gabe565/cli-of-life
 
-go 1.22.6
+go 1.23.0
 
 require (
 	github.com/charmbracelet/bubbles v0.18.0
