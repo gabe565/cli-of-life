@@ -32,8 +32,10 @@ func (g *Game) Init() tea.Cmd { return g.active.Init() }
 func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		g.menu.Update(msg)
-		g.conway.Update(msg)
+		if msg.Width != 0 && msg.Height != 0 {
+			g.menu.Update(msg)
+			g.conway.Update(msg)
+		}
 	case commands.View:
 		var cmds []tea.Cmd
 		if _, cmd := g.active.Update(msg); cmd != nil {

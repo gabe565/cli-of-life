@@ -85,15 +85,13 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return c, Tick(c.ctx, speeds[c.speed])
 		}
 	case tea.WindowSizeMsg:
-		if msg.Width != 0 && msg.Height != 0 {
-			if c.viewSize.Width == 0 && c.viewSize.Height == 0 {
-				defer c.center()
-			}
-			c.viewSize = msg
-			c.gameSize.X, c.gameSize.Y = (msg.Width/2)<<c.level, (msg.Height-1)<<c.level
-			c.viewBuf.Reset()
-			c.viewBuf.Grow(c.viewSize.Width * c.viewSize.Height)
+		if c.viewSize.Width == 0 && c.viewSize.Height == 0 {
+			defer c.center()
 		}
+		c.viewSize = msg
+		c.gameSize.X, c.gameSize.Y = (msg.Width/2)<<c.level, (msg.Height-1)<<c.level
+		c.viewBuf.Reset()
+		c.viewBuf.Grow(c.viewSize.Width * c.viewSize.Height)
 	case tea.MouseMsg:
 		switch msg.Action {
 		case tea.MouseActionPress, tea.MouseActionMotion:
