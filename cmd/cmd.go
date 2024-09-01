@@ -69,10 +69,6 @@ func run(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	if conf.Pattern != "" {
-		slog.Info("Loaded pattern", "pattern", pat)
-	}
-	pat.Tree.SetMaxCache(conf.CacheLimit)
 
 	program := tea.NewProgram(
 		game.New(conf, pat),

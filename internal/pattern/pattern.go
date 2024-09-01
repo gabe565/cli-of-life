@@ -144,6 +144,8 @@ func New(conf *config.Config) (Pattern, error) {
 	}
 
 	quadtree.ClearCache()
+
+	var p Pattern
 	switch {
 	case conf.Pattern != "":
 		u, err := url.Parse(conf.Pattern)
@@ -158,15 +160,29 @@ func New(conf *config.Config) (Pattern, error) {
 			if err != nil {
 				return Pattern{}, err
 			}
-			return Unmarshal(f)
+			p, err = Unmarshal(f)
+			if err != nil {
+				return Pattern{}, err
+			}
 		case "http", "https":
 			slog.Info("Loading pattern URL", "url", conf.Pattern)
-			return UnmarshalURL(context.Background(), conf.Pattern)
+			p, err = UnmarshalURL(context.Background(), conf.Pattern)
+			if err != nil {
+				return Pattern{}, err
+			}
 		default:
 			slog.Info("Loading pattern file", "path", conf.Pattern)
-			return UnmarshalFile(conf.Pattern)
+			p, err = UnmarshalFile(conf.Pattern)
+			if err != nil {
+				return Pattern{}, err
+			}
 		}
+
+		slog.Info("Loaded pattern", "pattern", p)
 	default:
-		return Pattern{Rule: r, Tree: quadtree.New()}, nil
+		p = Pattern{Rule: r, Tree: quadtree.New()}
 	}
+
+	p.Tree.SetMaxCache(conf.CacheLimit)
+	return p, nil
 }
