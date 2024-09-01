@@ -246,12 +246,12 @@ func (g *Game) RenderStats() string {
 			return s
 		}).
 		Row("Steps", strconv.Itoa(stats.Steps)).
-		Row("Generation", strconv.Itoa(int(stats.Generation))).
+		Row("Generation", strconv.FormatInt(int64(stats.Generation), 10)). //nolint:gosec
 		Row("Level", strconv.Itoa(stats.Level)).
 		Row("Population", strconv.Itoa(stats.Population)).
 		Row("Cache Size", strconv.Itoa(stats.CacheSize)).
-		Row("Cache Hit", strconv.Itoa(stats.CacheHit)).
-		Row("Cache Miss", strconv.Itoa(stats.CacheMiss)).
+		Row("Cache Hit", strconv.FormatInt(int64(stats.CacheHit), 10)).   //nolint:gosec
+		Row("Cache Miss", strconv.FormatInt(int64(stats.CacheMiss), 10)). //nolint:gosec
 		Row("Cache Ratio", strconv.FormatFloat(float64(stats.CacheRatio()), 'f', 3, 32))
 	return lipgloss.JoinVertical(lipgloss.Center,
 		lipgloss.NewStyle().Bold(true).Render("Stats"),

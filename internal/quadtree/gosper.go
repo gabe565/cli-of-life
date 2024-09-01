@@ -20,7 +20,7 @@ type Gosper struct {
 	cells      *Node
 	generation uint
 	steps      int
-	maxCache   int
+	maxCache   uint
 }
 
 func (g *Gosper) Get(p image.Point) bool {
@@ -37,14 +37,14 @@ func (g *Gosper) Set(p image.Point, v int) {
 }
 
 func (g *Gosper) SetMaxCache(n uint) {
-	g.maxCache = int(n)
-	if memoizedNew.Len() > g.maxCache {
+	g.maxCache = n
+	if uint(memoizedNew.Len()) > g.maxCache {
 		memoizedNew.Clear()
 	}
 }
 
 func (g *Gosper) Step(r *rule.Rule, steps uint) {
-	if memoizedNew.Len() > g.maxCache {
+	if uint(memoizedNew.Len()) > g.maxCache {
 		memoizedNew.Clear()
 	}
 

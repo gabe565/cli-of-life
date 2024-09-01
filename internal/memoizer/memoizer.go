@@ -54,15 +54,15 @@ func (m *Memoizer[K, V]) Stats() Stats {
 	defer m.mu.Unlock()
 	return Stats{
 		CacheSize: len(m.m),
-		CacheHit:  int(m.hits),
-		CacheMiss: int(m.misses),
+		CacheHit:  m.hits,
+		CacheMiss: m.misses,
 	}
 }
 
 type Stats struct {
 	CacheSize int
-	CacheHit  int
-	CacheMiss int
+	CacheHit  uint
+	CacheMiss uint
 }
 
 func (s *Stats) CacheRatio() float32 {
