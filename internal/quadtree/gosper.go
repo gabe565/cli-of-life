@@ -82,6 +82,10 @@ func (g *Gosper) FilledCoords() image.Rectangle {
 	return g.cells.FilledCoords()
 }
 
+func (g *Gosper) IsEmpty() bool {
+	return g.cells.IsEmpty()
+}
+
 func (g *Gosper) Level() uint8 {
 	return g.cells.level
 }

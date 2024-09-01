@@ -116,10 +116,9 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case commands.View:
 		if msg == commands.Menu {
-			filled := m.conway.Pattern.Tree.FilledCoords()
-			started := filled.Dx() == 0 && filled.Dy() == 0
-			m.buttons.List[0].Hidden = started
-			m.buttons.List[1].Hidden = started
+			empty := m.conway.Pattern.Tree.IsEmpty()
+			m.buttons.List[0].Hidden = empty
+			m.buttons.List[1].Hidden = empty
 			m.buttons.Active = 0
 		}
 	case tea.KeyMsg:
