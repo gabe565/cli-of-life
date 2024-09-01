@@ -66,18 +66,20 @@ func (b *Buttons) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case Move:
 		switch msg {
 		case MoveUp:
-			if b.Active > 0 {
-				b.Active--
-				if b.List[b.Active].Hidden {
-					return b.Update(msg)
-				}
+			b.Active--
+			if b.Active < 0 {
+				b.Active = len(b.List) - 1
+			}
+			if b.List[b.Active].Hidden {
+				return b.Update(msg)
 			}
 		case MoveDown:
-			if b.Active < len(b.List)-1 {
-				b.Active++
-				if b.List[b.Active].Hidden {
-					return b.Update(msg)
-				}
+			b.Active++
+			if b.Active > len(b.List)-1 {
+				b.Active = 0
+			}
+			if b.List[b.Active].Hidden {
+				return b.Update(msg)
 			}
 		}
 	}
