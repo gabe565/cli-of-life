@@ -8,10 +8,12 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
 
+	"github.com/gabe565/cli-of-life/internal/config"
 	"github.com/gabe565/cli-of-life/internal/quadtree"
 	"github.com/gabe565/cli-of-life/internal/rule"
 )
@@ -80,7 +82,7 @@ func UnmarshalFile(path string) (Pattern, error) {
 	}
 }
 
-var ErrResponse = errors.New("received an error response")
+var ErrResponse = errors.New("HTTP error")
 
 func UnmarshalURL(ctx context.Context, url string) (Pattern, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -98,7 +100,7 @@ func UnmarshalURL(ctx context.Context, url string) (Pattern, error) {
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return Pattern{}, ErrResponse
+		return Pattern{}, fmt.Errorf("%w: %s", ErrResponse, resp.Status)
 	}
 
 	ext := path.Ext(url)
@@ -130,5 +132,31 @@ func Unmarshal(r io.Reader) (Pattern, error) {
 		return UnmarshalPlaintext(bytes.NewReader(buf))
 	default:
 		return Pattern{}, ErrInferFailed
+	}
+}
+
+func New(conf *config.Config) (Pattern, error) {
+	var r rule.Rule
+	if err := r.UnmarshalText([]byte(conf.RuleString)); err != nil {
+		return Pattern{}, err
+	}
+
+	switch {
+	case conf.Pattern != "":
+		u, err := url.Parse(conf.Pattern)
+		if err != nil {
+			return Pattern{}, err
+		}
+
+		switch u.Scheme {
+		case "http", "https":
+			slog.Info("Loading pattern URL", "url", conf.Pattern)
+			return UnmarshalURL(context.Background(), conf.Pattern)
+		default:
+			slog.Info("Loading pattern file", "path", conf.Pattern)
+			return UnmarshalFile(conf.Pattern)
+		}
+	default:
+		return Pattern{Rule: r, Tree: quadtree.New()}, nil
 	}
 }

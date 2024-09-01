@@ -1,4 +1,4 @@
-package game
+package conway
 
 import (
 	"github.com/charmbracelet/bubbles/key"
@@ -56,12 +56,13 @@ func newKeymap() keymap {
 			key.WithKeys("t"),
 			key.WithHelp("t", "tick"),
 		),
-		reset: key.NewBinding(
-			key.WithKeys("r"),
-			key.WithHelp("r", "reset"),
+		menu: key.NewBinding(
+			key.WithKeys("esc"),
+			key.WithHelp("esc", "menu"),
 		),
+		reset: key.NewBinding(key.WithKeys("r")),
 		quit: key.NewBinding(
-			key.WithKeys("q", "ctrl+c", "esc"),
+			key.WithKeys("q", "ctrl+c"),
 			key.WithHelp("q", "quit"),
 		),
 		debug: key.NewBinding(
@@ -86,6 +87,7 @@ type keymap struct {
 	speed     key.Binding
 	move      key.Binding
 	tick      key.Binding
+	menu      key.Binding
 	reset     key.Binding
 	quit      key.Binding
 	debug     key.Binding
@@ -99,7 +101,7 @@ func (k keymap) ShortHelp() []key.Binding {
 		k.zoom,
 		k.speed,
 		k.tick,
-		k.reset,
+		k.menu,
 		k.quit,
 	}
 }

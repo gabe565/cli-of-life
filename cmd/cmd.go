@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/url"
 	"os"
 	"runtime/debug"
 
@@ -13,9 +12,6 @@ import (
 	"github.com/gabe565/cli-of-life/internal/game"
 	"github.com/gabe565/cli-of-life/internal/pattern"
 	"github.com/gabe565/cli-of-life/internal/pprof"
-	"github.com/gabe565/cli-of-life/internal/quadtree"
-	"github.com/gabe565/cli-of-life/internal/rule"
-	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +28,7 @@ func New(opts ...Option) *cobra.Command {
 		DisableAutoGenTag: true,
 	}
 
-	config.InitLog()
+	config.InitLog(slog.LevelInfo)
 	conf := config.New()
 	conf.RegisterFlags(cmd.Flags())
 	if err := config.RegisterCompletion(cmd); err != nil {
@@ -65,54 +61,21 @@ func run(cmd *cobra.Command, args []string) error {
 		return completion(cmd, conf.Completion)
 	}
 
-	var r rule.Rule
-	if err := r.UnmarshalText([]byte(conf.RuleString)); err != nil {
-		return err
-	}
-
 	if len(args) == 1 {
 		conf.Pattern = args[0]
 	}
 
-	var pat pattern.Pattern
-	var err error
-	switch {
-	case conf.Pattern != "":
-		u, err := url.Parse(conf.Pattern)
-		if err != nil {
-			return err
-		}
-
-		switch u.Scheme {
-		case "http", "https":
-			slog.Info("Loading pattern URL", "url", conf.Pattern)
-			if pat, err = pattern.UnmarshalURL(context.Background(), conf.Pattern); err != nil {
-				return err
-			}
-		default:
-			slog.Info("Loading pattern file", "path", conf.Pattern)
-			if pat, err = pattern.UnmarshalFile(conf.Pattern); err != nil {
-				return err
-			}
-		}
-		slog.Info("Loaded pattern", "pattern", pat)
-	case !isatty.IsTerminal(os.Stdin.Fd()) && !isatty.IsCygwinTerminal(os.Stdin.Fd()):
-		slog.Info("Loading pattern from stdin")
-		if pat, err = pattern.Unmarshal(os.Stdin); err != nil {
-			return err
-		}
-		slog.Info("Loaded pattern", "pattern", pat)
-	default:
-		pat = pattern.Pattern{
-			Rule: r,
-			Tree: quadtree.New(),
-		}
+	pat, err := pattern.New(conf)
+	if err != nil {
+		return err
 	}
-
+	if conf.Pattern != "" {
+		slog.Info("Loaded pattern", "pattern", pat)
+	}
 	pat.Tree.SetMaxCache(conf.CacheLimit)
 
 	program := tea.NewProgram(
-		game.New(game.WithPattern(pat), game.WithConfig(conf)),
+		game.New(conf, pat),
 		tea.WithAltScreen(),
 		tea.WithMouseAllMotion(),
 		tea.WithoutCatchPanics(),
@@ -130,6 +93,7 @@ func run(cmd *cobra.Command, args []string) error {
 	}()
 
 	slog.Info("Starting game")
+	config.InitLog(slog.LevelWarn)
 	_, err = program.Run()
 	slog.Info("Quitting game")
 	return err

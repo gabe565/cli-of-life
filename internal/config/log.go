@@ -8,10 +8,10 @@ import (
 	"github.com/lmittmann/tint"
 )
 
-func InitLog() {
+func InitLog(level slog.Level) {
 	slog.SetDefault(slog.New(
 		tint.NewHandler(os.Stderr, &tint.Options{
-			Level:      slog.LevelDebug,
+			Level:      level,
 			TimeFormat: time.Kitchen,
 		}),
 	))
