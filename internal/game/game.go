@@ -134,13 +134,9 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, g.keymap.playPause):
 			if g.ctx == nil {
-				g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "pause")
-				g.ctx, g.cancel = context.WithCancel(context.Background())
-				return g, Tick(g.ctx, speeds[g.speed])
+				return g, g.play()
 			} else {
-				g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "play")
-				g.cancel()
-				g.ctx, g.cancel = nil, nil
+				g.pause()
 			}
 		case key.Matches(msg, g.keymap.tick):
 			if g.ctx == nil {
@@ -188,9 +184,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				tps := int(time.Second / speeds[g.speed])
 				g.keymap.speed.SetHelp(g.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" tps")
 				if g.ctx != nil {
-					g.cancel()
-					g.ctx, g.cancel = context.WithCancel(context.Background())
-					return g, Tick(g.ctx, speeds[g.speed])
+					return g, g.play()
 				}
 			}
 		case key.Matches(msg, g.keymap.speedDown):
@@ -199,9 +193,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				tps := int(time.Second / speeds[g.speed])
 				g.keymap.speed.SetHelp(g.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" tps")
 				if g.ctx != nil {
-					g.cancel()
-					g.ctx, g.cancel = context.WithCancel(context.Background())
-					return g, Tick(g.ctx, speeds[g.speed])
+					return g, g.play()
 				}
 			}
 		case key.Matches(msg, g.keymap.reset):
@@ -263,6 +255,23 @@ func (g *Game) center() {
 	size := g.pattern.Tree.FilledCoords().Size()
 	g.view.X = size.X/2 - g.gameSize.X/2
 	g.view.Y = size.Y/2 - g.gameSize.Y/2
+}
+
+func (g *Game) play() tea.Cmd {
+	if g.cancel != nil {
+		g.cancel()
+	}
+	g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "pause")
+	g.ctx, g.cancel = context.WithCancel(context.Background())
+	return Tick(g.ctx, speeds[g.speed])
+}
+
+func (g *Game) pause() {
+	g.keymap.playPause.SetHelp(g.keymap.playPause.Help().Key, "play")
+	if g.cancel != nil {
+		g.cancel()
+	}
+	g.ctx, g.cancel = nil, nil
 }
 
 type tick struct{}
