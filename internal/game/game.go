@@ -35,14 +35,20 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		g.menu.Update(msg)
 		g.conway.Update(msg)
 	case commands.View:
+		var cmds []tea.Cmd
+		if _, cmd := g.active.Update(msg); cmd != nil {
+			cmds = append(cmds, cmd)
+		}
 		switch msg {
 		case commands.Conway:
 			g.active = g.conway
 		case commands.Menu:
 			g.active = g.menu
 		}
-		_, cmd := g.active.Update(msg)
-		return g, cmd
+		if _, cmd := g.active.Update(msg); cmd != nil {
+			cmds = append(cmds, cmd)
+		}
+		return g, tea.Batch(cmds...)
 	default:
 		_, cmd := g.active.Update(msg)
 		return g, cmd

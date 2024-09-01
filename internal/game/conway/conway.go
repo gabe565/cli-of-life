@@ -202,10 +202,6 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, c.keymap.reset):
 			c.Reset()
 		case key.Matches(msg, c.keymap.menu):
-			if c.ctx != nil {
-				c.resumeOnFocus = true
-				c.Pause()
-			}
 			return c, commands.ChangeView(commands.Menu)
 		case key.Matches(msg, c.keymap.quit):
 			c.Pause()
@@ -214,9 +210,17 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			c.debug = !c.debug
 		}
 	case commands.View:
-		if c.resumeOnFocus {
-			c.resumeOnFocus = false
-			return c, c.Play()
+		switch msg {
+		case commands.Conway:
+			if c.resumeOnFocus {
+				c.resumeOnFocus = false
+				return c, c.Play()
+			}
+		default:
+			if c.ctx != nil {
+				c.resumeOnFocus = true
+				c.Pause()
+			}
 		}
 	}
 	return c, nil
