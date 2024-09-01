@@ -143,6 +143,7 @@ func New(conf *config.Config) (Pattern, error) {
 		return Pattern{}, err
 	}
 
+	quadtree.ClearCache()
 	switch {
 	case conf.Pattern != "":
 		u, err := url.Parse(conf.Pattern)

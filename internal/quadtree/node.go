@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"image"
 	"math"
-
-	"github.com/gabe565/cli-of-life/internal/memoizer"
 )
 
 const MaxLevel = 63
@@ -35,14 +33,8 @@ func (n *Node) Value() int {
 
 //nolint:gochecknoglobals
 var (
-	memoizedNew = memoizer.New(newNode,
-		memoizer.WithCondition[Children, *Node](func(n *Node) bool {
-			return n.value == 0 || n.level <= 16
-		}),
-	)
-	memoizedEmpty = memoizer.New(Empty)
-	aliveLeaf     = &Node{value: 1}
-	deadLeaf      = &Node{value: 0}
+	aliveLeaf = &Node{value: 1}
+	deadLeaf  = &Node{value: 0}
 )
 
 func newNode(children Children) *Node {
