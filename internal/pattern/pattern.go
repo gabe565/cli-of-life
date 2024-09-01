@@ -12,8 +12,10 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/gabe565/cli-of-life/internal/config"
+	"github.com/gabe565/cli-of-life/internal/pattern/embedded"
 	"github.com/gabe565/cli-of-life/internal/quadtree"
 	"github.com/gabe565/cli-of-life/internal/rule"
 )
@@ -149,6 +151,13 @@ func New(conf *config.Config) (Pattern, error) {
 		}
 
 		switch u.Scheme {
+		case "embedded":
+			slog.Info("Loading embedded pattern", "path", conf.Pattern)
+			f, err := embedded.Embedded.Open(strings.TrimPrefix(conf.Pattern, "embedded://"))
+			if err != nil {
+				return Pattern{}, err
+			}
+			return Unmarshal(f)
 		case "http", "https":
 			slog.Info("Loading pattern URL", "url", conf.Pattern)
 			return UnmarshalURL(context.Background(), conf.Pattern)

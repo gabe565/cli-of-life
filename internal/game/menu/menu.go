@@ -86,13 +86,15 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch m.form.State {
 		case huh.StateCompleted:
 			m.form = nil
-
-			switch m.patternSrc {
-			case sourceFile:
+			defer func() {
 				m.patternSrc = ""
+			}()
+			switch m.patternSrc {
+			case sourceEmbedded:
+				return m, m.patternEmbeddedForm()
+			case sourceFile:
 				return m, m.patternFileForm()
 			case sourceURL:
-				m.patternSrc = ""
 				return m, m.patternURLForm()
 			default:
 				if p, err := pattern.New(m.config); err == nil {

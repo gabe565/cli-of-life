@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//go:embed glider.rle
+//go:embed embedded/glider.rle
 var gliderRLE []byte
 
 func TestUnmarshalRLE(t *testing.T) {
