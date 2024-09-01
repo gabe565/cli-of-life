@@ -8,6 +8,7 @@ require (
 	github.com/charmbracelet/huh v0.5.3
 	github.com/charmbracelet/lipgloss v0.13.0
 	github.com/lmittmann/tint v1.0.5
+	github.com/lrstanley/bubblezone v0.0.0-20240820044643-3964e2111228
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0

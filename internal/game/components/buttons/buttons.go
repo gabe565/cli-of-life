@@ -3,11 +3,16 @@ package buttons
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	zone "github.com/lrstanley/bubblezone"
 )
 
 type Button struct {
 	Name   string
 	Hidden bool
+}
+
+func (b *Button) ID() string {
+	return "button_" + b.Name
 }
 
 func New(names ...string) *Buttons {
@@ -103,7 +108,7 @@ func (b *Buttons) View() string {
 			view = b.styles.button.Render(btn.Name)
 		}
 		if !btn.Hidden {
-			fields = append(fields, view)
+			fields = append(fields, zone.Mark(btn.ID(), view))
 		}
 	}
 	return lipgloss.JoinVertical(b.Position, fields...)

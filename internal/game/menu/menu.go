@@ -1,9 +1,6 @@
 package menu
 
 import (
-	"net/url"
-	"os"
-
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -13,8 +10,8 @@ import (
 	"github.com/gabe565/cli-of-life/internal/game/commands"
 	"github.com/gabe565/cli-of-life/internal/game/components/buttons"
 	"github.com/gabe565/cli-of-life/internal/game/conway"
-	"github.com/gabe565/cli-of-life/internal/game/util"
 	"github.com/gabe565/cli-of-life/internal/pattern"
+	zone "github.com/lrstanley/bubblezone"
 )
 
 const (
@@ -36,6 +33,7 @@ const (
 )
 
 func NewMenu(conf *config.Config, conway *conway.Conway) *Menu {
+	zone.NewGlobal()
 	m := &Menu{
 		config: conf,
 		keymap: newKeymap(),
@@ -57,6 +55,7 @@ type Menu struct {
 	help   help.Model
 	styles styles
 
+	wasPressed bool
 	conway     *conway.Conway
 	buttons    *buttons.Buttons
 	form       *huh.Form
@@ -66,11 +65,6 @@ type Menu struct {
 }
 
 func (m *Menu) Init() tea.Cmd { return nil }
-
-const (
-	sourceFile = "file"
-	sourceURL  = "url"
-)
 
 func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -96,41 +90,10 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch m.patternSrc {
 			case sourceFile:
 				m.patternSrc = ""
-
-				wd, _ := os.Getwd()
-
-				m.form = util.NewForm(
-					huh.NewGroup(
-						huh.NewFilePicker().
-							Title("Pattern File Picker").
-							Picking(true).
-							CurrentDirectory(wd).
-							ShowSize(true).
-							ShowPermissions(false).
-							AllowedTypes([]string{pattern.ExtRLE, pattern.ExtPlaintext}).
-							Height(15).
-							Value(&m.config.Pattern),
-					),
-				)
-				return m, m.initForm()
+				return m, m.patternFileForm()
 			case sourceURL:
 				m.patternSrc = ""
-				ne := huh.ValidateNotEmpty()
-				m.form = util.NewForm(
-					huh.NewGroup(
-						huh.NewInput().
-							Title("Pattern Path/URL").
-							Validate(func(s string) error {
-								if err := ne(s); err != nil {
-									return err
-								}
-								_, err := url.Parse(s)
-								return err
-							}).
-							Value(&m.config.Pattern),
-					),
-				)
-				return m, m.initForm()
+				return m, m.patternURLForm()
 			default:
 				if p, err := pattern.New(m.config); err == nil {
 					m.conway.Pattern = p
@@ -163,38 +126,27 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.down):
 			m.buttons.Update(buttons.MoveDown)
 		case key.Matches(msg, m.keymap.choose):
-			defer func() {
-				m.buttons.Active = 0
-			}()
-			switch m.buttons.Current().Name {
-			case BtnResume:
-				return m, commands.ChangeView(commands.Conway)
-			case BtnReset:
-				m.conway.Reset()
-				return m, commands.ChangeView(commands.Conway)
-			case BtnNew:
-				m.conway.Clear()
-				return m, commands.ChangeView(commands.Conway)
-			case BtnLoad:
-				m.form = util.NewForm(
-					huh.NewGroup(
-						huh.NewSelect[string]().
-							Title("Pattern Source").
-							Options(
-								huh.NewOption("File Picker", sourceFile),
-								huh.NewOption("Path/URL", sourceURL),
-							).
-							Value(&m.patternSrc),
-					),
-				)
-				return m, m.initForm()
-			case BtnQuit:
-				return m, tea.Quit
-			}
+			return m, m.handleButtonPress(m.buttons.Current())
 		case key.Matches(msg, m.keymap.resume):
 			return m, commands.ChangeView(commands.Conway)
 		case key.Matches(msg, m.keymap.quit):
 			return m, tea.Quit
+		}
+	case tea.MouseMsg:
+		defer func() {
+			m.wasPressed = msg.Action == tea.MouseActionPress
+		}()
+		switch msg.Action {
+		case tea.MouseActionRelease, tea.MouseActionMotion:
+			for i, btn := range m.buttons.List {
+				if zone.Get(btn.ID()).InBounds(msg) {
+					if m.wasPressed && msg.Action == tea.MouseActionRelease {
+						return m, m.handleButtonPress(btn)
+					}
+					m.buttons.Active = i
+					break
+				}
+			}
 		}
 	}
 	return m, nil
@@ -236,7 +188,7 @@ func (m *Menu) View() string {
 		views = append(views, m.form.View())
 	}
 
-	return lipgloss.Place(m.size.Width, m.size.Height, lipgloss.Center, lipgloss.Center,
+	return zone.Scan(lipgloss.Place(m.size.Width, m.size.Height, lipgloss.Center, lipgloss.Center,
 		lipgloss.JoinVertical(lipgloss.Center, views...),
-	)
+	))
 }
