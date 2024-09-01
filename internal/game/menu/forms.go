@@ -4,7 +4,6 @@ import (
 	"io/fs"
 	"net/url"
 	"os"
-	"path/filepath"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
@@ -71,17 +70,7 @@ func (m *Menu) patternEmbeddedForm() tea.Cmd {
 			return err
 		}
 
-		var name string
-		if p.Name != "" {
-			name = p.Name
-			if p.Author != "" {
-				name += " by " + p.Author
-			}
-		} else {
-			name = filepath.Base(path)
-		}
-
-		options = append(options, huh.NewOption(name, "embedded://"+path))
+		options = append(options, huh.NewOption(p.NameAuthor(), "embedded://"+path))
 		return nil
 	}); err != nil {
 		m.error = err

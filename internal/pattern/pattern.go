@@ -49,6 +49,14 @@ func (p Pattern) LogValue() slog.Value {
 	return slog.GroupValue(attrs...)
 }
 
+func (p Pattern) NameAuthor() string {
+	val := p.Name
+	if p.Author != "" {
+		val += " by " + p.Author
+	}
+	return val
+}
+
 var (
 	ErrInvalidHeader       = errors.New("invalid header")
 	ErrUnexpectedCharacter = errors.New("unexpected character")
@@ -178,6 +186,9 @@ func New(conf *config.Config) (Pattern, error) {
 			}
 		}
 
+		if p.Name == "" {
+			p.Name = filepath.Base(conf.Pattern)
+		}
 		slog.Info("Loaded pattern", "pattern", p)
 	default:
 		p = Pattern{Rule: r, Tree: quadtree.New()}

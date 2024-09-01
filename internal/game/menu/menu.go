@@ -173,11 +173,7 @@ func (m *Menu) View() string {
 
 	if m.form == nil {
 		if p := m.conway.Pattern; p.Name != "" {
-			view := "Current pattern: " + p.Name
-			if p.Author != "" {
-				view += " by " + p.Author
-			}
-			views = append(views, view+"\n")
+			views = append(views, "Current pattern: "+p.NameAuthor()+"\n")
 		}
 
 		if m.error != nil {
