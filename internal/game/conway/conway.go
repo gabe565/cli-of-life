@@ -49,20 +49,21 @@ func NewConway(conf *config.Config, p pattern.Pattern) *Conway {
 }
 
 type Conway struct {
-	viewSize tea.WindowSizeMsg
-	gameSize image.Point
-	view     image.Point
-	level    uint8
-	Pattern  pattern.Pattern
-	ctx      context.Context
-	cancel   context.CancelFunc
-	keymap   keymap
-	help     help.Model
-	mode     Mode
-	smartVal int
-	speed    int
-	viewBuf  bytes.Buffer
-	debug    bool
+	viewSize      tea.WindowSizeMsg
+	gameSize      image.Point
+	view          image.Point
+	level         uint8
+	Pattern       pattern.Pattern
+	ctx           context.Context
+	cancel        context.CancelFunc
+	resumeOnFocus bool
+	keymap        keymap
+	help          help.Model
+	mode          Mode
+	smartVal      int
+	speed         int
+	viewBuf       bytes.Buffer
+	debug         bool
 }
 
 func (c *Conway) Init() tea.Cmd {
@@ -201,13 +202,21 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, c.keymap.reset):
 			c.Reset()
 		case key.Matches(msg, c.keymap.menu):
-			c.Pause()
+			if c.ctx != nil {
+				c.resumeOnFocus = true
+				c.Pause()
+			}
 			return c, commands.ChangeView(commands.Menu)
 		case key.Matches(msg, c.keymap.quit):
 			c.Pause()
 			return c, tea.Quit
 		case key.Matches(msg, c.keymap.debug):
 			c.debug = !c.debug
+		}
+	case commands.View:
+		if c.resumeOnFocus {
+			c.resumeOnFocus = false
+			return c, c.Play()
 		}
 	}
 	return c, nil
@@ -291,6 +300,7 @@ func (c *Conway) Reset() {
 }
 
 func (c *Conway) ResetView() {
+	c.resumeOnFocus = false
 	c.level = 0
 	c.gameSize.X, c.gameSize.Y = c.viewSize.Width/2, c.viewSize.Height-1
 	c.center()

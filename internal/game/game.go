@@ -41,7 +41,8 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case commands.Menu:
 			g.active = g.menu
 		}
-		g.active.Update(msg)
+		_, cmd := g.active.Update(msg)
+		return g, cmd
 	default:
 		_, cmd := g.active.Update(msg)
 		return g, cmd
