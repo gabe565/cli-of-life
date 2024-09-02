@@ -26,6 +26,7 @@ func New(opts ...Option) *cobra.Command {
 			return pattern.Extensions(), cobra.ShellCompDirectiveFilterFileExt
 		},
 		DisableAutoGenTag: true,
+		SilenceErrors:     true,
 	}
 
 	config.InitLog(slog.LevelInfo)
