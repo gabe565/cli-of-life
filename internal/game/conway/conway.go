@@ -203,6 +203,9 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case commands.View:
 		switch msg {
 		case commands.Conway:
+			if c.Pattern == nil {
+				c.Pattern = pattern.Default()
+			}
 			if c.resumeOnFocus {
 				c.resumeOnFocus = false
 				return c, c.Play()
