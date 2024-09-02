@@ -4,14 +4,17 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"runtime/debug"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gabe565/cli-of-life/internal/config"
 	"github.com/gabe565/cli-of-life/internal/game"
 	"github.com/gabe565/cli-of-life/internal/pattern"
 	"github.com/gabe565/cli-of-life/internal/pprof"
+	"github.com/gabe565/cli-of-life/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -45,6 +48,8 @@ func New(opts ...Option) *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) error {
+	setUserAgentTransport(cmd)
+
 	if pprof.Enabled {
 		go func() {
 			if err := pprof.ListenAndServe(); err != nil {
@@ -91,4 +96,12 @@ func run(cmd *cobra.Command, args []string) error {
 	_, err := program.Run()
 	slog.Info("Quitting game")
 	return err
+}
+
+func setUserAgentTransport(cmd *cobra.Command) {
+	ua := cmd.Name() + "/" + cmd.Annotations[VersionKey]
+	if commit := cmd.Annotations[CommitKey]; commit != "" {
+		ua += "-" + strings.TrimPrefix(commit, "*")
+	}
+	http.DefaultTransport = util.NewUserAgentTransport(ua)
 }
