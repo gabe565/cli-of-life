@@ -15,7 +15,7 @@ func newKeymap() keymap {
 			key.WithHelp("↓", "down"),
 		),
 		choose: key.NewBinding(
-			key.WithKeys("enter", "space"),
+			key.WithKeys("enter", " "),
 			key.WithHelp("enter", "choose"),
 		),
 		resume: key.NewBinding(
