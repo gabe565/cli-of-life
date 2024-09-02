@@ -16,8 +16,6 @@ import (
 	"github.com/gabe565/cli-of-life/internal/config"
 	"github.com/gabe565/cli-of-life/internal/game/commands"
 	"github.com/gabe565/cli-of-life/internal/pattern"
-	"github.com/gabe565/cli-of-life/internal/quadtree"
-	"github.com/gabe565/cli-of-life/internal/rule"
 )
 
 type Mode uint8
@@ -284,10 +282,7 @@ func (c *Conway) Pause() {
 }
 
 func (c *Conway) Clear() {
-	c.Pattern = &pattern.Pattern{
-		Tree: quadtree.New(),
-		Rule: rule.GameOfLife(),
-	}
+	c.Pattern = pattern.Default()
 	c.ResetView()
 }
 

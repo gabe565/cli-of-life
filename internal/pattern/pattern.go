@@ -57,6 +57,13 @@ func (p Pattern) NameAuthor() string {
 	return val
 }
 
+func Default() *Pattern {
+	return &Pattern{
+		Tree: quadtree.New(),
+		Rule: rule.GameOfLife(),
+	}
+}
+
 var (
 	ErrInvalidHeader       = errors.New("invalid header")
 	ErrUnexpectedCharacter = errors.New("unexpected character")
@@ -206,7 +213,7 @@ func New(conf *config.Config) (*Pattern, error) {
 		}
 		slog.Info("Loaded pattern", "pattern", p)
 	default:
-		p = &Pattern{Rule: r, Tree: quadtree.New()}
+		p = Default()
 	}
 
 	p.Tree.SetMaxCache(conf.CacheLimit)

@@ -9,7 +9,6 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/gabe565/cli-of-life/internal/quadtree"
 	"github.com/gabe565/cli-of-life/internal/rule"
 )
 
@@ -18,9 +17,7 @@ func RLEHeaderRegexp() *regexp.Regexp {
 }
 
 func UnmarshalRLE(r io.Reader) (*Pattern, error) {
-	pattern := &Pattern{
-		Tree: quadtree.New(),
-	}
+	pattern := Default()
 	scanner := bufio.NewScanner(r)
 	var p image.Point
 scan:

@@ -6,16 +6,10 @@ import (
 	"fmt"
 	"image"
 	"io"
-
-	"github.com/gabe565/cli-of-life/internal/quadtree"
-	"github.com/gabe565/cli-of-life/internal/rule"
 )
 
 func UnmarshalPlaintext(r io.Reader) (*Pattern, error) {
-	pattern := &Pattern{
-		Rule: rule.GameOfLife(),
-		Tree: quadtree.New(),
-	}
+	pattern := Default()
 	scanner := bufio.NewScanner(r)
 	var p image.Point
 	for scanner.Scan() {
