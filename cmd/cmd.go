@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -67,17 +66,8 @@ func run(cmd *cobra.Command, args []string) error {
 		conf.Pattern = args[0]
 	}
 
-	pat, err := pattern.New(conf)
-	if err != nil {
-		var multipleErr pattern.MultiplePatternsError
-		if errors.As(err, &multipleErr) {
-			return fmt.Errorf("%w\n%s", err, "This is currently only supported from the menu within the game.")
-		}
-		return err
-	}
-
 	program := tea.NewProgram(
-		game.New(conf, pat),
+		game.New(conf),
 		tea.WithAltScreen(),
 		tea.WithMouseAllMotion(),
 		tea.WithoutCatchPanics(),
@@ -96,7 +86,7 @@ func run(cmd *cobra.Command, args []string) error {
 
 	slog.Info("Starting game")
 	config.InitLog(slog.LevelWarn)
-	_, err = program.Run()
+	_, err := program.Run()
 	slog.Info("Quitting game")
 	return err
 }

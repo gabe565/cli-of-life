@@ -28,17 +28,12 @@ const (
 	ModeErase
 )
 
-func NewConway(conf *config.Config, p *pattern.Pattern) *Conway {
+func NewConway(conf *config.Config) *Conway {
 	conway := &Conway{
-		Pattern:  p,
 		keymap:   newKeymap(),
 		help:     help.New(),
 		speed:    5,
 		smartVal: -1,
-	}
-
-	if conway.Pattern.Rule.IsZero() {
-		conway.Pattern.Rule = rule.GameOfLife()
 	}
 
 	if conf.Play {
@@ -85,7 +80,7 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return c, Tick(c.ctx, speeds[c.speed])
 		}
 	case tea.WindowSizeMsg:
-		if c.viewSize.Width == 0 && c.viewSize.Height == 0 {
+		if c.viewSize.Width == 0 && c.viewSize.Height == 0 && c.Pattern != nil {
 			defer c.center()
 		}
 		c.viewSize = msg

@@ -8,6 +8,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/gabe565/cli-of-life/internal/game/util"
 	"github.com/gabe565/cli-of-life/internal/pattern"
 	"github.com/gabe565/cli-of-life/internal/pattern/embedded"
@@ -18,6 +19,19 @@ const (
 	sourceFile     = "file"
 	sourceURL      = "url"
 )
+
+func (m *Menu) initForm() tea.Cmd {
+	m.form = m.form.WithWidth(lipgloss.Width(Title))
+	cmds := []tea.Cmd{m.form.Init()}
+
+	form, cmd := m.form.Update(m.size)
+	if f, ok := form.(*huh.Form); ok {
+		m.form = f
+	}
+	cmds = append(cmds, cmd)
+
+	return tea.Batch(cmds...)
+}
 
 func (m *Menu) loadPatternForm() tea.Cmd {
 	m.form = util.NewForm(

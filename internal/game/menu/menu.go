@@ -66,7 +66,12 @@ type Menu struct {
 	error error
 }
 
-func (m *Menu) Init() tea.Cmd { return nil }
+func (m *Menu) Init() tea.Cmd {
+	if m.config.Pattern != "" {
+		return m.LoadPattern()
+	}
+	return nil
+}
 
 func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -99,17 +104,7 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case sourceURL:
 				return m, m.patternURLForm()
 			default:
-				if p, err := pattern.New(m.config); err == nil {
-					m.conway.Pattern = p
-					m.conway.ResetView()
-					return m, commands.ChangeView(commands.Conway)
-				} else {
-					var multiplePatterns pattern.MultiplePatternsError
-					if errors.As(err, &multiplePatterns) {
-						return m, m.choosePatternForm(multiplePatterns.URLs)
-					}
-					m.error = err
-				}
+				return m, m.LoadPattern()
 			}
 		case huh.StateAborted:
 			m.form = nil
@@ -161,25 +156,29 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *Menu) initForm() tea.Cmd {
-	m.form = m.form.WithWidth(lipgloss.Width(Title))
-	cmds := []tea.Cmd{m.form.Init()}
-
-	form, cmd := m.form.Update(m.size)
-	if f, ok := form.(*huh.Form); ok {
-		m.form = f
+func (m *Menu) LoadPattern() tea.Cmd {
+	p, err := pattern.New(m.config)
+	if err != nil {
+		var multiplePatterns pattern.MultiplePatternsError
+		if errors.As(err, &multiplePatterns) {
+			return m.choosePatternForm(multiplePatterns.URLs)
+		}
+		m.error = err
+		return nil
 	}
-	cmds = append(cmds, cmd)
-
-	return tea.Batch(cmds...)
+	m.conway.Pattern = p
+	m.conway.ResetView()
+	return commands.ChangeView(commands.Conway)
 }
 
 func (m *Menu) View() string {
 	views := []string{Title}
 
 	if m.form == nil {
-		if p := m.conway.Pattern; p.Name != "" {
-			views = append(views, "Current pattern: "+p.NameAuthor()+"\n")
+		if m.conway.Pattern != nil {
+			if p := m.conway.Pattern; p.Name != "" {
+				views = append(views, "Current pattern: "+p.NameAuthor()+"\n")
+			}
 		}
 
 		if m.error != nil {
