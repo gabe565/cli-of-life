@@ -97,7 +97,8 @@ func (n *Node) step(r *rule.Rule) *Node {
 	case n.next != nil:
 		return n.next
 	case n.level == 2:
-		return n.slowSimulation(r)
+		n.next = n.slowSimulation(r)
+		return n.next
 	}
 
 	n00 := n.NW.centeredSubnode()
