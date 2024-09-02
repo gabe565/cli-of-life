@@ -14,6 +14,7 @@ import (
 	"github.com/gabe565/cli-of-life/internal/game"
 	"github.com/gabe565/cli-of-life/internal/pattern"
 	"github.com/gabe565/cli-of-life/internal/pprof"
+	"github.com/gabe565/cli-of-life/internal/quadtree"
 	"github.com/gabe565/cli-of-life/internal/util"
 	"github.com/spf13/cobra"
 )
@@ -71,6 +72,10 @@ func run(cmd *cobra.Command, args []string) error {
 
 	if len(args) == 1 {
 		conf.Pattern = args[0]
+	}
+
+	if conf.CacheLimit > 0 {
+		quadtree.SetMaxCache(conf.CacheLimit)
 	}
 
 	program := tea.NewProgram(

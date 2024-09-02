@@ -16,3 +16,7 @@ func ClearCache() {
 	memoizedNew.Clear()
 	memoizedEmpty.Clear()
 }
+
+func SetMaxCache(n int) {
+	memoizer.WithMax[Children, *Node](n)(memoizedNew)
+}

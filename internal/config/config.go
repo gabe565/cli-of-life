@@ -10,7 +10,7 @@ type Config struct {
 	PatternFormat string
 	RuleString    string
 	Play          bool
-	CacheLimit    uint
+	CacheLimit    int
 
 	Completion string
 }

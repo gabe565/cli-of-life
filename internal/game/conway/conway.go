@@ -16,6 +16,7 @@ import (
 	"github.com/gabe565/cli-of-life/internal/config"
 	"github.com/gabe565/cli-of-life/internal/game/commands"
 	"github.com/gabe565/cli-of-life/internal/pattern"
+	"github.com/gabe565/cli-of-life/internal/quadtree"
 )
 
 type Mode uint8
@@ -286,12 +287,14 @@ func (c *Conway) Pause() {
 
 func (c *Conway) Clear() {
 	c.ResumeOnFocus = false
+	quadtree.ClearCache()
 	c.Pattern = pattern.Default()
 	c.ResetView()
 }
 
 func (c *Conway) Reset() {
 	c.ResumeOnFocus = false
+	quadtree.ClearCache()
 	c.Pattern.Tree.Reset()
 	c.ResetView()
 }

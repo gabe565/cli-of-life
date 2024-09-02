@@ -13,6 +13,7 @@ import (
 	"github.com/gabe565/cli-of-life/internal/game/components/buttons"
 	"github.com/gabe565/cli-of-life/internal/game/conway"
 	"github.com/gabe565/cli-of-life/internal/pattern"
+	"github.com/gabe565/cli-of-life/internal/quadtree"
 	zone "github.com/lrstanley/bubblezone"
 )
 
@@ -158,6 +159,7 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *Menu) LoadPattern() tea.Cmd {
+	quadtree.ClearCache()
 	p, err := pattern.New(m.config)
 	if err != nil {
 		var multiplePatterns pattern.MultiplePatternsError

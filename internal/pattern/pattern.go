@@ -216,6 +216,5 @@ func New(conf *config.Config) (*Pattern, error) {
 		p = Default()
 	}
 
-	p.Tree.SetMaxCache(conf.CacheLimit)
 	return p, nil
 }

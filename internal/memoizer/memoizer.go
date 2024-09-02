@@ -14,6 +14,7 @@ func New[K comparable, V any](fn func(K) V, opts ...Opt[K, V]) *Memoizer[K, V] {
 }
 
 type Memoizer[K comparable, V any] struct {
+	max    int
 	m      map[K]V
 	hits   uint
 	misses uint
@@ -34,7 +35,16 @@ func (m *Memoizer[K, V]) Call(k K) V {
 	if m.cmp == nil || m.cmp(v) {
 		m.m[k] = v
 	}
+
 	return v
+}
+
+func (m *Memoizer[K, V]) Cleanup() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.max != 0 && len(m.m) > m.max {
+		clear(m.m)
+	}
 }
 
 func (m *Memoizer[K, V]) Clear() {
