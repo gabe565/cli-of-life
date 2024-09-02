@@ -116,7 +116,7 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	switch msg := msg.(type) {
-	case commands.View:
+	case commands.ViewMsg:
 		if msg == commands.Menu {
 			empty := m.conway.Pattern.Tree.IsEmpty()
 			m.buttons.List[0].Hidden = empty

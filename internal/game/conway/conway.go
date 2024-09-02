@@ -68,7 +68,7 @@ func (c *Conway) Init() tea.Cmd {
 
 func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tick:
+	case tickMsg:
 		steps := uint(1)
 		if speeds[c.speed] < time.Second/240 {
 			steps += uint(time.Second / 240 / speeds[c.speed])
@@ -135,7 +135,7 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, c.keymap.tick):
 			if c.ctx == nil {
 				return c, func() tea.Msg {
-					return tick{}
+					return tickMsg{}
 				}
 			}
 		case key.Matches(msg, c.keymap.mode):
@@ -200,7 +200,7 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, c.keymap.debug):
 			c.debug = !c.debug
 		}
-	case commands.View:
+	case commands.ViewMsg:
 		switch msg {
 		case commands.Conway:
 			if c.Pattern == nil {

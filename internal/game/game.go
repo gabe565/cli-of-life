@@ -30,7 +30,7 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			g.menu.Update(msg)
 			g.conway.Update(msg)
 		}
-	case commands.View:
+	case commands.ViewMsg:
 		var cmds []tea.Cmd
 		if _, cmd := g.active.Update(msg); cmd != nil {
 			cmds = append(cmds, cmd)

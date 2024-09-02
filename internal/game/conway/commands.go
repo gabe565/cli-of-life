@@ -7,7 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type tick struct{}
+type tickMsg struct{}
 
 func Tick(ctx context.Context, wait time.Duration) tea.Cmd {
 	return func() tea.Msg {
@@ -18,7 +18,7 @@ func Tick(ctx context.Context, wait time.Duration) tea.Cmd {
 		case <-ctx.Done():
 			return nil
 		case <-time.After(wait):
-			return tick{}
+			return tickMsg{}
 		}
 	}
 }

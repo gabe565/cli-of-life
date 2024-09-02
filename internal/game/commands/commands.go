@@ -4,14 +4,14 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type View uint8
+type ViewMsg uint8
 
 const (
-	Menu View = iota
+	Menu ViewMsg = iota
 	Conway
 )
 
-func ChangeView(view View) tea.Cmd {
+func ChangeView(view ViewMsg) tea.Cmd {
 	return func() tea.Msg {
 		return view
 	}
