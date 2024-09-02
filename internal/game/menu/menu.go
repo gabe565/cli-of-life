@@ -159,7 +159,7 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *Menu) LoadPattern() tea.Cmd {
-	quadtree.ClearCache()
+	quadtree.ResetCache()
 	p, err := pattern.New(m.config)
 	if err != nil {
 		var multiplePatterns pattern.MultiplePatternsError

@@ -1,6 +1,10 @@
 package quadtree
 
-import "github.com/gabe565/cli-of-life/internal/memoizer"
+import (
+	"runtime"
+
+	"github.com/gabe565/cli-of-life/internal/memoizer"
+)
 
 //nolint:gochecknoglobals
 var (
@@ -12,9 +16,10 @@ var (
 	memoizedEmpty = memoizer.New(Empty)
 )
 
-func ClearCache() {
-	memoizedNew.Clear()
-	memoizedEmpty.Clear()
+func ResetCache() {
+	memoizedNew.Reset()
+	memoizedEmpty.Reset()
+	runtime.GC()
 }
 
 func SetMaxCache(n int) {

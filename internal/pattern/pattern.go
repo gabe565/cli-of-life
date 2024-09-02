@@ -173,8 +173,6 @@ func New(conf *config.Config) (*Pattern, error) {
 		return nil, err
 	}
 
-	quadtree.ClearCache()
-
 	var p *Pattern
 	switch {
 	case conf.Pattern != "":

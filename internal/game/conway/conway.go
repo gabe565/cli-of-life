@@ -287,14 +287,14 @@ func (c *Conway) Pause() {
 
 func (c *Conway) Clear() {
 	c.ResumeOnFocus = false
-	quadtree.ClearCache()
+	quadtree.ResetCache()
 	c.Pattern = pattern.Default()
 	c.ResetView()
 }
 
 func (c *Conway) Reset() {
 	c.ResumeOnFocus = false
-	quadtree.ClearCache()
+	quadtree.ResetCache()
 	c.Pattern.Tree.Reset()
 	c.ResetView()
 }

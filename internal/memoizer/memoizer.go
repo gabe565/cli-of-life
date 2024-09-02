@@ -53,6 +53,14 @@ func (m *Memoizer[K, V]) Clear() {
 	clear(m.m)
 }
 
+func (m *Memoizer[K, V]) Reset() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	clear(m.m)
+	m.m = make(map[K]V, m.max/100)
+	m.hits, m.misses = 0, 0
+}
+
 func (m *Memoizer[K, V]) Len() int {
 	m.mu.Lock()
 	defer m.mu.Unlock()
