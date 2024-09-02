@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"net/url"
 	"os"
+	"path"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
@@ -101,6 +102,23 @@ func (m *Menu) patternURLForm() tea.Cmd {
 					_, err := url.Parse(s)
 					return err
 				}).
+				Value(&m.config.Pattern),
+		),
+	)
+	return m.initForm()
+}
+
+func (m *Menu) choosePatternForm(urls []string) tea.Cmd {
+	opts := make([]huh.Option[string], 0, len(urls))
+	for _, u := range urls {
+		opts = append(opts, huh.NewOption(path.Base(u), u))
+	}
+
+	m.form = util.NewForm(
+		huh.NewGroup(
+			huh.NewSelect[string]().
+				Title("Choose Pattern").
+				Options(opts...).
 				Value(&m.config.Pattern),
 		),
 	)

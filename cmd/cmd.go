@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -68,6 +69,10 @@ func run(cmd *cobra.Command, args []string) error {
 
 	pat, err := pattern.New(conf)
 	if err != nil {
+		var multipleErr pattern.MultiplePatternsError
+		if errors.As(err, &multipleErr) {
+			return fmt.Errorf("%w\n%s", err, "This is currently only supported from the menu within the game.")
+		}
 		return err
 	}
 

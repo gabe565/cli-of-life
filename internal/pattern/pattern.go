@@ -119,6 +119,17 @@ func UnmarshalURL(ctx context.Context, url string) (*Pattern, error) {
 
 	ext := path.Ext(url)
 	switch {
+	case strings.HasPrefix(resp.Header.Get("Content-Type"), "text/html"):
+		urls, err := FindHrefPatterns(resp)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(urls) > 1 {
+			return nil, MultiplePatternsError{urls}
+		}
+
+		return UnmarshalURL(ctx, urls[0])
 	case ext == ExtRLE:
 		return UnmarshalRLE(resp.Body)
 	case ext == ExtPlaintext:

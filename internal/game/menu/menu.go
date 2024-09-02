@@ -1,6 +1,8 @@
 package menu
 
 import (
+	"errors"
+
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -102,6 +104,10 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.conway.ResetView()
 					return m, commands.ChangeView(commands.Conway)
 				} else {
+					var multiplePatterns pattern.MultiplePatternsError
+					if errors.As(err, &multiplePatterns) {
+						return m, m.choosePatternForm(multiplePatterns.URLs)
+					}
 					m.error = err
 				}
 			}
