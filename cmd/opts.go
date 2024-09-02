@@ -4,9 +4,18 @@ import "github.com/spf13/cobra"
 
 type Option func(cmd *cobra.Command)
 
+const (
+	VersionKey = "version"
+	CommitKey  = "commit"
+)
+
 func WithVersion(version string) Option {
 	return func(cmd *cobra.Command) {
-		cmd.Version = buildVersion(version)
+		if cmd.Annotations == nil {
+			cmd.Annotations = make(map[string]string, 2)
+		}
+		cmd.Annotations[VersionKey] = version
+		cmd.Version, cmd.Annotations[CommitKey] = buildVersion(version)
 		cmd.InitDefaultVersionFlag()
 	}
 }

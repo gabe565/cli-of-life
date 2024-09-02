@@ -62,6 +62,8 @@ func run(cmd *cobra.Command, args []string) error {
 		return completion(cmd, conf.Completion)
 	}
 
+	slog.Info("cli-of-life", "version", cmd.Annotations[VersionKey], "commit", cmd.Annotations[CommitKey])
+
 	if len(args) == 1 {
 		conf.Pattern = args[0]
 	}

@@ -7,6 +7,6 @@ import (
 )
 
 func Test_buildVersion(t *testing.T) {
-	got := buildVersion("0.0.0-next")
+	got, _ := buildVersion("0.0.0-next")
 	assert.Equal(t, "0.0.0-next", got)
 }
