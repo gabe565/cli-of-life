@@ -23,7 +23,7 @@ func New(opts ...Option) *cobra.Command {
 		Args:  cobra.MaximumNArgs(1),
 
 		ValidArgsFunction: func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-			return []string{pattern.ExtRLE, pattern.ExtPlaintext}, cobra.ShellCompDirectiveFilterFileExt
+			return pattern.Extensions(), cobra.ShellCompDirectiveFilterFileExt
 		},
 		DisableAutoGenTag: true,
 	}

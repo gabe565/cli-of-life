@@ -68,6 +68,10 @@ const (
 	ExtPlaintext = ".cells"
 )
 
+func Extensions() []string {
+	return []string{ExtRLE, ExtPlaintext}
+}
+
 func UnmarshalFile(path string) (*Pattern, error) {
 	f, err := os.Open(path)
 	if err != nil {

@@ -45,7 +45,7 @@ func (m *Menu) patternFileForm() tea.Cmd {
 				CurrentDirectory(wd).
 				ShowSize(true).
 				ShowPermissions(false).
-				AllowedTypes([]string{pattern.ExtRLE, pattern.ExtPlaintext}).
+				AllowedTypes(pattern.Extensions()).
 				Height(15).
 				Value(&m.config.Pattern),
 		),
