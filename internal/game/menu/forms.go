@@ -125,6 +125,7 @@ func (m *Menu) patternURLForm() tea.Cmd {
 		huh.NewGroup(
 			huh.NewText().
 				Title("Pattern Path/URL").
+				Description("  Supports direct rle/cells URLs\n  or web pages with rle/cells links.\n").
 				Validate(func(s string) error {
 					if err := ne(s); err != nil {
 						return err
