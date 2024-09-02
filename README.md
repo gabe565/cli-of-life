@@ -114,27 +114,27 @@ For full command-line reference, see [docs](docs/cli-of-life.md).
 ### Examples
 
 ```shell
-$ cli-of-life https://conwaylife.com/patterns/gosperglidergun.rle
-$ cli-of-life https://conwaylife.com/patterns/3blocktwinbeesshuttle.rle
-$ cli-of-life https://conwaylife.com/patterns/breeder1.rle
-$ cli-of-life https://conwaylife.com/patterns/replicator.rle
+$ cli-of-life https://conwaylife.com/wiki/Gosper_glider_gun
+$ cli-of-life https://conwaylife.com/wiki/Twin_bees_shuttle
+$ cli-of-life https://conwaylife.com/wiki/Breeder_1
+$ cli-of-life https://conwaylife.com/wiki/Replicator
 ```
 
 See the [LifeWiki for pattern files](https://conwaylife.com/wiki/Category:Patterns).
 
 ### Keybinds
 
-| Key     | Description                               |
-|---------|-------------------------------------------|
-| mouse   | Place cells                               |
-| `space` | Play/pause                                |
-| `m`     | Toggle between modes: smart, place, erase |
-| `wasd`  | Move the game board                       |
-| `-`/`+` | Zoom                                      |
-| `<`/`>` | Change playback speed                     |
-| `t`     | Tick                                      |
-| `r`     | Reset                                     |
-| `q`     | Quit                                      |
+| Key      | Description                               |
+|----------|-------------------------------------------|
+| mouse    | Place cells                               |
+| `space`  | Play/pause                                |
+| `m`      | Toggle between modes: smart, place, erase |
+| `wasd`   | Move the game board                       |
+| `-`/`+`  | Zoom                                      |
+| `<`/`>`  | Change playback speed                     |
+| `esc`    | Toggle menu                               |
+| `t`      | Tick                                      |
+| `ctrl+c` | Quit                                      |
 
 ## References
 - [LifeWiki](https://conwaylife.com/wiki/Main_Page)
