@@ -104,6 +104,7 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case sourceURL:
 				return m, m.patternURLForm()
 			default:
+				m.conway.ResumeOnFocus = false
 				return m, m.LoadPattern()
 			}
 		case huh.StateAborted:

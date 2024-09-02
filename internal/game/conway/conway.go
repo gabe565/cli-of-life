@@ -35,7 +35,7 @@ func NewConway(conf *config.Config) *Conway {
 	}
 
 	if conf.Play {
-		conway.Play()
+		conway.ResumeOnFocus = true
 	}
 
 	return conway
@@ -49,7 +49,7 @@ type Conway struct {
 	Pattern       *pattern.Pattern
 	ctx           context.Context
 	cancel        context.CancelFunc
-	resumeOnFocus bool
+	ResumeOnFocus bool
 	keymap        keymap
 	help          help.Model
 	mode          Mode
@@ -206,13 +206,13 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if c.Pattern == nil {
 				c.Pattern = pattern.Default()
 			}
-			if c.resumeOnFocus {
-				c.resumeOnFocus = false
+			if c.ResumeOnFocus {
+				c.ResumeOnFocus = false
 				return c, c.Play()
 			}
 		default:
 			if c.ctx != nil {
-				c.resumeOnFocus = true
+				c.ResumeOnFocus = true
 				c.Pause()
 			}
 		}
@@ -285,20 +285,23 @@ func (c *Conway) Pause() {
 }
 
 func (c *Conway) Clear() {
+	c.ResumeOnFocus = false
 	c.Pattern = pattern.Default()
 	c.ResetView()
 }
 
 func (c *Conway) Reset() {
+	c.ResumeOnFocus = false
 	c.Pattern.Tree.Reset()
 	c.ResetView()
 }
 
 func (c *Conway) ResetView() {
-	c.resumeOnFocus = false
-	c.level = 0
-	c.gameSize.X, c.gameSize.Y = c.viewSize.Width/2, c.viewSize.Height-1
-	c.center()
+	if c.Pattern != nil {
+		c.level = 0
+		c.gameSize.X, c.gameSize.Y = c.viewSize.Width/2, c.viewSize.Height-1
+		c.center()
+	}
 }
 
 type Direction uint8
