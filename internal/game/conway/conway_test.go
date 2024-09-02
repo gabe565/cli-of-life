@@ -10,6 +10,6 @@ import (
 )
 
 func TestDefaultSpeed(t *testing.T) {
-	conway := NewConway(config.New(), pattern.Pattern{})
+	conway := NewConway(config.New(), &pattern.Pattern{})
 	assert.Equal(t, time.Second/30, speeds[conway.speed])
 }

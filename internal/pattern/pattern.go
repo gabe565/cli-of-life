@@ -68,10 +68,10 @@ const (
 	ExtPlaintext = ".cells"
 )
 
-func UnmarshalFile(path string) (Pattern, error) {
+func UnmarshalFile(path string) (*Pattern, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return Pattern{}, err
+		return nil, err
 	}
 	defer func() {
 		_ = f.Close()
@@ -94,15 +94,15 @@ func UnmarshalFile(path string) (Pattern, error) {
 
 var ErrResponse = errors.New("HTTP error")
 
-func UnmarshalURL(ctx context.Context, url string) (Pattern, error) {
+func UnmarshalURL(ctx context.Context, url string) (*Pattern, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return Pattern{}, err
+		return nil, err
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return Pattern{}, err
+		return nil, err
 	}
 	defer func() {
 		_, _ = io.Copy(io.Discard, resp.Body)
@@ -110,7 +110,7 @@ func UnmarshalURL(ctx context.Context, url string) (Pattern, error) {
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return Pattern{}, fmt.Errorf("%w: %s", ErrResponse, resp.Status)
+		return nil, fmt.Errorf("%w: %s", ErrResponse, resp.Status)
 	}
 
 	ext := path.Ext(url)
@@ -128,10 +128,10 @@ func UnmarshalURL(ctx context.Context, url string) (Pattern, error) {
 	}
 }
 
-func Unmarshal(r io.Reader) (Pattern, error) {
+func Unmarshal(r io.Reader) (*Pattern, error) {
 	buf, err := io.ReadAll(r)
 	if err != nil {
-		return Pattern{}, err
+		return nil, err
 	}
 
 	firstLine, _, _ := bytes.Cut(bytes.TrimSpace(buf), []byte("\n"))
@@ -141,24 +141,24 @@ func Unmarshal(r io.Reader) (Pattern, error) {
 	case bytes.HasPrefix(firstLine, []byte("!")), bytes.HasPrefix(firstLine, []byte(".")), bytes.HasPrefix(firstLine, []byte("O")):
 		return UnmarshalPlaintext(bytes.NewReader(buf))
 	default:
-		return Pattern{}, ErrInferFailed
+		return nil, ErrInferFailed
 	}
 }
 
-func New(conf *config.Config) (Pattern, error) {
+func New(conf *config.Config) (*Pattern, error) {
 	var r rule.Rule
 	if err := r.UnmarshalText([]byte(conf.RuleString)); err != nil {
-		return Pattern{}, err
+		return nil, err
 	}
 
 	quadtree.ClearCache()
 
-	var p Pattern
+	var p *Pattern
 	switch {
 	case conf.Pattern != "":
 		u, err := url.Parse(conf.Pattern)
 		if err != nil {
-			return Pattern{}, err
+			return nil, err
 		}
 
 		switch u.Scheme {
@@ -166,23 +166,23 @@ func New(conf *config.Config) (Pattern, error) {
 			slog.Info("Loading embedded pattern", "path", conf.Pattern)
 			f, err := embedded.Embedded.Open(strings.TrimPrefix(conf.Pattern, "embedded://"))
 			if err != nil {
-				return Pattern{}, err
+				return nil, err
 			}
 			p, err = Unmarshal(f)
 			if err != nil {
-				return Pattern{}, err
+				return nil, err
 			}
 		case "http", "https":
 			slog.Info("Loading pattern URL", "url", conf.Pattern)
 			p, err = UnmarshalURL(context.Background(), conf.Pattern)
 			if err != nil {
-				return Pattern{}, err
+				return nil, err
 			}
 		default:
 			slog.Info("Loading pattern file", "path", conf.Pattern)
 			p, err = UnmarshalFile(conf.Pattern)
 			if err != nil {
-				return Pattern{}, err
+				return nil, err
 			}
 		}
 
@@ -191,7 +191,7 @@ func New(conf *config.Config) (Pattern, error) {
 		}
 		slog.Info("Loaded pattern", "pattern", p)
 	default:
-		p = Pattern{Rule: r, Tree: quadtree.New()}
+		p = &Pattern{Rule: r, Tree: quadtree.New()}
 	}
 
 	p.Tree.SetMaxCache(conf.CacheLimit)

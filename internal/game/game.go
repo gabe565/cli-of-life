@@ -9,7 +9,7 @@ import (
 	"github.com/gabe565/cli-of-life/internal/pattern"
 )
 
-func New(conf *config.Config, p pattern.Pattern) tea.Model {
+func New(conf *config.Config, p *pattern.Pattern) tea.Model {
 	game := &Game{conway: conway.NewConway(conf, p)}
 	game.menu = menu.NewMenu(conf, game.conway)
 

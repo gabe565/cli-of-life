@@ -28,7 +28,7 @@ const (
 	ModeErase
 )
 
-func NewConway(conf *config.Config, p pattern.Pattern) *Conway {
+func NewConway(conf *config.Config, p *pattern.Pattern) *Conway {
 	conway := &Conway{
 		Pattern:  p,
 		keymap:   newKeymap(),
@@ -53,7 +53,7 @@ type Conway struct {
 	gameSize      image.Point
 	view          image.Point
 	level         uint8
-	Pattern       pattern.Pattern
+	Pattern       *pattern.Pattern
 	ctx           context.Context
 	cancel        context.CancelFunc
 	resumeOnFocus bool
@@ -289,7 +289,7 @@ func (c *Conway) Pause() {
 }
 
 func (c *Conway) Clear() {
-	c.Pattern = pattern.Pattern{
+	c.Pattern = &pattern.Pattern{
 		Tree: quadtree.New(),
 		Rule: rule.GameOfLife(),
 	}

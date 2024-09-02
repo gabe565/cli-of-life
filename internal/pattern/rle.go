@@ -17,8 +17,8 @@ func RLEHeaderRegexp() *regexp.Regexp {
 	return regexp.MustCompile(`^x *= *(?P<x>[^,]+), *y *= *(?P<y>[^,]+)(?:, *rule *= *(?P<rule>.+))?$`)
 }
 
-func UnmarshalRLE(r io.Reader) (Pattern, error) {
-	pattern := Pattern{
+func UnmarshalRLE(r io.Reader) (*Pattern, error) {
+	pattern := &Pattern{
 		Tree: quadtree.New(),
 	}
 	scanner := bufio.NewScanner(r)
@@ -45,7 +45,7 @@ scan:
 			matches := headerRe.FindStringSubmatch(scanner.Text())
 
 			if len(matches) == 0 {
-				return pattern, fmt.Errorf("rle: %w: %s", ErrInvalidHeader, line)
+				return nil, fmt.Errorf("rle: %w: %s", ErrInvalidHeader, line)
 			}
 
 			var w, h int
@@ -54,11 +54,11 @@ scan:
 				switch name {
 				case "x":
 					if w, err = strconv.Atoi(matches[i]); err != nil {
-						return pattern, fmt.Errorf("rle: parsing header x: %w", err)
+						return nil, fmt.Errorf("rle: parsing header x: %w", err)
 					}
 				case "y":
 					if h, err = strconv.Atoi(matches[i]); err != nil {
-						return pattern, fmt.Errorf("rle: parsing header y: %w", err)
+						return nil, fmt.Errorf("rle: parsing header y: %w", err)
 					}
 				case "rule":
 					switch matches[i] {
@@ -66,7 +66,7 @@ scan:
 						pattern.Rule = rule.GameOfLife()
 					default:
 						if err := pattern.Rule.UnmarshalText([]byte(matches[i])); err != nil {
-							return pattern, fmt.Errorf("rle: %w", err)
+							return nil, fmt.Errorf("rle: %w", err)
 						}
 					}
 				}
@@ -114,7 +114,7 @@ scan:
 		}
 	}
 	if scanner.Err() != nil {
-		return pattern, fmt.Errorf("rle: %w", scanner.Err())
+		return nil, fmt.Errorf("rle: %w", scanner.Err())
 	}
 	pattern.Tree.SetReset()
 	return pattern, nil

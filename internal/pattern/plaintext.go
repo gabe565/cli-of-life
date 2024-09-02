@@ -11,8 +11,8 @@ import (
 	"github.com/gabe565/cli-of-life/internal/rule"
 )
 
-func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
-	pattern := Pattern{
+func UnmarshalPlaintext(r io.Reader) (*Pattern, error) {
+	pattern := &Pattern{
 		Rule: rule.GameOfLife(),
 		Tree: quadtree.New(),
 	}
@@ -43,7 +43,7 @@ func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 					pattern.Tree.Set(p, 1)
 					p.X++
 				default:
-					return pattern, fmt.Errorf("plaintext: %w: %q in line %q", ErrUnexpectedCharacter, string(b), line)
+					return nil, fmt.Errorf("plaintext: %w: %q in line %q", ErrUnexpectedCharacter, string(b), line)
 				}
 			}
 			p.X = 0
@@ -51,7 +51,7 @@ func UnmarshalPlaintext(r io.Reader) (Pattern, error) {
 		}
 	}
 	if scanner.Err() != nil {
-		return pattern, fmt.Errorf("plaintext: %w", scanner.Err())
+		return nil, fmt.Errorf("plaintext: %w", scanner.Err())
 	}
 	pattern.Tree.SetReset()
 	return pattern, nil

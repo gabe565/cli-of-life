@@ -21,14 +21,14 @@ func TestUnmarshalPlaintext(t *testing.T) {
 	tests := []struct {
 		name     string
 		args     args
-		want     Pattern
+		want     *Pattern
 		wantGrid [][]int
 		wantErr  require.ErrorAssertionFunc
 	}{
 		{
 			"glider",
 			args{bytes.NewReader(gliderPlaintext)},
-			Pattern{
+			&Pattern{
 				Name:    "Glider",
 				Comment: "The smallest, most common, and first discovered spaceship.\nwww.conwaylife.com/wiki/index.php?title=Glider",
 				Author:  "Richard K. Guy",
@@ -42,10 +42,13 @@ func TestUnmarshalPlaintext(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := UnmarshalPlaintext(tt.args.r)
 			tt.wantErr(t, err)
-			tree := got.Tree
-			got.Tree = nil
-			assert.Equal(t, tt.want, got)
-			assert.Equal(t, tt.wantGrid, tree.ToSlice())
+			if len(tt.wantGrid) != 0 {
+				assert.Equal(t, tt.wantGrid, got.Tree.ToSlice())
+			}
+			if got != nil {
+				got.Tree = nil
+			}
+			assert.EqualValues(t, tt.want, got)
 		})
 	}
 }
