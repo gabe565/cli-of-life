@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
@@ -104,16 +105,36 @@ func (m *Menu) patternEmbeddedForm() tea.Cmd {
 	return m.initForm()
 }
 
+var ErrLineBreak = errors.New("line breaks are not allowed")
+
+type trimSpaceAccessor struct {
+	value *string
+}
+
+func (t *trimSpaceAccessor) Get() string {
+	return *t.value
+}
+
+func (t *trimSpaceAccessor) Set(value string) {
+	*t.value = strings.TrimSpace(value)
+}
+
 func (m *Menu) patternURLForm() tea.Cmd {
 	ne := huh.ValidateNotEmpty()
 	m.form = util.NewForm(
 		huh.NewGroup(
-			huh.NewInput().
+			huh.NewText().
 				Title("Pattern Path/URL").
 				Validate(func(s string) error {
 					if err := ne(s); err != nil {
 						return err
 					}
+
+					s = strings.TrimSpace(s)
+					if strings.Contains(s, "\n") {
+						return ErrLineBreak
+					}
+
 					_, err := url.Parse(s)
 					var urlErr *url.Error
 					if errors.As(err, &urlErr) {
@@ -121,7 +142,7 @@ func (m *Menu) patternURLForm() tea.Cmd {
 					}
 					return err
 				}).
-				Value(&m.config.Pattern),
+				Accessor(&trimSpaceAccessor{&m.config.Pattern}),
 		),
 	)
 	return m.initForm()

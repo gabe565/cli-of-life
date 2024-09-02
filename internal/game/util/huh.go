@@ -13,6 +13,7 @@ func NewForm(groups ...*huh.Group) *huh.Form {
 	keymap.FilePicker.Open = addKeys(keymap.FilePicker.Open, " ")
 	keymap.FilePicker.Select = addKeys(keymap.FilePicker.Select, " ")
 	keymap.FilePicker.Submit = addKeys(keymap.FilePicker.Submit, " ")
+	keymap.Text.NewLine.SetKeys()
 
 	return huh.NewForm(groups...).WithKeyMap(keymap)
 }
