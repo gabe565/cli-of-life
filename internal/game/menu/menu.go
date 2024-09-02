@@ -77,6 +77,7 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.size = msg
+		m.styles.errorStyle = m.styles.errorStyle.Width(msg.Width)
 	case tea.KeyMsg:
 		switch { //nolint:gocritic
 		case key.Matches(msg, m.keymap.quit):

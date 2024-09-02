@@ -1,6 +1,7 @@
 package menu
 
 import (
+	"errors"
 	"io/fs"
 	"net/url"
 	"os"
@@ -114,6 +115,10 @@ func (m *Menu) patternURLForm() tea.Cmd {
 						return err
 					}
 					_, err := url.Parse(s)
+					var urlErr *url.Error
+					if errors.As(err, &urlErr) {
+						return urlErr.Err
+					}
 					return err
 				}).
 				Value(&m.config.Pattern),

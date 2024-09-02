@@ -4,7 +4,10 @@ import "github.com/charmbracelet/lipgloss"
 
 func newStyles() styles {
 	return styles{
-		errorStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("204")).Bold(true),
+		errorStyle: lipgloss.NewStyle().
+			Align(lipgloss.Center).
+			Foreground(lipgloss.Color("204")).
+			Bold(true),
 	}
 }
 
