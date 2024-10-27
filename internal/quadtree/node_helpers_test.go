@@ -16,7 +16,7 @@ func treeWithRandomPattern(level uint) (*Node, *big.Int) {
 		node = node.grow()
 	}
 	edgeLength := int(1) << level
-	cellsInTree := uint(edgeLength * edgeLength)
+	cellsInTree := uint(edgeLength * edgeLength) //nolint:gosec
 
 	upperBound := new(big.Int)
 	upperBound.SetInt64(1)

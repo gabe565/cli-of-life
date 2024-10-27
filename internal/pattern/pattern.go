@@ -28,7 +28,7 @@ type Pattern struct {
 	Rule    rule.Rule
 }
 
-func (p Pattern) Step(steps uint) {
+func (p Pattern) Step(steps uint64) {
 	p.Tree.Step(&p.Rule, steps)
 }
 

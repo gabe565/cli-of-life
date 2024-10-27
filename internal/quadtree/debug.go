@@ -6,7 +6,7 @@ import (
 
 type Stats struct {
 	Steps      int
-	Generation uint
+	Generation uint64
 	Level      int
 	Population int
 	memoizer.Stats

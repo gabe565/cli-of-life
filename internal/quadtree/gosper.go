@@ -18,7 +18,7 @@ func New() *Gosper {
 type Gosper struct {
 	resetCells *Node
 	cells      *Node
-	generation uint
+	generation uint64
 	steps      int
 }
 
@@ -35,7 +35,7 @@ func (g *Gosper) Set(p image.Point, v int) {
 	g.cells = g.cells.Set(p, v)
 }
 
-func (g *Gosper) Step(r *rule.Rule, steps uint) {
+func (g *Gosper) Step(r *rule.Rule, steps uint64) {
 	memoizedNew.Cleanup()
 
 	g.steps++
