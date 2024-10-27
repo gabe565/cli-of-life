@@ -1,9 +1,9 @@
 package menu
 
 import (
+	"gabe565.com/cli-of-life/internal/game/commands"
+	"gabe565.com/cli-of-life/internal/game/components/buttons"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gabe565/cli-of-life/internal/game/commands"
-	"github.com/gabe565/cli-of-life/internal/game/components/buttons"
 )
 
 func (m *Menu) handleButtonPress(btn *buttons.Button) tea.Cmd {

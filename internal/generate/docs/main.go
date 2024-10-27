@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/gabe565/cli-of-life/cmd"
+	"gabe565.com/cli-of-life/cmd"
 	"github.com/spf13/cobra/doc"
 )
 

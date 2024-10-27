@@ -3,17 +3,17 @@ package menu
 import (
 	"errors"
 
+	"gabe565.com/cli-of-life/internal/config"
+	"gabe565.com/cli-of-life/internal/game/commands"
+	"gabe565.com/cli-of-life/internal/game/components/buttons"
+	"gabe565.com/cli-of-life/internal/game/conway"
+	"gabe565.com/cli-of-life/internal/pattern"
+	"gabe565.com/cli-of-life/internal/quadtree"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gabe565/cli-of-life/internal/config"
-	"github.com/gabe565/cli-of-life/internal/game/commands"
-	"github.com/gabe565/cli-of-life/internal/game/components/buttons"
-	"github.com/gabe565/cli-of-life/internal/game/conway"
-	"github.com/gabe565/cli-of-life/internal/pattern"
-	"github.com/gabe565/cli-of-life/internal/quadtree"
 	zone "github.com/lrstanley/bubblezone"
 )
 

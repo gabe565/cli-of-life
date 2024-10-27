@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 
-	"github.com/gabe565/cli-of-life/internal/rule"
+	"gabe565.com/cli-of-life/internal/rule"
 	"github.com/spf13/cobra"
 )
 

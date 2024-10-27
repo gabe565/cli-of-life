@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/gabe565/cli-of-life/internal/ptr"
-	"github.com/gabe565/cli-of-life/internal/rule"
+	"gabe565.com/cli-of-life/internal/ptr"
+	"gabe565.com/cli-of-life/internal/rule"
 	"github.com/stretchr/testify/assert"
 )
 

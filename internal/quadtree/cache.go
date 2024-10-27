@@ -3,7 +3,7 @@ package quadtree
 import (
 	"runtime"
 
-	"github.com/gabe565/cli-of-life/internal/memoizer"
+	"gabe565.com/cli-of-life/internal/memoizer"
 )
 
 //nolint:gochecknoglobals

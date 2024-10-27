@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gabe565/cli-of-life/cmd"
+	"gabe565.com/cli-of-life/cmd"
 	"github.com/spf13/cobra/doc"
 	flag "github.com/spf13/pflag"
 )

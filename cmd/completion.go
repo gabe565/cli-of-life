@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gabe565/cli-of-life/internal/config"
+	"gabe565.com/cli-of-life/internal/config"
 	"github.com/spf13/cobra"
 )
 

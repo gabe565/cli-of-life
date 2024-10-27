@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/gabe565/cli-of-life/cmd"
+	"gabe565.com/cli-of-life/cmd"
 )
 
 var version = "beta"

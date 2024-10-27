@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gabe565/cli-of-life/internal/config"
+	"gabe565.com/cli-of-life/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 

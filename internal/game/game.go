@@ -1,11 +1,11 @@
 package game
 
 import (
+	"gabe565.com/cli-of-life/internal/config"
+	"gabe565.com/cli-of-life/internal/game/commands"
+	"gabe565.com/cli-of-life/internal/game/conway"
+	"gabe565.com/cli-of-life/internal/game/menu"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gabe565/cli-of-life/internal/config"
-	"github.com/gabe565/cli-of-life/internal/game/commands"
-	"github.com/gabe565/cli-of-life/internal/game/conway"
-	"github.com/gabe565/cli-of-life/internal/game/menu"
 )
 
 func New(conf *config.Config) tea.Model {

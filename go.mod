@@ -1,4 +1,4 @@
-module github.com/gabe565/cli-of-life
+module gabe565.com/cli-of-life
 
 go 1.23.0
 

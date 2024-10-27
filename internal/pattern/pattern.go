@@ -14,10 +14,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gabe565/cli-of-life/internal/config"
-	"github.com/gabe565/cli-of-life/internal/pattern/embedded"
-	"github.com/gabe565/cli-of-life/internal/quadtree"
-	"github.com/gabe565/cli-of-life/internal/rule"
+	"gabe565.com/cli-of-life/internal/config"
+	"gabe565.com/cli-of-life/internal/pattern/embedded"
+	"gabe565.com/cli-of-life/internal/quadtree"
+	"gabe565.com/cli-of-life/internal/rule"
 )
 
 type Pattern struct {

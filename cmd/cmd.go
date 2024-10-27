@@ -9,13 +9,13 @@ import (
 	"runtime/debug"
 	"strings"
 
+	"gabe565.com/cli-of-life/internal/config"
+	"gabe565.com/cli-of-life/internal/game"
+	"gabe565.com/cli-of-life/internal/pattern"
+	"gabe565.com/cli-of-life/internal/pprof"
+	"gabe565.com/cli-of-life/internal/quadtree"
+	"gabe565.com/cli-of-life/internal/util"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gabe565/cli-of-life/internal/config"
-	"github.com/gabe565/cli-of-life/internal/game"
-	"github.com/gabe565/cli-of-life/internal/pattern"
-	"github.com/gabe565/cli-of-life/internal/pprof"
-	"github.com/gabe565/cli-of-life/internal/quadtree"
-	"github.com/gabe565/cli-of-life/internal/util"
 	"github.com/spf13/cobra"
 )
 

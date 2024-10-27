@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/gabe565/cli-of-life/cmd"
+	"gabe565.com/cli-of-life/cmd"
 	flag "github.com/spf13/pflag"
 )
 

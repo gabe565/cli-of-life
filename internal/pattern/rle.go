@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/gabe565/cli-of-life/internal/rule"
+	"gabe565.com/cli-of-life/internal/rule"
 )
 
 func RLEHeaderRegexp() *regexp.Regexp {

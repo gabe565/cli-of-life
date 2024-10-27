@@ -8,12 +8,12 @@ import (
 	"path"
 	"strings"
 
+	"gabe565.com/cli-of-life/internal/game/util"
+	"gabe565.com/cli-of-life/internal/pattern"
+	"gabe565.com/cli-of-life/internal/pattern/embedded"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gabe565/cli-of-life/internal/game/util"
-	"github.com/gabe565/cli-of-life/internal/pattern"
-	"github.com/gabe565/cli-of-life/internal/pattern/embedded"
 )
 
 const (

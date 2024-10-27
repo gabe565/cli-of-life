@@ -4,7 +4,7 @@ import (
 	"image"
 	"slices"
 
-	"github.com/gabe565/cli-of-life/internal/rule"
+	"gabe565.com/cli-of-life/internal/rule"
 )
 
 func (n *Node) centeredSubnode() *Node {

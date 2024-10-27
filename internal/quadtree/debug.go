@@ -1,7 +1,7 @@
 package quadtree
 
 import (
-	"github.com/gabe565/cli-of-life/internal/memoizer"
+	"gabe565.com/cli-of-life/internal/memoizer"
 )
 
 type Stats struct {

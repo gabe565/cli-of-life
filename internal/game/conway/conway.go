@@ -8,15 +8,15 @@ import (
 	"strings"
 	"time"
 
+	"gabe565.com/cli-of-life/internal/config"
+	"gabe565.com/cli-of-life/internal/game/commands"
+	"gabe565.com/cli-of-life/internal/pattern"
+	"gabe565.com/cli-of-life/internal/quadtree"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
-	"github.com/gabe565/cli-of-life/internal/config"
-	"github.com/gabe565/cli-of-life/internal/game/commands"
-	"github.com/gabe565/cli-of-life/internal/pattern"
-	"github.com/gabe565/cli-of-life/internal/quadtree"
 )
 
 type Mode uint8

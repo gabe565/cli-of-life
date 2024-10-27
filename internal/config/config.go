@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/gabe565/cli-of-life/internal/rule"
+	"gabe565.com/cli-of-life/internal/rule"
 )
 
 type Config struct {
