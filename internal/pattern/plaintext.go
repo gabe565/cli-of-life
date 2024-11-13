@@ -37,7 +37,7 @@ func UnmarshalPlaintext(r io.Reader) (*Pattern, error) {
 					pattern.Tree.Set(p, 1)
 					p.X++
 				default:
-					return nil, fmt.Errorf("plaintext: %w: %q in line %q", ErrUnexpectedCharacter, string(b), line)
+					return nil, fmt.Errorf("plaintext: %w: %q in line: %q", ErrUnexpectedCharacter, string(b), line)
 				}
 			}
 			p.X = 0

@@ -42,7 +42,7 @@ scan:
 			matches := headerRe.FindStringSubmatch(scanner.Text())
 
 			if len(matches) == 0 {
-				return nil, fmt.Errorf("rle: %w: %s", ErrInvalidHeader, line)
+				return nil, fmt.Errorf("rle: %w: %q", ErrInvalidHeader, line)
 			}
 
 			var w, h int

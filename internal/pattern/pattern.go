@@ -67,7 +67,7 @@ func Default() *Pattern {
 var (
 	ErrInvalidHeader       = errors.New("invalid header")
 	ErrUnexpectedCharacter = errors.New("unexpected character")
-	ErrInferFailed         = errors.New("unable to infer pattern file type")
+	ErrDetectFailed        = errors.New("unable to detect pattern file format")
 )
 
 const (
@@ -163,7 +163,7 @@ func Unmarshal(r io.Reader) (*Pattern, error) {
 	case bytes.HasPrefix(firstLine, []byte("!")), bytes.HasPrefix(firstLine, []byte(".")), bytes.HasPrefix(firstLine, []byte("O")):
 		return UnmarshalPlaintext(bytes.NewReader(buf))
 	default:
-		return nil, ErrInferFailed
+		return nil, ErrDetectFailed
 	}
 }
 
