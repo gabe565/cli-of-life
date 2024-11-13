@@ -82,7 +82,7 @@ func (m *Menu) patternEmbeddedForm() tea.Cmd {
 			return err
 		}
 
-		p, err := pattern.Unmarshal(f)
+		p, err := pattern.UnmarshalRLE(f)
 		if err != nil {
 			return err
 		}
