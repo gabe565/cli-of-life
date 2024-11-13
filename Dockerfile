@@ -1,4 +1,4 @@
-#syntax=docker/dockerfile:1.9
+#syntax=docker/dockerfile:1.11
 
 FROM --platform=$BUILDPLATFORM golang:1.23.0-alpine AS build
 WORKDIR /app
