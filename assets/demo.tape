@@ -1,6 +1,6 @@
 Output cli-of-life.gif
 
-Set TypingSpeed 20ms
+Set TypingSpeed 150ms
 
 Set Theme "Builtin Dark"
 # Set Theme "Builtin Light"
@@ -13,41 +13,80 @@ Set WindowBar Colorful
 Set BorderRadius 10
 
 Hide
-Type@0 'cli-of-life() ( ./cli-of-life "$@" 2>/dev/null ); clear'
+Type@0 './cli-of-life'
 Enter
 Sleep 100ms
 Show
-Sleep 50ms
 
-Type "cli-of-life --play https://conwaylife.com/patterns/gosperglidergun.rle"
-Sleep 400ms
+# Gosper glider gun
+Sleep 1s
+Down
+Sleep 500ms
+Enter
+Sleep 500ms
+Enter
+Sleep 500ms
+Down 7
+Sleep 500ms
+Enter
+Sleep 50ms
 Enter
 Sleep 4s
-Type "q"
-Sleep 250ms
 
-Type "cli-of-life --play https://conwaylife.com/patterns/3blocktwinbeesshuttle.rle"
-Sleep 400ms
+# Twin bees shuttle
+Escape
+Sleep 500ms
+Down 3
+Sleep 300ms
 Enter
-Sleep 3s
-Type "q"
-Sleep 250ms
+Sleep 300ms
+Enter
+Sleep 300ms
+Up 7
+Sleep 500ms
+Enter
+Sleep 50ms
+Enter
+Sleep 4s
 
-Type "cli-of-life --play https://conwaylife.com/patterns/breeder1.rle"
-Sleep 400ms
+# Breeder 1
+Escape
+Sleep 500ms
+Down 3
+Sleep 300ms
+Enter
+Sleep 300ms
+Enter
+Sleep 300ms
+Down 2
+Sleep 500ms
+Enter
+Sleep 50ms
 Enter
 Sleep 200ms
 Type@200ms "-->wddd-->wddd-->>>--wddddddd"
-Sleep 3s
-Type "<<<<<"
+Sleep 2s
+Type@50ms "<<<<<"
 Type@250ms "++++++++"
 Sleep 1s
-Type "q"
-Sleep 250ms
 
-Type "cli-of-life --play https://conwaylife.com/patterns/gabrielsp138.rle"
-Sleep 400ms
+# Gabriel's p138
+Escape
+Sleep 500ms
+Down 3
+Sleep 300ms
+Enter
+Sleep 300ms
+Enter
+Sleep 300ms
+Down 3
+Sleep 500ms
+Enter
+Sleep 50ms
 Enter
 Sleep 3s
-Type "q"
-Sleep 250ms
+
+Escape
+Sleep 500ms
+Down 2
+Sleep 500ms
