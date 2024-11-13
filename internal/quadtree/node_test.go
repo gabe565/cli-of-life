@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"testing"
 
-	"gabe565.com/cli-of-life/internal/ptr"
 	"gabe565.com/cli-of-life/internal/rule"
 	"github.com/stretchr/testify/assert"
+	"k8s.io/utils/ptr"
 )
 
 func TestEmpty(t *testing.T) {

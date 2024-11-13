@@ -2,10 +2,10 @@ package config
 
 import (
 	"bytes"
-	"errors"
 	"log/slog"
 	"strings"
 
+	"gabe565.com/utils/must"
 	"github.com/spf13/pflag"
 )
 
@@ -29,12 +29,8 @@ func (c *Config) RegisterFlags(fs *pflag.FlagSet) {
 
 	fs.StringVarP(&c.Pattern, FileFlag, "f", c.Pattern, "Load a pattern file")
 	fs.StringVar(&c.Pattern, URLFlag, c.Pattern, "Load a pattern URL")
-	if err := errors.Join(
-		fs.MarkDeprecated(FileFlag, "pass file as positional argument instead."),
-		fs.MarkDeprecated(URLFlag, "pass URL as positional argument instead."),
-	); err != nil {
-		panic(err)
-	}
+	must.Must(fs.MarkDeprecated(FileFlag, "pass file as positional argument instead."))
+	must.Must(fs.MarkDeprecated(URLFlag, "pass URL as positional argument instead."))
 	fs.SetOutput(DeprecatedWriter{})
 }
 

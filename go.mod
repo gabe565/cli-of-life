@@ -3,6 +3,7 @@ module gabe565.com/cli-of-life
 go 1.23.3
 
 require (
+	gabe565.com/utils v0.0.0-20241113080130-5627e2628c07
 	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.2.2
@@ -13,6 +14,7 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
+	k8s.io/utils v0.0.0-20241104163129-6fe5fd82f078
 )
 
 require (

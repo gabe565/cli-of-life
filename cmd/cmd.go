@@ -4,22 +4,21 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"os"
 	"runtime/debug"
-	"strings"
 
 	"gabe565.com/cli-of-life/internal/config"
 	"gabe565.com/cli-of-life/internal/game"
 	"gabe565.com/cli-of-life/internal/pattern"
 	"gabe565.com/cli-of-life/internal/pprof"
 	"gabe565.com/cli-of-life/internal/quadtree"
-	"gabe565.com/cli-of-life/internal/util"
+	"gabe565.com/utils/cobrax"
+	"gabe565.com/utils/must"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 )
 
-func New(opts ...Option) *cobra.Command {
+func New(opts ...cobrax.Option) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cli-of-life [file | url]",
 		Short: "Play Conway's Game of Life in your terminal",
@@ -36,9 +35,7 @@ func New(opts ...Option) *cobra.Command {
 	config.InitLog(slog.LevelInfo)
 	conf := config.New()
 	conf.RegisterFlags(cmd.Flags())
-	if err := config.RegisterCompletion(cmd); err != nil {
-		panic(err)
-	}
+	must.Must(config.RegisterCompletion(cmd))
 	cmd.SetContext(config.NewContext(context.Background(), conf))
 
 	for _, opt := range opts {
@@ -49,8 +46,6 @@ func New(opts ...Option) *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) error {
-	setUserAgentTransport(cmd)
-
 	if pprof.Enabled {
 		go func() {
 			if err := pprof.ListenAndServe(); err != nil {
@@ -68,7 +63,7 @@ func run(cmd *cobra.Command, args []string) error {
 		return completion(cmd, conf.Completion)
 	}
 
-	slog.Info("cli-of-life", "version", cmd.Annotations[VersionKey], "commit", cmd.Annotations[CommitKey])
+	slog.Info("cli-of-life", "version", cobrax.GetVersion(cmd), "commit", cobrax.GetCommit(cmd))
 
 	if len(args) == 1 {
 		conf.Pattern = args[0]
@@ -101,12 +96,4 @@ func run(cmd *cobra.Command, args []string) error {
 	_, err := program.Run()
 	slog.Info("Quitting game")
 	return err
-}
-
-func setUserAgentTransport(cmd *cobra.Command) {
-	ua := cmd.Name() + "/" + cmd.Annotations[VersionKey]
-	if commit := cmd.Annotations[CommitKey]; commit != "" {
-		ua += "-" + strings.TrimPrefix(commit, "*")
-	}
-	http.DefaultTransport = util.NewUserAgentTransport(ua)
 }
