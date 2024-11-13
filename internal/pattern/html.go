@@ -27,13 +27,13 @@ func FindHrefPatterns(resp *http.Response) ([]string, error) {
 	}
 
 	var matches []string
-	doc.Find("a").Each(func(_ int, s *goquery.Selection) {
+	for _, s := range doc.Find("a").EachIter() {
 		if href, found := s.Attr("href"); found {
 			if slices.Contains(Extensions(), path.Ext(href)) {
 				matches = append(matches, href)
 			}
 		}
-	})
+	}
 
 	slices.Sort(matches)
 	slices.Reverse(matches) // Reverse so that .rle comes before .cells
