@@ -125,15 +125,16 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.buttons.Active = 0
 		}
 	case tea.KeyMsg:
-		m.error = nil
 		switch {
 		case key.Matches(msg, m.keymap.up):
 			m.buttons.Update(buttons.MoveUp)
 		case key.Matches(msg, m.keymap.down):
 			m.buttons.Update(buttons.MoveDown)
 		case key.Matches(msg, m.keymap.choose):
+			m.error = nil
 			return m, m.handleButtonPress(m.buttons.Current())
 		case key.Matches(msg, m.keymap.resume):
+			m.error = nil
 			return m, commands.ChangeView(commands.Conway)
 		case key.Matches(msg, m.keymap.quit):
 			return m, tea.Quit
