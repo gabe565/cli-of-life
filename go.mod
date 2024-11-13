@@ -1,6 +1,6 @@
 module gabe565.com/cli-of-life
 
-go 1.23.0
+go 1.23.3
 
 require (
 	github.com/PuerkitoBio/goquery v1.9.2
