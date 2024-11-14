@@ -41,11 +41,10 @@ func (g *Gosper) Step(r *rule.Rule, steps uint64) {
 	g.steps++
 	g.generation += steps
 
-	if !g.cells.IsEdgesEmpty() {
-		g.cells = g.cells.grow()
-	}
-
 	for range steps {
+		if !g.cells.IsEdgesEmpty() {
+			g.cells = g.cells.grow()
+		}
 		g.cells = g.cells.grow().step(r)
 	}
 }
