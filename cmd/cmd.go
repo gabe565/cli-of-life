@@ -94,6 +94,7 @@ func run(cmd *cobra.Command, args []string) error {
 	slog.Info("Starting game")
 	config.InitLog(slog.LevelWarn)
 	_, err := program.Run()
+	config.InitLog(slog.LevelInfo)
 	slog.Info("Quitting game")
 	return err
 }
