@@ -26,7 +26,7 @@ func New(names ...string) *Buttons {
 	btnStyle := lipgloss.NewStyle().
 		Border(lipgloss.InnerHalfBlockBorder()).
 		BorderForeground(bgColor).
-		Padding(0, 1).
+		Padding(0, 3).
 		Background(bgColor).
 		Width(20)
 
@@ -38,6 +38,7 @@ func New(names ...string) *Buttons {
 			button: btnStyle,
 			selected: btnStyle.Bold(true).
 				Background(selectedBgColor).
+				PaddingLeft(1).
 				BorderForeground(selectedBgColor),
 		},
 		Position: lipgloss.Center,
@@ -105,7 +106,7 @@ func (b *Buttons) View() string {
 			if btn.Hidden && b.Active < len(b.List)-1 {
 				b.Active++
 			}
-			view = b.styles.selected.Render(btn.Name)
+			view = b.styles.selected.Render("> " + btn.Name)
 		} else {
 			view = b.styles.button.Render(btn.Name)
 		}
