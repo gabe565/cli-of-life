@@ -34,7 +34,7 @@ func New(opts ...cobrax.Option) *cobra.Command {
 
 	config.InitLog(slog.LevelInfo)
 	conf := config.New()
-	conf.RegisterFlags(cmd.Flags())
+	conf.RegisterFlags(cmd)
 	must.Must(config.RegisterCompletion(cmd))
 	cmd.SetContext(config.NewContext(context.Background(), conf))
 
@@ -57,10 +57,6 @@ func run(cmd *cobra.Command, args []string) error {
 	conf, ok := config.FromContext(cmd.Context())
 	if !ok {
 		panic("command missing config")
-	}
-
-	if conf.Completion != "" {
-		return completion(cmd, conf.Completion)
 	}
 
 	slog.Info("cli-of-life", "version", cobrax.GetVersion(cmd), "commit", cobrax.GetCommit(cmd))
