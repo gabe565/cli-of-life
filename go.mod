@@ -6,7 +6,7 @@ require (
 	gabe565.com/utils v0.0.0-20241116061915-abe2278ecd5c
 	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/charmbracelet/bubbles v0.20.0
-	github.com/charmbracelet/bubbletea v1.2.2
+	github.com/charmbracelet/bubbletea v1.2.4
 	github.com/charmbracelet/huh v0.6.0
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/lmittmann/tint v1.0.5
