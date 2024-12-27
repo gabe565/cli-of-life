@@ -18,9 +18,9 @@ func (c *Children) value() int {
 
 type Node struct {
 	Children
+	next  *Node
 	level uint8
 	value int
-	next  *Node
 }
 
 func (n *Node) Level() uint8 {
