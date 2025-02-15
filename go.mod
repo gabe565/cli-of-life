@@ -9,7 +9,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.2.2
 	github.com/charmbracelet/huh v0.6.0
 	github.com/charmbracelet/lipgloss v1.0.0
-	github.com/lmittmann/tint v1.0.5
+	github.com/lmittmann/tint v1.0.7
 	github.com/lrstanley/bubblezone v0.0.0-20240914071701-b48c55a5e78e
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
