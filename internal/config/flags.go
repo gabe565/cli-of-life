@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"log/slog"
 
-	"gabe565.com/utils/cobrax"
 	"gabe565.com/utils/must"
 	"github.com/spf13/cobra"
 )
@@ -21,7 +20,6 @@ const (
 )
 
 func (c *Config) RegisterFlags(cmd *cobra.Command) {
-	must.Must(cobrax.RegisterCompletionFlag(cmd))
 	fs := cmd.Flags()
 	fs.StringVar(&c.RuleString, RuleStringFlag, c.RuleString, "Rule string to use. This will be ignored if a pattern file is loaded.")
 	fs.BoolVar(&c.Play, PlayFlag, c.Play, "Play on startup")
