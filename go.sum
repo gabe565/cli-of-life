@@ -1,5 +1,5 @@
-gabe565.com/utils v0.0.0-20241116061915-abe2278ecd5c h1:1rmGsS/Sbm85ZELLkfOtXJ99v3YHdmqvkhMDLteLUug=
-gabe565.com/utils v0.0.0-20241116061915-abe2278ecd5c/go.mod h1:1WioSVukwGZYG4Q0LJBnRhgYyVljmW2Izl+RW36ALUc=
+gabe565.com/utils v0.0.0-20250217005250-f306fa7738cd h1:yIF1LBavwbZnIl7b4Gc/RFALrwrCa2CrE6Zv6cSOqpQ=
+gabe565.com/utils v0.0.0-20250217005250-f306fa7738cd/go.mod h1:8IpokjLTL2meO6pWztDzfN95olyT6P8ip3HjKu/ri9o=
 github.com/MakeNowJust/heredoc v1.0.0 h1:cXCdzVdstXyiTqTvfqk9SDHpKNjxuom+DOlyEeQ4pzQ=
 github.com/MakeNowJust/heredoc v1.0.0/go.mod h1:mG5amYoWBHf8vpLOuehzbGGw0EHxpZZ6lCpQ4fNJ8LE=
 github.com/PuerkitoBio/goquery v1.10.2 h1:7fh2BdHcG6VFZsK7toXBT/Bh1z5Wmy8Q9MV9HqT2AM8=
