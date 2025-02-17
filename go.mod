@@ -12,7 +12,7 @@ require (
 	github.com/lmittmann/tint v1.0.5
 	github.com/lrstanley/bubblezone v0.0.0-20240914071701-b48c55a5e78e
 	github.com/spf13/cobra v1.8.1
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
 	k8s.io/utils v0.0.0-20241104163129-6fe5fd82f078
 )
