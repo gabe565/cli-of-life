@@ -10,7 +10,6 @@ cli-of-life [file | url] [flags]
 
 ```
       --cache-limit int      Maximum number of entries to keep cached. Higher values will use more memory, but less CPU. (default 10000000)
-      --completion string    Generate the autocompletion script for the specified shell (one of bash, zsh, fish, powershell)
   -h, --help                 help for cli-of-life
       --play                 Play on startup
       --rule-string string   Rule string to use. This will be ignored if a pattern file is loaded. (default "B3/S23")
