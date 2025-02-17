@@ -130,9 +130,8 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, c.keymap.playPause):
 			if c.ctx == nil {
 				return c, c.Play()
-			} else {
-				c.Pause()
 			}
+			c.Pause()
 		case key.Matches(msg, c.keymap.tick):
 			if c.ctx == nil {
 				return c, func() tea.Msg {
