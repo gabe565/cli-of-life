@@ -3,7 +3,7 @@ module gabe565.com/cli-of-life
 go 1.24.0
 
 require (
-	gabe565.com/utils v0.0.0-20250217005250-f306fa7738cd
+	gabe565.com/utils v0.0.0-20250302063333-ede73b14282c
 	github.com/PuerkitoBio/goquery v1.10.2
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.3.3
