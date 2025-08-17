@@ -10,7 +10,7 @@ require (
 	github.com/charmbracelet/huh v0.6.0
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/lmittmann/tint v1.1.2
-	github.com/lrstanley/bubblezone v0.0.0-20250208020128-be525e7e10ed
+	github.com/lrstanley/bubblezone/v2 v2.0.0-alpha.2
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
