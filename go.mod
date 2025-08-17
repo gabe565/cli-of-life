@@ -1,6 +1,6 @@
 module gabe565.com/cli-of-life
 
-go 1.24.0
+go 1.25.0
 
 require (
 	gabe565.com/utils v0.0.0-20250217005250-f306fa7738cd
