@@ -48,9 +48,9 @@ func TestNode_Set(t *testing.T) {
 		for i := range 10 {
 			x, y := i-5*3, i-5*i
 			node = node.GrowToFit(image.Pt(x, y)).Set(image.Pt(x, y), 1)
-			assert.EqualValues(t, 1, node.Get(image.Pt(x, y), 0).value)
+			assert.Equal(t, 1, node.Get(image.Pt(x, y), 0).value)
 			node = node.Set(image.Pt(x, y), 0)
-			assert.EqualValues(t, 0, node.Get(image.Pt(x, y), 0).value)
+			assert.Equal(t, 0, node.Get(image.Pt(x, y), 0).value)
 		}
 
 		// check that not all cells get set
@@ -81,7 +81,7 @@ func TestNode_Visit(t *testing.T) {
 			assert.Equal(t, image.Pt(55, 232), p)
 		}
 		assert.EqualValues(t, 0, node.level, "level")
-		assert.EqualValues(t, 1, node.value, "value")
+		assert.Equal(t, 1, node.value, "value")
 		callCount++
 	})
 	assert.Equal(t, 2, callCount)
@@ -91,31 +91,31 @@ func Test_oneGen(t *testing.T) {
 	r := rule.GameOfLife()
 
 	t.Run("dying", func(t *testing.T) {
-		assert.EqualValues(t, 0, oneGen(0xFFFF, &r).value)
+		assert.Equal(t, 0, oneGen(0xFFFF, &r).value)
 	})
 
 	t.Run("none alive", func(t *testing.T) {
-		assert.EqualValues(t, 0, oneGen(0x0000, &r).value)
+		assert.Equal(t, 0, oneGen(0x0000, &r).value)
 	})
 
 	t.Run("live neighbors", func(t *testing.T) {
 		// 0b0111_0000_0000
-		assert.EqualValues(t, 1, oneGen(0x0700, &r).value)
+		assert.Equal(t, 1, oneGen(0x0700, &r).value)
 	})
 
 	t.Run("live neighbors and self is alive", func(t *testing.T) {
 		// 0b0011_0010_0000
-		assert.EqualValues(t, 1, oneGen(0x0320, &r).value)
+		assert.Equal(t, 1, oneGen(0x0320, &r).value)
 	})
 
 	t.Run("live neighbors and self is alive", func(t *testing.T) {
 		// 0b0010_0010_0000
-		assert.EqualValues(t, 0, oneGen(0x0220, &r).value)
+		assert.Equal(t, 0, oneGen(0x0220, &r).value)
 	})
 
 	t.Run("live neighbors below", func(t *testing.T) {
 		// 0b0000_0000_0111
-		assert.EqualValues(t, 1, oneGen(0x0007, &r).value)
+		assert.Equal(t, 1, oneGen(0x0007, &r).value)
 	})
 }
 
@@ -251,7 +251,7 @@ func TestNode_slowSimulation(t *testing.T) {
 }
 
 // trivial case of empty tree
-// more testing should happen on universe level
+// more testing should happen on universe level.
 func TestNode_NextGeneration(t *testing.T) {
 	node := Empty(4).grow()
 	next := node.step(ptr.To(rule.GameOfLife())).grow()
@@ -264,7 +264,7 @@ func TestNode_Width(t *testing.T) {
 		t.Run(strconv.Itoa(int(i)), func(t *testing.T) {
 			node := Empty(i)
 			expect := int(math.Pow(2, float64(i)))
-			assert.EqualValues(t, expect, node.Width())
+			assert.Equal(t, expect, node.Width())
 		})
 	}
 }

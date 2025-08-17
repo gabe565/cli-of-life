@@ -48,7 +48,7 @@ func TestUnmarshalPlaintext(t *testing.T) {
 			if got != nil {
 				got.Tree = nil
 			}
-			assert.EqualValues(t, tt.want, got)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

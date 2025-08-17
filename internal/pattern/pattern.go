@@ -89,10 +89,10 @@ func UnmarshalFile(path string) (*Pattern, error) {
 	}()
 
 	ext := filepath.Ext(path)
-	switch {
-	case ext == ExtRLE:
+	switch ext {
+	case ExtRLE:
 		return UnmarshalRLE(f)
-	case ext == ExtPlaintext:
+	case ExtPlaintext:
 		return UnmarshalPlaintext(f)
 	default:
 		pattern, err := Unmarshal(f)
@@ -160,7 +160,9 @@ func Unmarshal(r io.Reader) (*Pattern, error) {
 	switch {
 	case bytes.HasPrefix(firstLine, []byte("#")), RLEHeaderRegexp().Match(firstLine):
 		return UnmarshalRLE(bytes.NewReader(buf))
-	case bytes.HasPrefix(firstLine, []byte("!")), bytes.HasPrefix(firstLine, []byte(".")), bytes.HasPrefix(firstLine, []byte("O")):
+	case bytes.HasPrefix(firstLine, []byte("!")),
+		bytes.HasPrefix(firstLine, []byte(".")),
+		bytes.HasPrefix(firstLine, []byte("O")):
 		return UnmarshalPlaintext(bytes.NewReader(buf))
 	default:
 		return nil, ErrDetectFailed

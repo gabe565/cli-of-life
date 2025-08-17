@@ -16,12 +16,12 @@ func treeWithRandomPattern(level uint) (*Node, *big.Int) {
 		node = node.grow()
 	}
 	edgeLength := int(1) << level
-	cellsInTree := uint(edgeLength * edgeLength) //nolint:gosec
+	cellsInTree := uint(edgeLength * edgeLength)
 
 	upperBound := new(big.Int)
 	upperBound.SetInt64(1)
 	upperBound.Lsh(upperBound, cellsInTree-1)
-	r := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	randomNumber := new(big.Int).Rand(r, upperBound)
 
 	for x := range edgeLength {
@@ -52,18 +52,20 @@ func treeCorrectness(t *testing.T, node *Node) {
 	}
 }
 
-// slashLevelOne returns a level one tree with the following pattern
-// 0 | 1
-// 1 | 0
+// slashLevelOne returns a level one tree with the following pattern:
+//
+//	0 | 1
+//	1 | 0
 func slashLevelOne() *Node {
 	return Empty(1).
 		Set(image.Pt(0, -1), 1).
 		Set(image.Pt(-1, 0), 1)
 }
 
-// backslashLevelOne returns a level one tree with the following pattern
-// 1 | 0
-// 0 | 1
+// backslashLevelOne returns a level one tree with the following pattern:
+//
+//	1 | 0
+//	0 | 1
 func backslashLevelOne() *Node {
 	return Empty(1).
 		Set(image.Pt(0, 0), 1).

@@ -223,7 +223,11 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (c *Conway) View() string {
 	c.viewBuf.Reset()
 	if c.debug {
-		stats := lipgloss.Place(c.viewSize.Width, c.viewSize.Height-1, lipgloss.Center, lipgloss.Center, c.RenderStats())
+		stats := lipgloss.Place(
+			c.viewSize.Width, c.viewSize.Height-1,
+			lipgloss.Center, lipgloss.Center,
+			c.RenderStats(),
+		)
 		c.viewBuf.WriteString(stats)
 	} else if c.gameSize.X != 0 && c.gameSize.Y != 0 {
 		c.Pattern.Tree.Render(&c.viewBuf, image.Rectangle{Min: c.view, Max: c.view.Add(c.gameSize)}, c.level)
