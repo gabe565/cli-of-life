@@ -7,7 +7,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/charmbracelet/bubbles v0.21.0
 	github.com/charmbracelet/bubbletea v1.3.6
-	github.com/charmbracelet/huh v0.7.0
+	github.com/charmbracelet/huh/v2 v2.0.3
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/lmittmann/tint v1.1.2
 	github.com/lrstanley/bubblezone v0.0.0-20250208020128-be525e7e10ed
