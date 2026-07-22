@@ -11,7 +11,7 @@ import (
 
 func InitLog(level slog.Level) {
 	slog.SetDefault(slog.New(
-		tint.NewHandler(os.Stderr, &tint.Options{
+		tint.NewTextHandler(os.Stderr, &tint.Options{
 			Level:      level,
 			TimeFormat: time.Kitchen,
 			NoColor:    !termx.IsColor(os.Stderr),
