@@ -114,6 +114,8 @@ linters:
               desc: Use log/slog instead, see https://go.dev/blog/slog
     errcheck:
       check-type-assertions: true
+    goconst:
+      ignore-tests: true
     gocritic:
       settings:
         captLocal:
@@ -151,9 +153,6 @@ linters:
       - legacy
       - std-error-handling
     rules:
-      - linters:
-          - revive
-        text: var-naming
       - path: _test\.go
         linters:
           - dupl

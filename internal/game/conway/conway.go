@@ -72,7 +72,7 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tickMsg:
 		steps := uint64(1)
 		if speeds[c.speed] < time.Second/240 {
-			steps += uint64(time.Second / 240 / speeds[c.speed]) //nolint:gosec
+			steps += uint64(time.Second / 240 / speeds[c.speed])
 		}
 		c.Pattern.Step(steps)
 		if c.ctx != nil {

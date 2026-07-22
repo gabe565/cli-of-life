@@ -24,7 +24,8 @@ const (
 
 func (m *Menu) initForm() tea.Cmd {
 	m.form = m.form.WithWidth(lipgloss.Width(Title))
-	cmds := []tea.Cmd{m.form.Init()}
+	cmds := make([]tea.Cmd, 0, 2)
+	cmds = append(cmds, m.form.Init())
 
 	form, cmd := m.form.Update(m.size)
 	if f, ok := form.(*huh.Form); ok {

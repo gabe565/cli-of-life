@@ -77,12 +77,12 @@ func (r Rule) String() string {
 	buf.Grow(3 + len(r.Born) + len(r.Survive))
 	buf.WriteByte('B')
 	for _, v := range r.Born {
-		buf.WriteByte(byte(v + '0'))
+		buf.WriteString(strconv.Itoa(v))
 	}
 	buf.WriteByte('/')
 	buf.WriteByte('S')
 	for _, v := range r.Survive {
-		buf.WriteByte(byte(v + '0'))
+		buf.WriteString(strconv.Itoa(v))
 	}
 	return buf.String()
 }
