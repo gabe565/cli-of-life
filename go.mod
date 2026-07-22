@@ -5,9 +5,9 @@ go 1.26.5
 require (
 	gabe565.com/utils v0.0.0-20260511235214-4059440fa83b
 	github.com/PuerkitoBio/goquery v1.12.0
-	github.com/charmbracelet/bubbles v0.21.0
+	github.com/charmbracelet/bubbles v0.21.1-0.20250623103423-23b8fd6302d7
 	github.com/charmbracelet/bubbletea v1.3.6
-	github.com/charmbracelet/huh v0.7.0
+	github.com/charmbracelet/huh v0.8.0
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/lmittmann/tint v1.2.0
 	github.com/lrstanley/bubblezone v0.0.0-20250208020128-be525e7e10ed
