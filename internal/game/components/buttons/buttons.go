@@ -1,9 +1,9 @@
 package buttons
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	zone "github.com/lrstanley/bubblezone"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
+	zone "github.com/lrstanley/bubblezone/v2"
 )
 
 type Button struct {
@@ -21,7 +21,17 @@ func New(names ...string) *Buttons {
 		btns = append(btns, &Button{Name: name})
 	}
 
-	bgColor := lipgloss.AdaptiveColor{Light: "#DDDADA", Dark: "#4A4A4A"}
+	b := &Buttons{
+		List:     btns,
+		Position: lipgloss.Center,
+	}
+	b.setStyles(true)
+	return b
+}
+
+func (b *Buttons) setStyles(dark bool) {
+	lightDark := lipgloss.LightDark(dark)
+	bgColor := lightDark(lipgloss.Color("#DDDADA"), lipgloss.Color("#4A4A4A"))
 
 	btnStyle := lipgloss.NewStyle().
 		Border(lipgloss.InnerHalfBlockBorder()).
@@ -30,19 +40,19 @@ func New(names ...string) *Buttons {
 		Background(bgColor).
 		Width(20)
 
-	selectedBgColor := lipgloss.AdaptiveColor{Light: "#aaf", Dark: "#4A4ABB"}
+	selectedBgColor := lightDark(lipgloss.Color("#aaf"), lipgloss.Color("#4A4ABB"))
 
-	return &Buttons{
-		List: btns,
-		styles: styles{
-			button: btnStyle,
-			selected: btnStyle.Bold(true).
-				Background(selectedBgColor).
-				PaddingLeft(1).
-				BorderForeground(selectedBgColor),
-		},
-		Position: lipgloss.Center,
+	b.styles = styles{
+		button: btnStyle,
+		selected: btnStyle.Bold(true).
+			Background(selectedBgColor).
+			PaddingLeft(1).
+			BorderForeground(selectedBgColor),
 	}
+}
+
+func (b *Buttons) SetDark(dark bool) {
+	b.setStyles(dark)
 }
 
 type styles struct {
@@ -62,7 +72,7 @@ func (b *Buttons) Init() tea.Cmd {
 	return nil
 }
 
-func (b *Buttons) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (b *Buttons) Update(msg tea.Msg) (*Buttons, tea.Cmd) {
 	switch msg := msg.(type) { //nolint:gocritic
 	case Move:
 		switch msg {

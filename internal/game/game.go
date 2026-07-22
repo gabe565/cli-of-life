@@ -1,11 +1,11 @@
 package game
 
 import (
+	tea "charm.land/bubbletea/v2"
 	"gabe565.com/cli-of-life/internal/config"
 	"gabe565.com/cli-of-life/internal/game/commands"
 	"gabe565.com/cli-of-life/internal/game/conway"
 	"gabe565.com/cli-of-life/internal/game/menu"
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 func New(conf *config.Config) tea.Model {
@@ -21,7 +21,9 @@ type Game struct {
 	conway *conway.Conway
 }
 
-func (g *Game) Init() tea.Cmd { return g.active.Init() }
+func (g *Game) Init() tea.Cmd {
+	return tea.Batch(g.active.Init(), tea.RequestBackgroundColor)
+}
 
 func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -30,6 +32,10 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			g.menu.Update(msg)
 			g.conway.Update(msg)
 		}
+	case tea.BackgroundColorMsg:
+		dark := msg.IsDark()
+		g.menu.SetDark(dark)
+		g.conway.SetDark(dark)
 	case commands.ViewMsg:
 		var cmds []tea.Cmd
 		if _, cmd := g.active.Update(msg); cmd != nil {
@@ -52,6 +58,9 @@ func (g *Game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return g, nil
 }
 
-func (g *Game) View() string {
-	return g.active.View()
+func (g *Game) View() tea.View {
+	v := g.active.View()
+	v.AltScreen = true
+	v.MouseMode = tea.MouseModeAllMotion
+	return v
 }

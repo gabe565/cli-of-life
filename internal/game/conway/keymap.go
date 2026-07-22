@@ -1,13 +1,13 @@
 package conway
 
 import (
-	"github.com/charmbracelet/bubbles/key"
+	"charm.land/bubbles/v2/key"
 )
 
 func newKeymap() keymap {
 	return keymap{
 		playPause: key.NewBinding(
-			key.WithKeys(" ", "enter"),
+			key.WithKeys("space", "enter"),
 			key.WithHelp("space", "play"),
 		),
 		mode: key.NewBinding(

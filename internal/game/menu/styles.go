@@ -1,6 +1,6 @@
 package menu
 
-import "github.com/charmbracelet/lipgloss"
+import "charm.land/lipgloss/v2"
 
 func newStyles() styles {
 	return styles{

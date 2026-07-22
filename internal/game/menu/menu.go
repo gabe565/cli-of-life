@@ -3,18 +3,18 @@ package menu
 import (
 	"errors"
 
+	"charm.land/bubbles/v2/help"
+	"charm.land/bubbles/v2/key"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/huh/v2"
+	"charm.land/lipgloss/v2"
 	"gabe565.com/cli-of-life/internal/config"
 	"gabe565.com/cli-of-life/internal/game/commands"
 	"gabe565.com/cli-of-life/internal/game/components/buttons"
 	"gabe565.com/cli-of-life/internal/game/conway"
 	"gabe565.com/cli-of-life/internal/pattern"
 	"gabe565.com/cli-of-life/internal/quadtree"
-	"github.com/charmbracelet/bubbles/help"
-	"github.com/charmbracelet/bubbles/key"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/lipgloss"
-	zone "github.com/lrstanley/bubblezone"
+	zone "github.com/lrstanley/bubblezone/v2"
 )
 
 const (
@@ -79,7 +79,7 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.size = msg
 		m.styles.errorStyle = m.styles.errorStyle.Width(msg.Width)
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		if msg.String() == "ctrl+c" {
 			return m, tea.Quit
 		}
@@ -124,7 +124,7 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.buttons.List[1].Hidden = empty
 			m.buttons.Active = 0
 		}
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		switch {
 		case key.Matches(msg, m.keymap.up):
 			m.buttons.Update(buttons.MoveUp)
@@ -140,14 +140,15 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	case tea.MouseMsg:
+		_, isRelease := msg.(tea.MouseReleaseMsg)
+		_, isMotion := msg.(tea.MouseMotionMsg)
 		defer func() {
-			m.wasPressed = msg.Action == tea.MouseActionPress
+			_, m.wasPressed = msg.(tea.MouseClickMsg)
 		}()
-		switch msg.Action {
-		case tea.MouseActionRelease, tea.MouseActionMotion:
+		if isRelease || isMotion {
 			for i, btn := range m.buttons.List {
 				if zone.Get(btn.ID()).InBounds(msg) {
-					if m.wasPressed && msg.Action == tea.MouseActionRelease {
+					if m.wasPressed && isRelease {
 						return m, m.handleButtonPress(btn)
 					}
 					m.buttons.Active = i
@@ -175,7 +176,12 @@ func (m *Menu) LoadPattern() tea.Cmd {
 	return commands.ChangeView(commands.Conway)
 }
 
-func (m *Menu) View() string {
+func (m *Menu) SetDark(dark bool) {
+	m.help.Styles = help.DefaultStyles(dark)
+	m.buttons.SetDark(dark)
+}
+
+func (m *Menu) View() tea.View {
 	views := []string{Title}
 
 	if m.form == nil {
@@ -196,7 +202,7 @@ func (m *Menu) View() string {
 		views = append(views, m.form.View())
 	}
 
-	return zone.Scan(lipgloss.Place(m.size.Width, m.size.Height, lipgloss.Center, lipgloss.Center,
+	return tea.NewView(zone.Scan(lipgloss.Place(m.size.Width, m.size.Height, lipgloss.Center, lipgloss.Center,
 		lipgloss.JoinVertical(lipgloss.Center, views...),
-	))
+	)))
 }

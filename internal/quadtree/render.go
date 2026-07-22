@@ -7,28 +7,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 )
 
 //nolint:gochecknoglobals
 var (
-	colors     []lipgloss.Style
-	halfBlocks [16]string
+	colors         []lipgloss.Style
+	halfBlocks     [16]string
+	darkBackground = true
 )
 
 func init() { //nolint:gochecknoinits
-	var first, last int
-	first = 236
-	last = 254
-	colors = make([]lipgloss.Style, 0, last-first)
-	for i := first; i <= last; i++ {
-		s := lipgloss.NewStyle().Foreground(lipgloss.Color(strconv.Itoa(i)))
-		colors = append(colors, s)
-	}
-	if !lipgloss.HasDarkBackground() {
-		slices.Reverse(colors)
-	}
-	colors = append(colors, lipgloss.NewStyle())
+	buildColors()
 
 	// Precompute the half-block glyph for every 2x2 sub-cell occupancy pattern.
 	// Bits: NW=1, NE=2, SW=4, SE=8. Each cell is two columns wide, so the left
@@ -50,8 +40,28 @@ func init() { //nolint:gochecknoinits
 	}
 }
 
-// cell is the fully-resolved on-screen representation of one sampled block: a
-// two-column glyph plus a color index into colors (-1 means render unstyled).
+// buildColors builds the density color gradient, ordering it to suit the
+// current background. On light backgrounds the gradient is reversed so that
+// cells stay legible.
+func buildColors() {
+	const first, last = 236, 254
+	colors = make([]lipgloss.Style, 0, last-first+2)
+	for i := first; i <= last; i++ {
+		colors = append(colors, lipgloss.NewStyle().Foreground(lipgloss.Color(strconv.Itoa(i))))
+	}
+	if !darkBackground {
+		slices.Reverse(colors)
+	}
+	colors = append(colors, lipgloss.NewStyle())
+}
+
+func SetDarkBackground(dark bool) {
+	if dark != darkBackground {
+		darkBackground = dark
+		buildColors()
+	}
+}
+
 type cell struct {
 	str   string
 	color int
@@ -85,9 +95,6 @@ func (n *Node) Render(buf *bytes.Buffer, rect image.Rectangle, level uint8) {
 	}
 }
 
-// renderCell picks the glyph and color for a single sampled block. When zoomed
-// in (level 0) it is a solid block; when zoomed out it uses half-block glyphs to
-// show which of the region's 2x2 sub-quadrants are populated, colored by density.
 func renderCell(node *Node, level uint8) cell {
 	switch {
 	case node.value == 0:

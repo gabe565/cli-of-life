@@ -8,15 +8,15 @@ import (
 	"strings"
 	"time"
 
+	"charm.land/bubbles/v2/help"
+	"charm.land/bubbles/v2/key"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
+	"charm.land/lipgloss/v2/table"
 	"gabe565.com/cli-of-life/internal/config"
 	"gabe565.com/cli-of-life/internal/game/commands"
 	"gabe565.com/cli-of-life/internal/pattern"
 	"gabe565.com/cli-of-life/internal/quadtree"
-	"github.com/charmbracelet/bubbles/help"
-	"github.com/charmbracelet/bubbles/key"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
 )
 
 type Mode uint8
@@ -87,45 +87,44 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		c.viewBuf.Reset()
 		c.viewBuf.Grow(c.viewSize.Width * c.viewSize.Height)
 	case tea.MouseMsg:
-		switch msg.Action {
-		case tea.MouseActionPress, tea.MouseActionMotion:
-			switch msg.Button {
-			case tea.MouseButtonLeft:
-				if c.level != 0 {
-					break
-				}
-				msg.X /= 2
-				msg.X += c.view.X
-				msg.Y += c.view.Y
+		mouse := msg.Mouse()
+		switch msg.(type) {
+		case tea.MouseClickMsg, tea.MouseMotionMsg:
+			if mouse.Button == tea.MouseLeft && c.level == 0 {
+				mouse.X = mouse.X/2 + c.view.X
+				mouse.Y += c.view.Y
 				switch c.mode {
 				case ModeSmart:
 					if c.smartVal == -1 {
-						val := c.Pattern.Tree.Get(image.Pt(msg.X, msg.Y))
+						val := c.Pattern.Tree.Get(image.Pt(mouse.X, mouse.Y))
 						if val {
 							c.smartVal = 0
 						} else {
 							c.smartVal = 1
 						}
 					}
-					c.Pattern.Tree.Set(image.Pt(msg.X, msg.Y), c.smartVal)
+					c.Pattern.Tree.Set(image.Pt(mouse.X, mouse.Y), c.smartVal)
 				case ModePlace:
-					c.Pattern.Tree.Set(image.Pt(msg.X, msg.Y), 1)
+					c.Pattern.Tree.Set(image.Pt(mouse.X, mouse.Y), 1)
 				case ModeErase:
-					c.Pattern.Tree.Set(image.Pt(msg.X, msg.Y), 0)
+					c.Pattern.Tree.Set(image.Pt(mouse.X, mouse.Y), 0)
 				}
-			case tea.MouseButtonWheelUp:
+			}
+		case tea.MouseWheelMsg:
+			switch mouse.Button {
+			case tea.MouseWheelUp:
 				c.Scroll(DirUp, 1)
-			case tea.MouseButtonWheelLeft:
+			case tea.MouseWheelLeft:
 				c.Scroll(DirLeft, 2)
-			case tea.MouseButtonWheelDown:
+			case tea.MouseWheelDown:
 				c.Scroll(DirDown, 1)
-			case tea.MouseButtonWheelRight:
+			case tea.MouseWheelRight:
 				c.Scroll(DirRight, 2)
 			}
-		case tea.MouseActionRelease:
+		case tea.MouseReleaseMsg:
 			c.smartVal = -1
 		}
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		switch {
 		case key.Matches(msg, c.keymap.playPause):
 			if c.ctx == nil {
@@ -220,7 +219,7 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return c, nil
 }
 
-func (c *Conway) View() string {
+func (c *Conway) View() tea.View {
 	c.viewBuf.Reset()
 	if c.debug {
 		stats := lipgloss.Place(
@@ -235,7 +234,12 @@ func (c *Conway) View() string {
 			c.viewBuf.WriteString(strings.Repeat("\n", c.viewSize.Height-lipgloss.Height(c.viewBuf.String())))
 		}
 	}
-	return c.viewBuf.String() + c.help.ShortHelpView(c.keymap.ShortHelp())
+	return tea.NewView(c.viewBuf.String() + c.help.ShortHelpView(c.keymap.ShortHelp()))
+}
+
+func (c *Conway) SetDark(dark bool) {
+	c.help.Styles = help.DefaultStyles(dark)
+	quadtree.SetDarkBackground(dark)
 }
 
 func (c *Conway) RenderStats() string {

@@ -7,6 +7,7 @@ import (
 	"os"
 	"runtime/debug"
 
+	tea "charm.land/bubbletea/v2"
 	"gabe565.com/cli-of-life/internal/config"
 	"gabe565.com/cli-of-life/internal/game"
 	"gabe565.com/cli-of-life/internal/pattern"
@@ -14,7 +15,6 @@ import (
 	"gabe565.com/cli-of-life/internal/quadtree"
 	"gabe565.com/utils/cobrax"
 	"gabe565.com/utils/must"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 )
 
@@ -71,8 +71,6 @@ func run(cmd *cobra.Command, args []string) error {
 
 	program := tea.NewProgram(
 		game.New(conf),
-		tea.WithAltScreen(),
-		tea.WithMouseAllMotion(),
 		tea.WithoutCatchPanics(),
 	)
 

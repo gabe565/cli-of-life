@@ -1,7 +1,7 @@
 package commands
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
 type ViewMsg uint8

@@ -1,7 +1,7 @@
 package menu
 
 import (
-	"github.com/charmbracelet/bubbles/key"
+	"charm.land/bubbles/v2/key"
 )
 
 func newKeymap() keymap {
@@ -15,7 +15,7 @@ func newKeymap() keymap {
 			key.WithHelp("↓", "down"),
 		),
 		choose: key.NewBinding(
-			key.WithKeys("enter", " "),
+			key.WithKeys("enter", "space"),
 			key.WithHelp("enter", "choose"),
 		),
 		resume: key.NewBinding(
