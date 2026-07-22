@@ -8,7 +8,6 @@ import (
 
 	"gabe565.com/cli-of-life/internal/rule"
 	"github.com/stretchr/testify/assert"
-	"k8s.io/utils/ptr"
 )
 
 func TestEmpty(t *testing.T) {
@@ -254,7 +253,7 @@ func TestNode_slowSimulation(t *testing.T) {
 // more testing should happen on universe level.
 func TestNode_NextGeneration(t *testing.T) {
 	node := Empty(4).grow()
-	next := node.step(ptr.To(rule.GameOfLife())).grow()
+	next := node.step(new(rule.GameOfLife())).grow()
 	assert.Equal(t, node, next)
 	assert.NotNil(t, node.next)
 }
