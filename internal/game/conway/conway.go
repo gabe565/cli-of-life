@@ -90,25 +90,8 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		mouse := msg.Mouse()
 		switch msg.(type) {
 		case tea.MouseClickMsg, tea.MouseMotionMsg:
-			if mouse.Button == tea.MouseLeft && c.level == 0 {
-				mouse.X = mouse.X/2 + c.view.X
-				mouse.Y += c.view.Y
-				switch c.mode {
-				case ModeSmart:
-					if c.smartVal == -1 {
-						val := c.Pattern.Tree.Get(image.Pt(mouse.X, mouse.Y))
-						if val {
-							c.smartVal = 0
-						} else {
-							c.smartVal = 1
-						}
-					}
-					c.Pattern.Tree.Set(image.Pt(mouse.X, mouse.Y), c.smartVal)
-				case ModePlace:
-					c.Pattern.Tree.Set(image.Pt(mouse.X, mouse.Y), 1)
-				case ModeErase:
-					c.Pattern.Tree.Set(image.Pt(mouse.X, mouse.Y), 0)
-				}
+			if mouse.Button == tea.MouseLeft {
+				c.paintAtMouse(mouse.X, mouse.Y)
 			}
 		case tea.MouseWheelMsg:
 			switch mouse.Button {
@@ -273,6 +256,59 @@ func (c *Conway) center() {
 	size := c.Pattern.Tree.FilledCoords().Size()
 	c.view.X = size.X/2 - c.gameSize.X/2
 	c.view.Y = size.Y/2 - c.gameSize.Y/2
+}
+
+// mouseToWorldRect maps a terminal mouse position to the world-space rectangle
+// covered by that screen cell at the current zoom level. Each screen cell is two
+// columns wide; zoom level N maps one screen cell to a (1<<N)×(1<<N) block.
+func (c *Conway) mouseToWorldRect(mouseX, mouseY int) image.Rectangle {
+	skip := 1 << c.level
+	x := c.view.X + (mouseX/2)*skip
+	y := c.view.Y + mouseY*skip
+	return image.Rect(x, y, x+skip, y+skip)
+}
+
+func (c *Conway) regionHasAlive(rect image.Rectangle) bool {
+	for y := rect.Min.Y; y < rect.Max.Y; y++ {
+		for x := rect.Min.X; x < rect.Max.X; x++ {
+			if c.Pattern.Tree.Get(image.Pt(x, y)) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (c *Conway) fillRegion(rect image.Rectangle, value int) {
+	for y := rect.Min.Y; y < rect.Max.Y; y++ {
+		for x := rect.Min.X; x < rect.Max.X; x++ {
+			c.Pattern.Tree.Set(image.Pt(x, y), value)
+		}
+	}
+}
+
+// paintAtMouse places or erases cells under the cursor. When zoomed out, the
+// whole visible block is painted so the change stays visible at that zoom.
+func (c *Conway) paintAtMouse(mouseX, mouseY int) {
+	if c.Pattern == nil {
+		return
+	}
+	rect := c.mouseToWorldRect(mouseX, mouseY)
+	switch c.mode {
+	case ModeSmart:
+		if c.smartVal == -1 {
+			if c.regionHasAlive(rect) {
+				c.smartVal = 0
+			} else {
+				c.smartVal = 1
+			}
+		}
+		c.fillRegion(rect, c.smartVal)
+	case ModePlace:
+		c.fillRegion(rect, 1)
+	case ModeErase:
+		c.fillRegion(rect, 0)
+	}
 }
 
 func (c *Conway) Play() tea.Cmd {
