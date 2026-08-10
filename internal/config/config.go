@@ -1,6 +1,7 @@
 package config
 
 import (
+	"gabe565.com/cli-of-life/internal/quadtree"
 	"gabe565.com/cli-of-life/internal/rule"
 )
 
@@ -11,6 +12,7 @@ type Config struct {
 	RuleString    string
 	Play          bool
 	CacheLimit    int
+	Palette       string
 
 	Completion string
 }
@@ -20,5 +22,6 @@ func New() *Config {
 		PatternFormat: "auto",
 		RuleString:    rule.GameOfLife().String(),
 		CacheLimit:    10_000_000,
+		Palette:       quadtree.DefaultPalette,
 	}
 }

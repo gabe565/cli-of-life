@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log/slog"
 
+	"gabe565.com/cli-of-life/internal/quadtree"
 	"gabe565.com/utils/must"
 	"github.com/spf13/cobra"
 )
@@ -12,6 +13,7 @@ const (
 	RuleStringFlag = "rule-string"
 	PlayFlag       = "play"
 	CacheLimitFlag = "cache-limit"
+	PaletteFlag    = "palette"
 
 	// Deprecated: Pass file as positional argument instead.
 	FileFlag = "file"
@@ -28,6 +30,7 @@ func (c *Config) RegisterFlags(cmd *cobra.Command) {
 	fs.IntVar(&c.CacheLimit, CacheLimitFlag, c.CacheLimit,
 		"Maximum number of entries to keep cached. Higher values will use more memory, but less CPU.",
 	)
+	fs.StringVar(&c.Palette, PaletteFlag, c.Palette, quadtree.PaletteFlagHelp())
 
 	fs.StringVarP(&c.Pattern, FileFlag, "f", c.Pattern, "Load a pattern file")
 	fs.StringVar(&c.Pattern, URLFlag, c.Pattern, "Load a pattern URL")

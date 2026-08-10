@@ -68,6 +68,9 @@ func run(cmd *cobra.Command, args []string) error {
 	if conf.CacheLimit > 0 {
 		quadtree.SetMaxCache(conf.CacheLimit)
 	}
+	if err := quadtree.SetPalette(conf.Palette); err != nil {
+		return err
+	}
 
 	program := tea.NewProgram(
 		game.New(conf),

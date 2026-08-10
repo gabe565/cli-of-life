@@ -14,39 +14,7 @@ var (
 	colors         []lipgloss.Style
 	halfBlocks     [16]string
 	darkBackground = true
-
-	// Density stops for zoomed-out rendering (sparse → dense). Expanded by lerp
-	// into the runtime palette. Dark terminals use a cool→hot heat map; light
-	// terminals use a pastel→ink scale so sparse cells stay visible.
-	darkDensityStops = [][3]uint8{
-		{11, 29, 81},   // deep navy (also zoom level 0)
-		{26, 75, 140},  // blue
-		{33, 118, 174}, // steel
-		{27, 154, 170}, // teal
-		{46, 196, 182}, // cyan-green
-		{92, 219, 149}, // green
-		{181, 229, 80}, // chartreuse
-		{244, 211, 94}, // yellow
-		{238, 150, 75}, // orange
-		{249, 87, 56},  // red-orange
-		{220, 20, 30},  // red
-	}
-	lightDensityStops = [][3]uint8{
-		{190, 220, 255}, // pale blue (also zoom level 0)
-		{120, 180, 230},
-		{60, 150, 200},
-		{40, 160, 140},
-		{50, 170, 80},
-		{180, 190, 40},
-		{230, 150, 40},
-		{210, 70, 40},
-		{160, 30, 60},
-		{90, 20, 70},
-		{20, 10, 30}, // near-black
-	}
 )
-
-const densityPaletteSize = 24
 
 func init() { //nolint:gochecknoinits
 	buildColors()
@@ -71,16 +39,9 @@ func init() { //nolint:gochecknoinits
 	}
 }
 
-// buildColors builds the density color gradient for the current background.
+// buildColors builds the active palette for the current background.
 func buildColors() {
-	stops := darkDensityStops
-	if !darkBackground {
-		stops = lightDensityStops
-	}
-	colors = make([]lipgloss.Style, 0, densityPaletteSize)
-	for _, rgb := range expandStops(stops, densityPaletteSize) {
-		colors = append(colors, lipgloss.NewStyle().Foreground(lipgloss.Color(rgbHex(rgb))))
-	}
+	colors = activePalette.build(darkBackground)
 }
 
 func expandStops(stops [][3]uint8, n int) [][3]uint8 {
@@ -160,8 +121,7 @@ func renderCell(node *Node, level uint8) cell {
 	case node.value == 0:
 		return cell{str: "  ", color: -1}
 	case level == 0:
-		// Zoomed-in cells use the cold end of the density scale.
-		return cell{str: "██", color: 0}
+		return cell{str: "██", color: activePalette.zoom0Color(len(colors))}
 	default:
 		var pattern int
 		if node.NW.value > 0 {

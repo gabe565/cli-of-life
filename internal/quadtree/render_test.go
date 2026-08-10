@@ -20,22 +20,96 @@ func TestExpandStops(t *testing.T) {
 	assert.Equal(t, [3]uint8{100, 50, 0}, out[2])
 }
 
-func TestBuildColorsDensityPalette(t *testing.T) {
+func TestSetPalette(t *testing.T) {
+	t.Cleanup(func() {
+		require.NoError(t, SetPalette(DefaultPalette))
+		SetDarkBackground(true)
+	})
+
+	require.NoError(t, SetPalette(PaletteHeat))
+	assert.Equal(t, PaletteHeat, ActivePaletteName())
 	SetDarkBackground(true)
 	require.Len(t, colors, densityPaletteSize)
-	assert.NotEqual(t, colors[0].GetForeground(), colors[len(colors)-1].GetForeground())
+	assert.Equal(t, 0, activePalette.zoom0Color(len(colors)))
 
+	require.NoError(t, SetPalette(PaletteGreyscale))
+	assert.Equal(t, PaletteGreyscale, ActivePaletteName())
+	SetDarkBackground(true)
+	// 236..254 inclusive + default style
+	require.Len(t, colors, 254-236+2)
+	assert.Equal(t, len(colors)-1, activePalette.zoom0Color(len(colors)))
+
+	err := SetPalette("nope")
+	require.Error(t, err)
+	assert.Equal(t, PaletteGreyscale, ActivePaletteName())
+
+	require.NoError(t, SetPalette(""))
+	assert.Equal(t, PaletteHeat, ActivePaletteName())
+}
+
+func TestAllStopPalettesBuild(t *testing.T) {
+	t.Cleanup(func() {
+		require.NoError(t, SetPalette(DefaultPalette))
+		SetDarkBackground(true)
+	})
+
+	for _, name := range PaletteNames() {
+		if name == PaletteGreyscale {
+			continue
+		}
+		t.Run(name, func(t *testing.T) {
+			require.NoError(t, SetPalette(name))
+			SetDarkBackground(true)
+			require.Len(t, colors, densityPaletteSize)
+			darkFirst := colors[0].GetForeground()
+			darkLast := colors[len(colors)-1].GetForeground()
+			assert.NotEqual(t, darkFirst, darkLast)
+
+			SetDarkBackground(false)
+			require.Len(t, colors, densityPaletteSize)
+			assert.Equal(t, 0, activePalette.zoom0Color(len(colors)))
+		})
+	}
+}
+
+func TestBuildColorsHeatAndGreyscale(t *testing.T) {
+	t.Cleanup(func() {
+		require.NoError(t, SetPalette(DefaultPalette))
+		SetDarkBackground(true)
+	})
+
+	require.NoError(t, SetPalette(PaletteHeat))
+	SetDarkBackground(true)
+	heatDarkFirst := colors[0].GetForeground()
 	SetDarkBackground(false)
-	require.Len(t, colors, densityPaletteSize)
-	lightFirst := colors[0].GetForeground()
-	lightLast := colors[len(colors)-1].GetForeground()
-	assert.NotEqual(t, lightFirst, lightLast)
+	heatLightFirst := colors[0].GetForeground()
+	assert.NotEqual(t, heatDarkFirst, heatLightFirst)
 
+	require.NoError(t, SetPalette(PaletteGreyscale))
 	SetDarkBackground(true)
-	assert.NotEqual(t, lightFirst, colors[0].GetForeground())
+	greyDarkFirst := colors[0].GetForeground()
+	SetDarkBackground(false)
+	greyLightFirst := colors[0].GetForeground()
+	assert.NotEqual(t, greyDarkFirst, greyLightFirst)
+	assert.NotEqual(t, heatDarkFirst, greyDarkFirst)
 }
 
 func TestRgbHex(t *testing.T) {
 	assert.Equal(t, "#0B1D51", rgbHex([3]uint8{11, 29, 81}))
 	assert.Equal(t, "#DC141E", rgbHex([3]uint8{220, 20, 30}))
+}
+
+func TestCyclePalette(t *testing.T) {
+	t.Cleanup(func() {
+		require.NoError(t, SetPalette(DefaultPalette))
+		SetDarkBackground(true)
+	})
+
+	require.NoError(t, SetPalette(PaletteHeat))
+	assert.Equal(t, PaletteGreyscale, CyclePalette())
+	assert.Equal(t, PaletteViridis, CyclePalette())
+
+	require.NoError(t, SetPalette(PaletteCividis))
+	assert.Equal(t, PaletteHeat, CyclePalette())
+	assert.Equal(t, PaletteHeat, ActivePaletteName())
 }

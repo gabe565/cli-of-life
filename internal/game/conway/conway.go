@@ -124,13 +124,13 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch c.mode {
 			case ModeSmart:
 				c.mode = ModePlace
-				c.keymap.mode.SetHelp(c.keymap.mode.Help().Key, "mode: place")
+				c.keymap.mode.SetHelp(c.keymap.mode.Help().Key, "place")
 			case ModePlace:
 				c.mode = ModeErase
-				c.keymap.mode.SetHelp(c.keymap.mode.Help().Key, "mode: erase")
+				c.keymap.mode.SetHelp(c.keymap.mode.Help().Key, "erase")
 			case ModeErase:
 				c.mode = ModeSmart
-				c.keymap.mode.SetHelp(c.keymap.mode.Help().Key, "mode: smart")
+				c.keymap.mode.SetHelp(c.keymap.mode.Help().Key, "smart")
 			}
 		case key.Matches(msg, c.keymap.moveUp):
 			c.Scroll(DirUp, 2)
@@ -158,7 +158,7 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if c.speed < len(speeds)-1 {
 				c.speed++
 				tps := int(time.Second / speeds[c.speed])
-				c.keymap.speed.SetHelp(c.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" tps")
+				c.keymap.speed.SetHelp(c.keymap.speed.Help().Key, strconv.Itoa(tps)+"tps")
 				if c.ctx != nil {
 					return c, c.Play()
 				}
@@ -167,11 +167,14 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if c.speed > 0 {
 				c.speed--
 				tps := int(time.Second / speeds[c.speed])
-				c.keymap.speed.SetHelp(c.keymap.speed.Help().Key, "speed: "+strconv.Itoa(tps)+" tps")
+				c.keymap.speed.SetHelp(c.keymap.speed.Help().Key, strconv.Itoa(tps)+"tps")
 				if c.ctx != nil {
 					return c, c.Play()
 				}
 			}
+		case key.Matches(msg, c.keymap.palette):
+			next := quadtree.CyclePalette()
+			c.keymap.palette.SetHelp(c.keymap.palette.Help().Key, next)
 		case key.Matches(msg, c.keymap.reset):
 			c.Reset()
 		case key.Matches(msg, c.keymap.menu):

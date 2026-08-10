@@ -122,6 +122,29 @@ $ cli-of-life https://conwaylife.com/wiki/Replicator
 
 See the [LifeWiki for pattern files](https://conwaylife.com/wiki/Category:Patterns).
 
+### Palettes
+
+Density colors when zoomed out can be selected with `--palette`:
+
+| Name         | Description |
+|--------------|-------------|
+| `heat`       | Cool-to-hot heat map (default). Dense regions are red; zoomed-in cells use the cold end. |
+| `greyscale`  | Original xterm greyscale ramp. Zoomed-in cells use the default terminal foreground. |
+| `viridis`    | Perceptually uniform purple→yellow. |
+| `plasma`     | Purple→pink→yellow. |
+| `inferno`    | Black→red→yellow. |
+| `magma`      | Black→purple→cream. |
+| `turbo`      | Improved rainbow (Google turbo). |
+| `cividis`    | Colorblind-friendly blue→yellow. |
+
+```shell
+$ cli-of-life --palette greyscale
+$ cli-of-life --palette viridis --play pattern.rle
+$ cli-of-life --palette inferno
+```
+
+From the live view status bar, press `p` to cycle through these options.
+
 ### Keybinds
 
 | Key      | Description                               |
@@ -129,6 +152,7 @@ See the [LifeWiki for pattern files](https://conwaylife.com/wiki/Category:Patter
 | mouse    | Place/erase cells (works at any zoom)     |
 | `space`  | Play/pause                                |
 | `m`      | Toggle between modes: smart, place, erase |
+| `p`      | Cycle density palette                     |
 | `wasd`   | Move the game board                       |
 | `-`/`+`  | Zoom                                      |
 | `<`/`>`  | Change playback speed                     |

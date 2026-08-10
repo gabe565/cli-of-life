@@ -2,17 +2,18 @@ package conway
 
 import (
 	"charm.land/bubbles/v2/key"
+	"gabe565.com/cli-of-life/internal/quadtree"
 )
 
 func newKeymap() keymap {
 	return keymap{
 		playPause: key.NewBinding(
 			key.WithKeys("space", "enter"),
-			key.WithHelp("space", "play"),
+			key.WithHelp("spc", "play"),
 		),
 		mode: key.NewBinding(
 			key.WithKeys("m"),
-			key.WithHelp("m", "mode: smart"),
+			key.WithHelp("m", "smart"),
 		),
 		moveUp: key.NewBinding(
 			key.WithKeys("up", "w"),
@@ -50,11 +51,15 @@ func newKeymap() keymap {
 		),
 		speed: key.NewBinding(
 			key.WithKeys("<", ".", ">", ","),
-			key.WithHelp("<>", "speed: 30 tps"),
+			key.WithHelp("<>", "30tps"),
 		),
 		tick: key.NewBinding(
 			key.WithKeys("t"),
 			key.WithHelp("t", "tick"),
+		),
+		palette: key.NewBinding(
+			key.WithKeys("p"),
+			key.WithHelp("p", quadtree.ActivePaletteName()),
 		),
 		menu: key.NewBinding(
 			key.WithKeys("esc"),
@@ -87,6 +92,7 @@ type keymap struct {
 	speed     key.Binding
 	move      key.Binding
 	tick      key.Binding
+	palette   key.Binding
 	menu      key.Binding
 	reset     key.Binding
 	quit      key.Binding
@@ -100,7 +106,7 @@ func (k keymap) ShortHelp() []key.Binding {
 		k.move,
 		k.zoom,
 		k.speed,
-		k.tick,
+		k.palette,
 		k.menu,
 		k.quit,
 	}

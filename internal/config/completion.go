@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 
+	"gabe565.com/cli-of-life/internal/quadtree"
 	"gabe565.com/cli-of-life/internal/rule"
 	"github.com/spf13/cobra"
 )
@@ -19,5 +20,10 @@ func RegisterCompletion(cmd *cobra.Command) error {
 		),
 		cmd.RegisterFlagCompletionFunc(PlayFlag, cobra.NoFileCompletions),
 		cmd.RegisterFlagCompletionFunc(CacheLimitFlag, cobra.NoFileCompletions),
+		cmd.RegisterFlagCompletionFunc(PaletteFlag,
+			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+				return quadtree.PaletteCompletions(), cobra.ShellCompDirectiveNoFileComp
+			},
+		),
 	)
 }
