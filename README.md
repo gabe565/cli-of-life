@@ -126,7 +126,7 @@ See the [LifeWiki for pattern files](https://conwaylife.com/wiki/Category:Patter
 
 | Key      | Description                               |
 |----------|-------------------------------------------|
-| mouse    | Place cells                               |
+| mouse    | Place/erase cells (works at any zoom)     |
 | `space`  | Play/pause                                |
 | `m`      | Toggle between modes: smart, place, erase |
 | `wasd`   | Move the game board                       |
