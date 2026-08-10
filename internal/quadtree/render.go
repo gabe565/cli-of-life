@@ -2,9 +2,8 @@ package quadtree
 
 import (
 	"bytes"
+	"fmt"
 	"image"
-	"slices"
-	"strconv"
 	"strings"
 
 	"charm.land/lipgloss/v2"
@@ -15,7 +14,39 @@ var (
 	colors         []lipgloss.Style
 	halfBlocks     [16]string
 	darkBackground = true
+
+	// Density stops for zoomed-out rendering (sparse → dense). Expanded by lerp
+	// into the runtime palette. Dark terminals use a cool→hot heat map; light
+	// terminals use a pastel→ink scale so sparse cells stay visible.
+	darkDensityStops = [][3]uint8{
+		{11, 29, 81},   // deep navy (also zoom level 0)
+		{26, 75, 140},  // blue
+		{33, 118, 174}, // steel
+		{27, 154, 170}, // teal
+		{46, 196, 182}, // cyan-green
+		{92, 219, 149}, // green
+		{181, 229, 80}, // chartreuse
+		{244, 211, 94}, // yellow
+		{238, 150, 75}, // orange
+		{249, 87, 56},  // red-orange
+		{220, 20, 30},  // red
+	}
+	lightDensityStops = [][3]uint8{
+		{190, 220, 255}, // pale blue (also zoom level 0)
+		{120, 180, 230},
+		{60, 150, 200},
+		{40, 160, 140},
+		{50, 170, 80},
+		{180, 190, 40},
+		{230, 150, 40},
+		{210, 70, 40},
+		{160, 30, 60},
+		{90, 20, 70},
+		{20, 10, 30}, // near-black
+	}
 )
+
+const densityPaletteSize = 24
 
 func init() { //nolint:gochecknoinits
 	buildColors()
@@ -40,19 +71,48 @@ func init() { //nolint:gochecknoinits
 	}
 }
 
-// buildColors builds the density color gradient, ordering it to suit the
-// current background. On light backgrounds the gradient is reversed so that
-// cells stay legible.
+// buildColors builds the density color gradient for the current background.
 func buildColors() {
-	const first, last = 236, 254
-	colors = make([]lipgloss.Style, 0, last-first+2)
-	for i := first; i <= last; i++ {
-		colors = append(colors, lipgloss.NewStyle().Foreground(lipgloss.Color(strconv.Itoa(i))))
-	}
+	stops := darkDensityStops
 	if !darkBackground {
-		slices.Reverse(colors)
+		stops = lightDensityStops
 	}
-	colors = append(colors, lipgloss.NewStyle())
+	colors = make([]lipgloss.Style, 0, densityPaletteSize)
+	for _, rgb := range expandStops(stops, densityPaletteSize) {
+		colors = append(colors, lipgloss.NewStyle().Foreground(lipgloss.Color(rgbHex(rgb))))
+	}
+}
+
+func expandStops(stops [][3]uint8, n int) [][3]uint8 {
+	if n <= 1 || len(stops) == 0 {
+		if len(stops) == 0 {
+			return nil
+		}
+		return [][3]uint8{stops[len(stops)-1]}
+	}
+	out := make([][3]uint8, n)
+	last := len(stops) - 1
+	for i := range n {
+		t := float64(i) / float64(n-1)
+		pos := t * float64(last)
+		lo := int(pos)
+		hi := min(lo+1, last)
+		frac := pos - float64(lo)
+		out[i] = lerpRGB(stops[lo], stops[hi], frac)
+	}
+	return out
+}
+
+func lerpRGB(a, b [3]uint8, t float64) [3]uint8 {
+	return [3]uint8{
+		uint8(float64(a[0]) + (float64(b[0])-float64(a[0]))*t + 0.5),
+		uint8(float64(a[1]) + (float64(b[1])-float64(a[1]))*t + 0.5),
+		uint8(float64(a[2]) + (float64(b[2])-float64(a[2]))*t + 0.5),
+	}
+}
+
+func rgbHex(rgb [3]uint8) string {
+	return fmt.Sprintf("#%02X%02X%02X", rgb[0], rgb[1], rgb[2])
 }
 
 func SetDarkBackground(dark bool) {
@@ -100,7 +160,8 @@ func renderCell(node *Node, level uint8) cell {
 	case node.value == 0:
 		return cell{str: "  ", color: -1}
 	case level == 0:
-		return cell{str: "██", color: len(colors) - 1}
+		// Zoomed-in cells use the cold end of the density scale.
+		return cell{str: "██", color: 0}
 	default:
 		var pattern int
 		if node.NW.value > 0 {
