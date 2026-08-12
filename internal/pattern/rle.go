@@ -8,6 +8,7 @@ import (
 	"io"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"gabe565.com/cli-of-life/internal/rule"
 )
@@ -115,4 +116,104 @@ scan:
 	}
 	pattern.Tree.SetReset()
 	return pattern, nil
+}
+
+const rleLineLength = 70
+
+func MarshalRLE(w io.Writer, p *Pattern) error {
+	bw := bufio.NewWriter(w)
+
+	if p.Name != "" {
+		if _, err := fmt.Fprintf(bw, "#N %s\n", p.Name); err != nil {
+			return err
+		}
+	}
+	if p.Author != "" {
+		if _, err := fmt.Fprintf(bw, "#O %s\n", p.Author); err != nil {
+			return err
+		}
+	}
+	for _, line := range strings.Split(p.Comment, "\n") {
+		if line == "" {
+			continue
+		}
+		if _, err := fmt.Fprintf(bw, "#C %s\n", line); err != nil {
+			return err
+		}
+	}
+
+	grid := p.Tree.ToSlice()
+	height := len(grid)
+	width := 0
+	if height != 0 {
+		width = len(grid[0])
+	}
+
+	if _, err := fmt.Fprintf(bw, "x = %d, y = %d, rule = %s\n", width, height, p.Rule.String()); err != nil {
+		return err
+	}
+
+	var tokens []string
+	for y, row := range grid {
+		runChar := byte(0)
+		runCount := 0
+		flush := func() {
+			if runCount == 0 {
+				return
+			}
+			c := byte('b')
+			if runChar != 0 {
+				c = 'o'
+			}
+			token := string(c)
+			if runCount > 1 {
+				token = strconv.Itoa(runCount) + token
+			}
+			tokens = append(tokens, token)
+			runCount = 0
+		}
+
+		for _, v := range row {
+			c := byte(0)
+			if v != 0 {
+				c = 1
+			}
+			if runCount > 0 && c != runChar {
+				flush()
+			}
+			runChar = c
+			runCount++
+		}
+		if runChar != 0 {
+			flush()
+		} else {
+			runCount = 0
+		}
+
+		if y < height-1 {
+			tokens = append(tokens, "$")
+		}
+	}
+	tokens = append(tokens, "!")
+
+	var lineLen int
+	for i, token := range tokens {
+		if lineLen != 0 && lineLen+len(token) > rleLineLength {
+			if _, err := bw.WriteString("\n"); err != nil {
+				return err
+			}
+			lineLen = 0
+		}
+		if _, err := bw.WriteString(token); err != nil {
+			return err
+		}
+		lineLen += len(token)
+		if i == len(tokens)-1 {
+			if _, err := bw.WriteString("\n"); err != nil {
+				return err
+			}
+		}
+	}
+
+	return bw.Flush()
 }

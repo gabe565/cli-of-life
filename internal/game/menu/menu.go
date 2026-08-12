@@ -32,6 +32,7 @@ const (
 	BtnReset  = "Reset Game"
 	BtnNew    = "New Game"
 	BtnLoad   = "Load Pattern"
+	BtnSave   = "Save Pattern"
 	BtnQuit   = "Quit"
 )
 
@@ -44,10 +45,11 @@ func NewMenu(conf *config.Config, conway *conway.Conway) *Menu {
 		styles: newStyles(),
 
 		conway:  conway,
-		buttons: buttons.New(BtnResume, BtnReset, BtnNew, BtnLoad, BtnQuit),
+		buttons: buttons.New(BtnResume, BtnReset, BtnNew, BtnLoad, BtnSave, BtnQuit),
 	}
 	m.buttons.List[0].Hidden = true
 	m.buttons.List[1].Hidden = true
+	m.buttons.List[4].Hidden = true
 	return m
 }
 
@@ -63,6 +65,9 @@ type Menu struct {
 	buttons    *buttons.Buttons
 	form       *huh.Form
 	patternSrc string
+
+	saveFilename   string
+	onFormComplete func() tea.Cmd
 
 	error error
 }
@@ -94,6 +99,11 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch m.form.State {
 		case huh.StateCompleted:
 			m.form = nil
+			if m.onFormComplete != nil {
+				cmd := m.onFormComplete
+				m.onFormComplete = nil
+				return m, cmd()
+			}
 			defer func() {
 				m.patternSrc = ""
 			}()
@@ -110,6 +120,7 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case huh.StateAborted:
 			m.form = nil
+			m.onFormComplete = nil
 			return m, nil
 		default:
 			return m, cmd
@@ -122,6 +133,7 @@ func (m *Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			empty := m.conway.Pattern.Tree.IsEmpty()
 			m.buttons.List[0].Hidden = empty
 			m.buttons.List[1].Hidden = empty
+			m.buttons.List[4].Hidden = empty
 			m.buttons.Active = 0
 		}
 	case tea.KeyPressMsg:
@@ -174,6 +186,15 @@ func (m *Menu) LoadPattern() tea.Cmd {
 	m.conway.Pattern = p
 	m.conway.ResetView()
 	return commands.ChangeView(commands.Conway)
+}
+
+func (m *Menu) SavePattern() tea.Cmd {
+	if err := pattern.MarshalFile(m.saveFilename, m.conway.Pattern); err != nil {
+		m.error = err
+	} else {
+		m.error = nil
+	}
+	return nil
 }
 
 func (m *Menu) SetDark(dark bool) {
