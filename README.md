@@ -150,6 +150,8 @@ From the live view status bar, press `p` to cycle through these options.
 | Key      | Description                               |
 |----------|-------------------------------------------|
 | mouse    | Place/erase cells (works at any zoom)     |
+| scroll   | Zoom in/out toward cursor                 |
+| middle   | Click and drag to pan the board           |
 | `space`  | Play/pause                                |
 | `m`      | Toggle between modes: smart, place, erase |
 | `p`      | Cycle density palette                     |

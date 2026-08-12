@@ -43,21 +43,23 @@ func NewConway(conf *config.Config) *Conway {
 }
 
 type Conway struct {
-	viewSize      tea.WindowSizeMsg
-	gameSize      image.Point
-	view          image.Point
-	level         uint8
-	Pattern       *pattern.Pattern
-	ctx           context.Context
-	cancel        context.CancelFunc
-	ResumeOnFocus bool
-	keymap        keymap
-	help          help.Model
-	mode          Mode
-	smartVal      int
-	speed         int
-	viewBuf       bytes.Buffer
-	debug         bool
+	viewSize       tea.WindowSizeMsg
+	gameSize       image.Point
+	view           image.Point
+	level          uint8
+	Pattern        *pattern.Pattern
+	ctx            context.Context
+	cancel         context.CancelFunc
+	ResumeOnFocus  bool
+	keymap         keymap
+	help           help.Model
+	mode           Mode
+	smartVal       int
+	speed          int
+	viewBuf        bytes.Buffer
+	debug          bool
+	middleDragging bool
+	lastMouse      image.Point
 }
 
 func (c *Conway) Init() tea.Cmd {
@@ -90,22 +92,34 @@ func (c *Conway) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		mouse := msg.Mouse()
 		switch msg.(type) {
 		case tea.MouseClickMsg, tea.MouseMotionMsg:
-			if mouse.Button == tea.MouseLeft {
+			switch mouse.Button {
+			case tea.MouseLeft:
 				c.paintAtMouse(mouse.X, mouse.Y)
+			case tea.MouseMiddle:
+				if _, isClick := msg.(tea.MouseClickMsg); isClick {
+					c.middleDragging = true
+					c.lastMouse = image.Pt(mouse.X, mouse.Y)
+				} else if c.middleDragging {
+					c.panByMouseDrag(c.lastMouse.X, c.lastMouse.Y, mouse.X, mouse.Y)
+					c.lastMouse = image.Pt(mouse.X, mouse.Y)
+				}
 			}
 		case tea.MouseWheelMsg:
 			switch mouse.Button {
 			case tea.MouseWheelUp:
-				c.Scroll(DirUp, 1)
+				c.zoomAtMouse(mouse.X, mouse.Y, true)
 			case tea.MouseWheelLeft:
 				c.Scroll(DirLeft, 2)
 			case tea.MouseWheelDown:
-				c.Scroll(DirDown, 1)
+				c.zoomAtMouse(mouse.X, mouse.Y, false)
 			case tea.MouseWheelRight:
 				c.Scroll(DirRight, 2)
 			}
 		case tea.MouseReleaseMsg:
 			c.smartVal = -1
+			if mouse.Button == tea.MouseMiddle {
+				c.middleDragging = false
+			}
 		}
 	case tea.KeyPressMsg:
 		switch {
@@ -269,6 +283,41 @@ func (c *Conway) mouseToWorldRect(mouseX, mouseY int) image.Rectangle {
 	x := c.view.X + (mouseX/2)*skip
 	y := c.view.Y + mouseY*skip
 	return image.Rect(x, y, x+skip, y+skip)
+}
+
+// zoomAtMouse changes zoom by one level while keeping the world cell under the
+// cursor stable. zoomIn true decreases level (closer); false increases it.
+func (c *Conway) zoomAtMouse(mouseX, mouseY int, zoomIn bool) {
+	if c.Pattern == nil || c.gameSize.Eq(image.Pt(0, 0)) {
+		return
+	}
+	if zoomIn {
+		if c.level == 0 {
+			return
+		}
+	} else if c.level >= c.Pattern.Tree.Level()-2 {
+		return
+	}
+
+	focus := c.mouseToWorldRect(mouseX, mouseY).Min
+	if zoomIn {
+		c.level--
+		c.gameSize = c.gameSize.Div(2)
+	} else {
+		c.level++
+		c.gameSize = c.gameSize.Mul(2)
+	}
+	newSkip := 1 << c.level
+	c.view.X = focus.X - (mouseX/2)*newSkip
+	c.view.Y = focus.Y - mouseY*newSkip
+}
+
+// panByMouseDrag moves the view so the board follows a middle-button drag
+// (grab-and-drag). Screen cells are two columns wide; zoom scales the delta.
+func (c *Conway) panByMouseDrag(lastX, lastY, mouseX, mouseY int) {
+	skip := 1 << c.level
+	c.view.X += (lastX/2 - mouseX/2) * skip
+	c.view.Y += (lastY - mouseY) * skip
 }
 
 func (c *Conway) regionHasAlive(rect image.Rectangle) bool {
