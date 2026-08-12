@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"image"
 	"io"
+	"strings"
 )
 
 func UnmarshalPlaintext(r io.Reader) (*Pattern, error) {
@@ -49,4 +50,44 @@ func UnmarshalPlaintext(r io.Reader) (*Pattern, error) {
 	}
 	pattern.Tree.SetReset()
 	return pattern, nil
+}
+
+func MarshalPlaintext(w io.Writer, p *Pattern) error {
+	bw := bufio.NewWriter(w)
+
+	if p.Name != "" {
+		if _, err := fmt.Fprintf(bw, "!Name: %s\n", p.Name); err != nil {
+			return err
+		}
+	}
+	if p.Author != "" {
+		if _, err := fmt.Fprintf(bw, "!Author: %s\n", p.Author); err != nil {
+			return err
+		}
+	}
+	for _, line := range strings.Split(p.Comment, "\n") {
+		if line == "" {
+			continue
+		}
+		if _, err := fmt.Fprintf(bw, "!%s\n", line); err != nil {
+			return err
+		}
+	}
+
+	for _, row := range p.Tree.ToSlice() {
+		line := make([]byte, len(row))
+		for x, v := range row {
+			if v != 0 {
+				line[x] = 'O'
+			} else {
+				line[x] = '.'
+			}
+		}
+		line = append(line, '\n')
+		if _, err := bw.Write(line); err != nil {
+			return err
+		}
+	}
+
+	return bw.Flush()
 }

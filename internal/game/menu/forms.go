@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
@@ -147,6 +148,37 @@ func (m *Menu) patternURLForm() tea.Cmd {
 				Accessor(&trimSpaceAccessor{&m.config.Pattern}),
 		),
 	)
+	return m.initForm()
+}
+
+func (m *Menu) savePatternForm() tea.Cmd {
+	ne := huh.ValidateNotEmpty()
+	m.saveFilename = ""
+	m.form = util.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Title("Save Pattern As").
+				Description("  Enter a file path. Extension defaults to .rle\n  (use .cells for the plaintext format).\n").
+				Placeholder("pattern" + pattern.ExtRLE).
+				Validate(func(s string) error {
+					if err := ne(s); err != nil {
+						return err
+					}
+					if strings.Contains(s, "\n") {
+						return ErrLineBreak
+					}
+					return nil
+				}).
+				Accessor(&trimSpaceAccessor{&m.saveFilename}),
+		),
+	)
+	m.onFormComplete = func() tea.Cmd {
+		ext := filepath.Ext(m.saveFilename)
+		if ext != pattern.ExtRLE && ext != pattern.ExtPlaintext {
+			m.saveFilename += pattern.ExtRLE
+		}
+		return m.SavePattern()
+	}
 	return m.initForm()
 }
 

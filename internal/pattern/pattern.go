@@ -103,6 +103,24 @@ func UnmarshalFile(path string) (*Pattern, error) {
 	}
 }
 
+func MarshalFile(path string, p *Pattern) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = f.Close()
+	}()
+
+	ext := filepath.Ext(path)
+	switch ext {
+	case ExtPlaintext:
+		return MarshalPlaintext(f, p)
+	default:
+		return MarshalRLE(f, p)
+	}
+}
+
 var ErrResponse = errors.New("HTTP error")
 
 func UnmarshalURL(ctx context.Context, url string) (*Pattern, error) {

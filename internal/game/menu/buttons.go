@@ -19,6 +19,8 @@ func (m *Menu) handleButtonPress(btn *buttons.Button) tea.Cmd {
 		return commands.ChangeView(commands.Conway)
 	case BtnLoad:
 		return m.loadPatternForm()
+	case BtnSave:
+		return m.savePatternForm()
 	case BtnQuit:
 		return tea.Quit
 	default:
