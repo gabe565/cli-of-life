@@ -1,6 +1,6 @@
 module gabe565.com/cli-of-life
 
-go 1.26.5
+go 1.27.1
 
 require (
 	charm.land/bubbles/v2 v2.1.1
